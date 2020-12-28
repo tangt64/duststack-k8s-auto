@@ -1,0 +1,15 @@
+---
+# tasks file for k18s-master
+- include_tasks: docker.yaml
+  when: runtime_enviroment == "docker"
+
+- include_tasks: crio.yaml
+  when: runtime_enviroment == "crio"
+
+- include_tasks: flanned.yaml
+  when: k8s_network == "flanned"
+
+- include_tasks: calico.yaml
+  when: k8s_network == "calico"
+
+- include_tasks: kubeconfig.yaml

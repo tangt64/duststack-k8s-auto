@@ -1,0 +1,22 @@
+- name: install packages
+  yum:
+    name: keepalived 
+    state: latest
+
+- name: install configuration
+  template:
+    src: keepalived.conf.j2 
+    dest: /etc/keepalived/keepalived.conf
+
+- name: start services
+  tags: service
+  systemd:
+    name: keepalived 
+    state: restarted 
+    enabled: yes
+  when: not ansible_check_mode|bool
+
+- name: verify vip is available
+  debug: 
+    msg: "{{ ansible_hostname}} have {{ ansible_all_ipv4_addresses }}"
+  when: internal_vip_address in ansible_all_ipv4_addresses

@@ -1,0 +1,13 @@
+# kubernetes inventory file
+
+[k8s_master]
+192.168.90.210 hostname=master1 nodename=master1
+192.168.90.220 hostname=master2 nodename=master2
+192.168.90.230 hostname=master2 nodename=master2
+
+[k8s_node]
+192.168.90.240 hostname=node1 nodename=node1
+192.168.90.250 hostname=node2 nodename=node2
+
+[k8s_utility]
+192.168.90.200 hostname=utility nodename=utility

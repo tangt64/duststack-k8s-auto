@@ -1,0 +1,4 @@
+- name: install helm on the master node
+  hosts: "{{ groups['k8s_master'] | first }}"
+  roles:
+    - helm/base

@@ -1,0 +1,21 @@
+---
+- name: copy a kubelet configuration file to /etc/sysconfig/kubelet
+  copy:
+    src: kubelet
+    dest: /etc/sysconfig/kubelet
+
+- name: template to a cri-o bridge network file
+  template:
+    src: 100-crio-bridge.conf.j2
+    dest: /etc/cni/net.d/100-crio-bridge.conf
+
+- name: enable openshift repository for cri-o
+  yum:
+    name: centos-release-openshift-origin311
+    state: latest
+
+- name: restart to cri-o service   
+  service: 
+    name: crio
+    state: restarted
+    enabled: yes

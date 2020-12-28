@@ -1,0 +1,5 @@
+- hosts: k8s_master:k8s_node
+
+  tasks:
+  - name: uninstall kubernetes all nodes
+    command: kubeadm reset --force

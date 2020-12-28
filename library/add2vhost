@@ -1,0 +1,31 @@
+#!/bin/bash
+sudo bash -c 'cat <<EOF>> /etc/hosts
+#
+# kubernetes nodes
+#
+192.168.90.210 master1.example.com master1 
+192.168.90.220 master2.example.com master2
+192.168.90.230 master3.example.com master3
+192.168.90.240 node1.example.com node1 
+192.168.90.250 node2.example.com node2
+192.168.90.200 utility.example.com utility
+
+#
+# openstakck nodes
+#
+192.168.90.110 node1.example.com node1
+192.168.90.120 node2.example.com node2
+192.168.90.130 node3.example.com node3
+192.168.90.140 node4.example.com node4
+
+#
+# openshift nodes
+#
+
+#
+# storage nodes
+#
+
+EOF'
+
+

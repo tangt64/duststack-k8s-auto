@@ -1,0 +1,20 @@
+- name: install and enable to cri-o,docker enviroment
+  hosts: k8s_master:k8s_node
+  tags: k8s-prepare
+  roles:  
+    - { role: crio, when: runtime_enviroment == "crio" }
+    - { role: docker-ce, when: runtime_enviroment == "docker" }
+    - { role: k8s-prepare }
+
+- name: install kubernetes master on the node
+  hosts: k8s_master
+  tags: k8s-master
+  roles:  
+    - k8s-master
+    - nginx-ingress
+
+- name: install kubernetes node
+  hosts: k8s_node
+  tags: k8s-node
+  roles:  
+    - k8s-node

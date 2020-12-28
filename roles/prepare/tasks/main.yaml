@@ -1,0 +1,54 @@
+- name: install {{ openstack_release }}
+  package: 
+    name: centos-release-openstack-{{ openstack_release }} 
+    state: latest
+
+- name: install support files for {{ openstack_release }}
+  package: name={{ item }} state=latest
+  with_items:
+    - python-openstackclient
+    - openstack-selinux
+    - epel-release
+
+- name: setup limits
+  copy: src=limits-openstack.conf dest=/etc/security/limits.d/30-openstack.conf 
+
+- name: generate environment
+  lineinfile: line="export {{ item.key }}={{ item.value }}" dest=/root/openstack-admin.rc state=present create=yes
+  tags: config
+  with_dict: "{{ openstack_env }}"
+
+- name: make workdir
+  tags: config
+  local_action: file dest={{ inventory_dir }}/workdir state=directory
+  run_once: true
+
+- name: generate services.xml
+  tags:
+    - config
+    - clinit
+  local_action: template src="services.xml.j2" dest={{ inventory_dir }}/workdir/services.xml
+  run_once: true
+
+- name: Stop and disabled firewalld
+  tags: config
+  systemd: name=firewalld state=stopped enabled=no
+
+- name: Install iptables-services package
+  tags: config
+  yum: name=iptables-services state=installed
+
+- name: Start and enabled iptables service
+  tags: config
+  systemd: name=iptables state=started enabled=yes
+
+- name: insert into iptables port policy for OpenStack services
+  shell: "{{ item }}"
+  with_items:
+    - 'iptables -F'
+    - 'iptables-save > /etc/sysconfig/iptables'
+
+- name: Temporary SELinux stop
+  tags: config
+  selinux: 
+    state: disabled

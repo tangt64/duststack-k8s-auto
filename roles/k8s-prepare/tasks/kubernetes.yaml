@@ -1,0 +1,24 @@
+---
+- name: repository kubernetes for YUM 
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: install to kubeadm
+  yum:
+    name: kubeadm
+    state: latest
+
+- name: start kubelet service
+  service:
+    name: kubelet
+    enabled: yes
+    state: started
+
+- name: copy the kubernetes repository file into /etc/yum.repos.d/
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: import kubernetes GPG key file from kubernetes server
+  command: rpmkeys --import https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg

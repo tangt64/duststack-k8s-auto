@@ -1,0 +1,15 @@
+- name: enable firewalld services and ports
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: yes
+    immediate: yes
+  with_items:
+    - "6443/tcp"
+    - "2379-2380/tcp"
+    - "10250/tcp"
+    - "10251/tcp"
+    - "10252/tcp"
+    - "10255/tcp"
+    - "30000-32767/tcp"
+    - "179/tcp"

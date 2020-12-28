@@ -1,0 +1,4 @@
+- name: install dashboard on master node
+  hosts: "{{ groups['k8s_master'] | first }}"
+  roles:
+    - k8s-dashboard

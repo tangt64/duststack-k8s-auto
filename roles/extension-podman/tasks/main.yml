@@ -1,0 +1,20 @@
+---
+# tasks file for podman
+- name: podman controller install
+  yum:
+    name: podman
+    state: latest
+
+- name: emulate docker CLI package
+  yum:
+    name: podman-docker
+    state: latest
+
+- name: enabled to podman service
+  service:
+    name: podman
+    state: started
+    enabled: yes
+    
+
+

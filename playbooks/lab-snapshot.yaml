@@ -1,0 +1,5 @@
+- name: make a snapshot from libvirtd
+  hosts: 127.0.0.1
+  tags: snapshot-save
+  roles:  
+    - virt-snapshot

@@ -1,0 +1,22 @@
+- name: install HPA chart by helm
+  shell: helm install --name metrics-server stable/metrics-server  --namespace metrics --set args={"--kubelet-insecure-tls=true,--kubelet-preferred-address-types=InternalIP\,Hostname\,ExternalIP"}
+
+- name: copy the sample deployment file
+  copy:
+    src: autoscale-example.yaml
+    dest: /tmp/autoscale-example.yaml
+
+- name: apply sample HPA stage1
+  command: kubectl create namespace hpa-sample
+
+- name: apply sample HPA stage2
+  command: kubectl create -f /tmp/hpa-sample
+
+- name: apply sample HPA deployment
+  command: kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10
+
+- deubg:
+    msg: kubectl run php-apache --image=gcr.io/google_containers/hpa-example --requests=cpu=100m,memory=100M --expose --port=80
+
+- deubg:
+    msg: wget -q -O- http://php-apache.default.svc.cluster.local
