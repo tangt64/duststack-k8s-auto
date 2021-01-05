@@ -9,7 +9,7 @@ k8s_network: calico
 
 ntp_server1: '3.kr.pool.ntp.org'
 ntp_server2: '0.asia.pool.ntp.org'
-TimeZone: 'Asia/Seoul'
+time_zone: 'Asia/Seoul'
 
 internal_vip_address: 192.168.90.250
 internal_vip_address_cinder: 24

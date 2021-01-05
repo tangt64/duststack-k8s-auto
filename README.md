@@ -1,101 +1,53 @@
-# Ansible Playbook: duststack
+# 쿠버네티스 설치
 
-## Describe of Project
+## 프로젝트 설명
 
-This Playbook builds for OpenStack/oVirt/Kubernetes Hybrid project playbook. You can use it as want as you can.
+앤서블 기반으로 쿠버네티스 설치를 도와주는 도구 입니다. 현재 이 도구는 CentOS/RHEL를 지원하고 있으며, 추후에 Debian/Ubuntu지원할 예정 입니다.
 
-** The provisioning problem has been solved. :) **
-** This playbook would not support a container mode. **
+바로 상용환경에서 사용이 가능하도록 설치 및 구성할 수 있도록 환경을 제공해주는게 주요 프로젝트의 목적 입니다. 지원하는 기능은 아래와 같습니다.
 
-## Announcement
+- CentOS 7 and CentOS 8 Stream
+- Debian and Ubuntu
+- CI/CD 지원
+- 컨테이너 스토리지 시스템 지원
+- HA/Router/Helm 같은 확장 기능 지원
 
-- **The placement** has a little problem. It will correct in future. **The Nova service** still useable it.
-- Kubernetes will be installed based on **CRI-O** container runtime.
-- The Playbook still working and building by someone.
-- The OpenStack version on **rocky**. But, I will support another OpenStack version.
-- The playbook commit will be late because I am super busy and lazy also too.
+## 알림사항
 
-## FAQ
+- CentOS 7/8버전에서 제일 안정적으로 설치가 지원 됩니다.
+- Debian/Ubuntu는 곧 지원할 예정입니다.
+  
+  **아직은 개발버전 입니다** 
 
-### Why the playbook update not often?
-
-> Busy and Busy. 
-
-### What is the difference between OpenStack Ansible and Duststack?
-
-> Offical vs UnOffical
-
-### Is Support other distribution?
-
-> Yes, It will support such as Debian and Slackware
-
-### What for this playbook propose?
-
-> Intergration for OpenStack or oVIrt with Kubernetes
-
-## Specification
+## 컴퓨터 사양
 
 * **CPU:** Intel E5 or AMD Ryzen 7 3700X (Physical 8 core)
 * **Memory:** Minimun 8 GiB
 * **Disk:** least 500GiB HDD or SSD 1TiB Recommend
 * **NIC:** least 1GiB 
 
-This Playbook can use on bare-metal machines or Virtual Machines as you want.
+이 환경은 가상 및 물리적 환경 설치를 지원 합니다.
 
-## How can do install the LAB
+## 가상머신에 설치하는 방법
 
-### Build a vLAB enviroment
+### 가상머신 구성
 
-If you wanna do build a OpenStack Lab, Use this command. 
-
-```bash
-# ansible-playbook -i inventory/classroom -e lab=openstack playbooks/classroom.yaml
-```
-
-If you wanna do build a Kubernetes Lab, Use this command.
+가상머신을 생성하려면 다음과 같은 명령어로 실행 합니다.
 
 ```bash
-# ansible-playbook -i inventory/classroom -e lab=kubernetes playbooks/classroom.yaml
-# library/sshkeygensend.sh
+# ansible-playbook -i inventory/classroom playbooks/classroom.yaml
 ```
 
-If you want to make a SSH private/public key, use the this a shell script.
+위의 명령어를 실행하면, 한대의 master와 3대의 node가 구성이 됩니다. 멀티 컨트롤노드가 필요한 경우에는 아래처럼 변경 합니다.
 
-```bash
-librar/sshkeygensend.sh [ openstack | kubernetes ]
-```
 
-### Prepare for install
+## 문의
 
-You should install these are packages on your baremetal machine
+다른 문의사항이 있으시면 아래로 연락 주세요! :)
 
-```bash
-# yum install ansible git -y
-# yum group install "Virtualization Host" -y
-# git clone http://git.howtodothat.kr/tang/duststack
-```
-
-Run the playbook for OpenStack or Kubernetes
-
-```bash
-# ansible-playbook -i inventory/openstack playbooks/openstack.yaml
-# ansiple-playbook -i inventory/kubernetes playbooks/kubernetes.yaml
-```
-
-## openstack/kubernetes install video
-
-[![kubernetes install video]()](https://youtu.be/cZyi61Oncrg)
-
-The **group_vars** has two directories. The **classroom** directory use for LAB. Another group_var **all** directory has the OpenStack and kubernetes.
-
-## Contact
-
-If you have question please send a mail
-
-**E-Mail:** <gochoi@redhat.com>
+**E-Mail:** <bluehelix@gmail.com>
 **Name:** 최국현(Choi Gook Hyun)
 
 ## License
 
-MIT 라이센스
-[MIT](LICENSE)
+GNU 2라이센스
