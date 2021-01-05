@@ -18,24 +18,23 @@
 
 - name: allow http service to firewalld service
   firewalld:
-    service: http
+    port: 8080/tcp
     permanent: yes
     immediate: yes
     state: enabled
-    zone: "{{ item }}"
-  with_items:
-    - libvirt
-    - public
+    zone: public
+
+- name: copy httpd.py server
+  template:
+    src: httpd.py
+    dest: "{{ k8s_work_dir }}"
+
+- name: start python httpd server
+  shell: "nohup python3 {{ k8s_work_dir }}/httpd.py &"
 
 - name: start libvirt daemon
   service:
     name: libvirtd
-    state: started
-    enabled: yes
-
-- name: start httpd service
-  service:
-    name: httpd
     state: started
     enabled: yes
 

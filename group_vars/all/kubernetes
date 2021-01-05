@@ -1,6 +1,8 @@
 subnetnetwork: 10.244.0.0/16
 vip_enabled: false
 
+k8s_work_dir: /opt/workdir/
+
 #runtime enviroment docker, crio
 runtime_enviroment: crio
 
