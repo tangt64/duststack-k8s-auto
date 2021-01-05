@@ -43,10 +43,10 @@
     command: list_vms
   register: virt_vms
 
-- name: copy a anaconda files to /var/www/html
+- name: copy a anaconda files to {{ k8s_work_dir }}
   copy:
     src: "{{ item }}.ks"
-    dest: "{{ local_apache_htdoc_directory }}{{ item }}.ks"
+    dest: "{{ k8s_work_dir }}{{ item }}.ks"
     owner: root
     group: root
     mode: 0644
@@ -57,7 +57,7 @@
 
 - name: adjust to kickstart .ks file permission 
   file:
-    path: "{{ local_apache_htdoc_directory }}{{ item }}.ks"
+    path: "{{ k8s_work_dir }}{{ item }}.ks"
     owner: root
     group: root
     mode: 0644
