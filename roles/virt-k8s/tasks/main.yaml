@@ -12,7 +12,7 @@
 
 - name: install libvirt daemon, python-libvirt and httpd packages
   yum:
-    name: ['libvirt-daemon-*','httpd','python2-lxml','python3-lxml']
+    name: ['libvirt-daemon-*']
     state: latest
   when: install_status.rc == 0
 
