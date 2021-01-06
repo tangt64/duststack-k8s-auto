@@ -10,7 +10,7 @@
     - virt-install
     - virt-manager
 
-- name: install libvirt daemon, python-libvirt and httpd packages
+- name: install libvirt daemon 
   yum:
     name: ['libvirt-daemon-*']
     state: latest
