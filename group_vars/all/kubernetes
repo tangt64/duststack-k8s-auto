@@ -2,6 +2,7 @@ subnetnetwork: 10.244.0.0/16
 vip_enabled: false
 
 k8s_work_dir: /opt/workdir/
+kickstart_address: http://192.168.122.1:8080
 
 #runtime enviroment docker, crio
 runtime_enviroment: crio
