@@ -24,8 +24,7 @@ skipx
 firewall --disabled
 # Network information
 network  --bootproto=static --device=eth0 --gateway=192.168.122.1 --ip=192.168.122.250 --nameserver=8.8.8.8 --netmask=255.255.255.0 --hostname=node2.example.com
-network  --bootproto=static --device=eth1 --ip=192.168.90.250 --netmask=255.255.255.0 --nodns
-# Reboot after installation
+network  --bootproto=static --device=eth1 --ip=192.168.90.250 --netmask=255.255.255.0 --nodefroute --nameserver=192.168.122.200
 reboot
 # System timezone
 timezone Asia/Seoul
