@@ -2,11 +2,11 @@
 # tasks file for k18s-master
 - name: copy kube-calico file to root home directory
   copy:
-   src: kube-calico.yaml
-   dest: /tmp/kube-calico.yaml
+   src: calico-3.8.2.yaml
+   dest: /tmp/calico-3.8.2.yaml
 
 - name: apply to kube-calico on kubernetes cluster
-  command: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/calico-3.8.2.yaml
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/calico-3.8.2.yaml
 
 - name: Change the autodetection method for calico interface
-  command: kubectl set env daemonset/calico-node -n kube-system IP_AUTODETECTION_METHOD=interface={{ k8s_interface }}
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl set env daemonset/calico-node -n kube-system IP_AUTODETECTION_METHOD=interface={{ k8s_interface }}
