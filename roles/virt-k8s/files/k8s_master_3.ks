@@ -47,7 +47,7 @@ cat <<EOF>> /etc/hosts
 192.168.90.230 master3.example.com master3
 192.168.90.240 node1.example.com node1
 192.168.90.250 node2.example.com node2
-192.168.90.260 utility.example.com utility
+192.168.90.200 utility.example.com utility
 EOF
 
 cat <<EOF> /root/.vimrc
