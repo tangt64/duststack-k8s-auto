@@ -6,4 +6,7 @@
    dest: /tmp/kube-calico.yaml
 
 - name: apply to kube-calico on kubernetes cluster
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/kube-calico.yaml
+  command: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/calico-3.8.2.yaml
+
+- name: Change the autodetection method for calico interface
+  command: kubectl set env daemonset/calico-node -n kube-system IP_AUTODETECTION_METHOD=interface={{ k8s_interface }}
