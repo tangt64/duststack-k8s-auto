@@ -9,6 +9,7 @@
     - libvirt-client
     - virt-install
     - virt-manager
+    - python3
 
 - name: install libvirt daemon 
   yum:
