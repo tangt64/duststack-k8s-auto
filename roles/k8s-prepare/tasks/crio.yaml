@@ -9,13 +9,8 @@
     src: 100-crio-bridge.conf.j2
     dest: /etc/cni/net.d/100-crio-bridge.conf
 
-- name: enable openshift repository for cri-o
-  yum:
-    name: centos-release-openshift-origin311
-    state: latest
-
-- name: restart to cri-o service   
-  service: 
+- name: restart to cri-o service
+  service:
     name: crio
     state: restarted
     enabled: yes
