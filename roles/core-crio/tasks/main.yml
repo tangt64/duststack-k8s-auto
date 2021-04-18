@@ -6,6 +6,11 @@
     - overlay
     - br_netfilter
 
+- name: disbaled to the ansible-26 repository file
+  file:
+    path: /etc/yum.repos.d/CentOS-ANSIBLE.repo
+    state: absent
+
 - name: enable repository for cri-o
   copy:
     src: "{{ item }}"
@@ -14,17 +19,17 @@
     - devel:kubic:libcontainers:stable:cri-o:1.18:1.18.3.repo
     - devel:kubic:libcontainers:stable.repo
 
-- name: install to cri-o 
+- name: install to cri-o
   yum:
     name: cri-o
     state: latest
 
-- name: update to system packages 
+- name: update to system packages
   yum:
     name: '*'
     state: latest
     exclude: kernel*
-    
+
 - name: net.bridge.bridge-nf-call-iptables, net.ipv4.ip_forward, net.bridge.bridge-nf-call-ip6tables
   lineinfile:
     path: /etc/sysctl.d/99-kubernetes-cri.conf
