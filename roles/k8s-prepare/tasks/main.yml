@@ -6,9 +6,9 @@
 - include_tasks: selinux.yaml
 
 - include_tasks: crio.yaml
-  when: runtime_enviroment == "crio"
-#- include_tasks: docker.yaml
-#  when: runtime_enviroment == "docker"
+  when: runtime_environment == "crio"
+- include_tasks: docker.yaml
+  when: runtime_environment == "docker"
 - include_tasks: kubernetes.yaml
 
 
