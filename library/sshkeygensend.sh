@@ -1,3 +1,7 @@
+keyName=$2
+
+echo $keyName
+
 case "$1" in
   openstack)
     server=$(awk '{ print $2 }' /etc/hosts | grep -e 'node1' -e 'node2' -e 'node3' -e 'node4' )
@@ -8,26 +12,24 @@ case "$1" in
     password=kubernetes
     ;;
   *)
-    echo "Using: $1 {openstack|kubernetes}"
+    echo "Using: $1 {openstack|kubernetes} {rsa_key_name}"
     exit 1
 esac
 
-
 function sendkeys(){
-  for ipadr in ${server} ; do sshpass -p ${password} ssh-copy-id -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@${ipadr} > /dev/null 2>&1 ; done
-exit
+  for ipadr in ${server} ; do echo $Server ${server} && sshpass -p ${password} ssh-copy-id -i $HOME/.ssh/$keyName -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@${ipadr} ; done
   for ipadr in ${server} ; do ssh-keyscan ${server} >> $HOME/.ssh/known_hosts ; done
 }
 
 function genkeys(){
-  ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa > /dev/null 2>&1 
+  ssh-keygen -t rsa -N '' -f $HOME/.ssh/$keyName
 }
 
-if [ -f ~/.ssh/id_rsa ]; then
+if [ -f $HOME/.ssh/$2 ]; then
   echo "the file exist. passed it"
-  sendkeys
+  sendkeys $2
 else
   echo "make a keys and send key to hosts"
-  genkeys
-  sendkeys
+  genkeys $keyName
+  sendkeys $keyName
 fi
