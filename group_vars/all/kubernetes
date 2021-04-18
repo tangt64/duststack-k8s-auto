@@ -4,8 +4,7 @@ vip_enabled: false
 k8s_work_dir: /opt/workdir/
 kickstart_address: http://192.168.122.1:8080
 
-#runtime enviroment docker, crio
-runtime_enviroment: crio
+runtime_environment: crio
 
 # support calico, flanned
 k8s_network: calico
