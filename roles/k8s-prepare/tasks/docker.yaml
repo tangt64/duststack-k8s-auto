@@ -7,7 +7,6 @@
     gpgcheck: no
     enabled: yes
 
-
 - name: check to docker if already install remove from a host
   block:
     - name: install new docker-ce version
