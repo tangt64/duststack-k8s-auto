@@ -1,5 +1,5 @@
 ---
-- name: repository kubernetes for YUM 
+- name: repository kubernetes for YUM
   copy:
     src: kubernetes.repo
     dest: /etc/yum.repos.d/kubernetes.repo
