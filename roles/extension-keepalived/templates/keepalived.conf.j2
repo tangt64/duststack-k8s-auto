@@ -1,0 +1,11 @@
+vrrp_instance internal_vip_01 {
+    state ACTIVE
+    nopreempt
+    interface {{ ansible_eth1.device }}
+    virtual_router_id 01
+    priority {{ groups['controller'].index(inventory_hostname) + 1 }}
+    advert_int 1
+    virtual_ipaddress {
+        {{ internal_vip_address }}/24 dev {{ ansible_eth1.device }}
+    }
+}

@@ -1,0 +1,11 @@
+---
+# tasks file for k18s-master
+#
+#
+- name: copy kube-flannel.yml file to root home directory
+  copy:
+   src: kube-flannel.yml
+   dest: /root/kube-flannel.yml
+
+- name: apply to kube-flannel on kubernetes cluster
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /root/kube-flannel.yml

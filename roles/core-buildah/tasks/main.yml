@@ -1,0 +1,6 @@
+---
+# tasks file for buildah
+- name: install buildah
+  yum:
+    name: buildah
+    state: latest

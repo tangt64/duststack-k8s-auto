@@ -1,0 +1,2 @@
+- include_tasks: k8s-prepare-etcd.yaml
+- include_tasks: k8s-etcd.yaml

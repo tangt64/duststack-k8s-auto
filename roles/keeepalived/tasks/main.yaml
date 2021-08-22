@@ -1,0 +1,10 @@
+- name: install keepalived
+  yum:
+    name: keepavlied
+    state: latest
+
+- name: enable the keepalived service
+  systemd:
+    name: keepalived
+    enabled: yes
+    state: started

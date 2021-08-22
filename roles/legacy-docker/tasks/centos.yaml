@@ -1,0 +1,20 @@
+- name: verify installed docker package
+  shell: "`which yum` list installed | grep docker | awk '{ print $1 }' | cut -d '-' -f1"
+  register: is_docker
+
+- name: install docker on a node
+  yum:
+    name: docker
+    state: present
+  when: (is_docker.stdout != 'docker')
+
+- name: create to docker storage
+  command: 'docker-storage-setup'
+  when: (is_docker.stdout != 'docker')
+
+- name: start enabled to docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  when: (is_docker.stdout != 'docker')

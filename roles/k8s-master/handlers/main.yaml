@@ -1,0 +1,6 @@
+handlers:
+  - name: restart kubelet
+    service:
+      name: kubelet
+      state: restarted
+      permanent: yes

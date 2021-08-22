@@ -1,0 +1,2 @@
+- name: off to swap disk and partitions
+  command: swapoff -a

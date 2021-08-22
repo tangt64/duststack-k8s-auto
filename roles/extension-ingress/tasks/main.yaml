@@ -1,0 +1,7 @@
+- name: copy nginx-ingress YAML file
+  copy:
+    src: deploy-nginx-ingress.yaml
+    dest: /tmp/deploy-nginx-ingress.yaml
+
+- name: deploy nginx ingress service
+  shell: kubectl create -f /tmp/deploy-nginx-ingress.yaml
