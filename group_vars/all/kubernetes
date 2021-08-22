@@ -1,0 +1,30 @@
+subnetnetwork: 10.244.0.0/16
+vip_enabled: false
+
+k8s_work_dir: /opt/workdir/
+kickstart_address: http://192.168.122.1:8080
+
+#runtime enviroment docker, crio
+runtime_enviroment: crio
+
+# support calico, flanned
+k8s_network: calico
+
+ntp_server1: '3.kr.pool.ntp.org'
+ntp_server2: '0.asia.pool.ntp.org'
+time_zone: 'Asia/Seoul'
+
+internal_vip_address: 192.168.90.250
+internal_vip_address_cinder: 24
+
+k8s_interface: eth1
+
+k8s_svc_cidr: 10.90.0.0/12
+k8s_cluster_svc_ip: 10.96.0.1
+k8s_cluster_dns_ip: 10.96.0.10
+k8s_pod_cider_cidr: 10.244.0.0/16
+k8s_svc_node_port_range: 30000-32767
+k8s_cluster_domain: cluster.local
+k8s_proxy_mode: ipvs
+
+KUBE_APISERVER: https://{% if groups['k8s_master'] | length !=1 %}{{ VIP }}:8443{% else %}{{ hostvars[groups['k8s_master'][0]].inventory_hostname }}:6443{% endif %}
