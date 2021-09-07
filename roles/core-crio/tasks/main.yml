@@ -3,7 +3,7 @@
 - name: kernel module up to overlay
   command: modprobe "{{ item }}"
   with_items:
-    - overlay2
+#    - overlay
     - br_netfilter
   
 
