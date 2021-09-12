@@ -2,3 +2,5 @@
 *.swp
 *.log
 rsa.yaml
+.sublime-project
+.sublime-workspace

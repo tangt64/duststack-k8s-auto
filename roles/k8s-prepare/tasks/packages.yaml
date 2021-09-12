@@ -1,0 +1,5 @@
+- name: install tc package for kubernetes
+  package:
+    name: tc
+    state: present
+    
