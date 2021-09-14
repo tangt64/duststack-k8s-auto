@@ -4,7 +4,7 @@
       command: sysctl --system -q
 
     - name: init kubeadmin with crio
-      shell: kubeadm init --pod-network-cidr={{ subnetnetwork }} --apiserver-advertise-address={{ ansible_[internal_nic_dev_name].ipv4.address }} --cri-socket=/var/run/crio/crio.sock
+      shell: kubeadm init --pod-network-cidr={{ subnetnetwork }} --apiserver-advertise-address={{ ansible_(internal_nic_dev_name).ipv4.address }} --cri-socket=/var/run/crio/crio.sock
       register: kube_discovery
     - debug:
         msg: The master nodes successfully installed
