@@ -12,6 +12,6 @@
   shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/{{ item }}
   loop:
     - custom-resources.yaml
-    - tigera-operator.yaml
+#    - tigera-operator.yaml
 #- name: Change the autodetection method for calico interface
 #  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl set env daemonset/calico-node -n kube-system IP_AUTODETECTION_METHOD=interface={{ k8s_interface }}
