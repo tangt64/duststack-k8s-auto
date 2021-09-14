@@ -1,15 +1,15 @@
 ---
 # tasks file for k18s-prepare
-- import_tasks: firewalld.yaml
-- import_tasks: swapoff.yaml
-- import_tasks: kernel-mods.yaml
-- import_tasks: selinux.yaml
-- import_tasks: packages.yaml 
+- include_tasks: firewalld.yaml
+- include_tasks: swapoff.yaml
+- include_tasks: kernel-mods.yaml
+- include_tasks: selinux.yaml
+- include_tasks: packages.yaml 
 
-- import_tasks: crio.yaml
+- include_tasks: crio.yaml
   when: runtime_environment == "crio"
-- import_tasks: docker.yaml
+- include_tasks: docker.yaml
   when: runtime_environment == "docker"
-- import_tasks: kubernetes.yaml
+- include_tasks: kubernetes.yaml
 
 
