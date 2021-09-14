@@ -2,11 +2,16 @@
 # tasks file for k18s-master
 - name: copy kube-calico file to root home directory
   copy:
-   src: calico-3.8.2.yaml
-   dest: /tmp/calico-3.8.2.yaml
+   src: "{{ item }}"
+   dest: /tmp/{{ item }}
+  loop:
+    - custom-resources.yaml
+    - tigera-operator.yaml
 
 - name: apply to kube-calico on kubernetes cluster
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/calico-3.8.2.yaml
-
-- name: Change the autodetection method for calico interface
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl set env daemonset/calico-node -n kube-system IP_AUTODETECTION_METHOD=interface={{ k8s_interface }}
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/{{ item }}
+  loop:
+    - custom-resources.yaml
+    - tigera-operator.yaml
+#- name: Change the autodetection method for calico interface
+#  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl set env daemonset/calico-node -n kube-system IP_AUTODETECTION_METHOD=interface={{ k8s_interface }}
