@@ -8,7 +8,7 @@ kickstart_address: http://192.168.122.1:8080
 runtime_environment: crio
 =======
 #runtime enviroment docker, crio
-runtime_enviroment: crio
+runtime_environment: crio
 >>>>>>> origin/main
 
 # support calico, flanned

@@ -48,13 +48,13 @@
       shell: |
         {{ k8stoken.stdout }}
       register: node_result
-      when: runtime_enviroment == "docker"
+      when: runtime_environment == "docker"
 
     - name: join to the kubernetes cluster as crio
       shell: |
         {{ k8stoken.stdout }} --cri-socket /var/run/crio/crio.sock
       register: node_result
-      when: runtime_enviroment == "crio"
+      when: runtime_environment == "crio"
 
     - pause:
         seconds: 30

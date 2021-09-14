@@ -1,10 +1,10 @@
 ---
 # tasks file for k18s-master
 - include_tasks: docker.yaml
-  when: runtime_enviroment == "docker"
+  when: runtime_environment == "docker"
 
 - include_tasks: crio.yaml
-  when: runtime_enviroment == "crio"
+  when: runtime_environment == "crio"
 
 - include_tasks: flanned.yaml
   when: k8s_network == "flanned"

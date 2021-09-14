@@ -2,8 +2,8 @@
   hosts: k8s_master:k8s_node
   tags: k8s-prepare
   roles:  
-    - { role: core-crio, when: runtime_enviroment == "crio" }
-    - { role: legacy-docker-ce, when: runtime_enviroment == "docker" }
+    - { role: core-crio, when: runtime_environment == "crio" }
+    - { role: legacy-docker-ce, when: runtime_environment == "docker" }
     - { role: k8s-prepare }
 
 - name: install kubernetes master on the node

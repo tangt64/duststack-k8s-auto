@@ -2,5 +2,5 @@
 *.swp
 *.log
 rsa.yaml
-.sublime-project
-.sublime-workspace
+kubernetes-ansible-playbook.sublime-project
+kubernetes-ansible-playbook.sublime-workspace
