@@ -11,6 +11,7 @@
   tags: k8s-master
   roles:  
     - k8s-master
+    - cni-calico
     - extension-ingress
 
 - name: install kubernetes node

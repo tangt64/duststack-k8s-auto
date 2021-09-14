@@ -9,7 +9,7 @@
 - include_tasks: flanned.yaml
   when: k8s_network == "flanned"
 
-- include_tasks: calico.yaml
-  when: k8s_network == "calico"
+#- include_tasks: calico.yaml
+#  when: k8s_network == "calico"
 
 - include_tasks: kubeconfig.yaml
