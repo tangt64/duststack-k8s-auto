@@ -3,7 +3,7 @@
 - name: kernel module up to overlay
   command: modprobe "{{ item }}"
   loop:
-    - overlay2
+    - overlay
     - br_netfilter
   
 - name: disbaled to the ansible-26 repository file
