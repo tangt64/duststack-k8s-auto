@@ -1,1 +1,1 @@
-- include_tasks: centos.yaml
+- import_tasks: centos.yaml

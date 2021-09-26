@@ -1,2 +1,2 @@
-- include_tasks: tls.yaml
-- include_tasks: kubeconfig.yaml
+- import_tasks: tls.yaml
+- import_tasks: kubeconfig.yaml
