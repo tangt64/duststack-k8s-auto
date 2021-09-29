@@ -8,8 +8,8 @@
 
 - import_tasks: crio.yaml
   when: runtime_environment == "crio"
-- import_tasks: docker.yaml
-  when: runtime_environment == "docker"
+# - import_tasks: docker.yaml
+#  when: runtime_environment == "docker"
 - import_tasks: kubernetes.yaml
 
 
