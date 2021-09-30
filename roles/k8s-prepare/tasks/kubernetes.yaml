@@ -9,12 +9,19 @@
   yum:
     name: kubeadm
     state: latest
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
+
+- name: install to kubeadm
+  yum:
+    name: kubeadm
+    state: latest
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "8")
 
 - name: start kubelet service
   service:
     name: kubelet
     enabled: yes
     state: started
-
+    
 - name: import kubernetes GPG key file from kubernetes server
   command: rpmkeys --import https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg

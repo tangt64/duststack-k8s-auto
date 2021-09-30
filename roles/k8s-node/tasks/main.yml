@@ -22,7 +22,7 @@
     src: kubelet
     dest: /etc/sysconfig/kubelet
  
-- name: kernel module up for nftables
+- name: kernel module up for iptables
   command: modprobe "{{ item }}"
   with_items:
     - ip_vs_rr
@@ -30,6 +30,16 @@
     - ip_vs_sh
     - ip_vs
     - nf_conntrack_ipv4
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
+ 
+- name: kernel module up for nftables
+  command: modprobe "{{ item }}"
+  with_items:
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - ip_vs
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "8")
 
 - name: restart to kubelet.service
   service:
