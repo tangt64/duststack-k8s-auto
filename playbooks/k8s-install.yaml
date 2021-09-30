@@ -3,7 +3,7 @@
   tags: k8s-prepare
   roles:  
     - { role: core-crio, when: runtime_environment == "crio" }
-    - { role: legacy-docker-ce, when: runtime_environment == "docker" }
+    - { role: core-docker-ce, when: runtime_environment == "docker" }
     - { role: k8s-prepare }
 
 - name: install kubernetes master on the node
@@ -12,10 +12,23 @@
   roles:  
     - k8s-master
     - cni-calico
-    - extension-ingress
 
-- name: install kubernetes node
+- name: install kubernetes network service
+  hosts: k8s_master
+  tags: k8s-network
+  roles:  
+    - { role: cni-calico, when: k8s_network is calico }
+    - { role: cni-flanned, when: k8s_network is calico }
+
+- name: install kubernetes nodes
   hosts: k8s_node
   tags: k8s-node
   roles:  
     - k8s-node
+
+- name: install extension compoments
+  hosts: k8s-master
+  tags: k8s-extension
+  roles:
+    - { role: extension-ingress, when: enabled_ingress is true }
+    - { role: extension-metrics, when: enabled_metrics is true }

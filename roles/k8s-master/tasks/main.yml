@@ -6,8 +6,8 @@
 - import_tasks: crio.yaml
   when: runtime_environment == "crio"
 
-- import_tasks: flanned.yaml
-  when: k8s_network == "flanned"
+#- import_tasks: flanned.yaml
+#  when: k8s_network == "flanned"
 
 #- import_tasks: calico.yaml
 #  when: k8s_network == "calico"
