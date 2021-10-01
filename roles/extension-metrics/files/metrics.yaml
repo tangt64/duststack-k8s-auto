@@ -134,6 +134,8 @@ spec:
         - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
         - --kubelet-use-node-status-port
         - --metric-resolution=15s
+        - --kubelet-insecure-tls
+        - --requestheader-allowed-names=aggregator
         image: k8s.gcr.io/metrics-server/metrics-server:v0.5.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -169,6 +171,7 @@ spec:
           name: tmp-dir
       nodeSelector:
         kubernetes.io/os: linux
+      hostNetwork: true
       priorityClassName: system-cluster-critical
       serviceAccountName: metrics-server
       volumes:
