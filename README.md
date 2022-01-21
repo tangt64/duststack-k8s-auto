@@ -6,16 +6,17 @@
 
 바로 상용환경에서 사용이 가능하도록 설치 및 구성할 수 있도록 환경을 제공해주는게 주요 프로젝트의 목적 입니다. 지원하는 기능은 아래와 같습니다.
 
-- CentOS 7 and CentOS 8 Stream
-- Debian and Ubuntu **(현재 준비중 입니다)**
-- CI/CD 지원 **(현재 준비중 입니다)**
-- 컨테이너 스토리지 시스템 지원 **(현재 준비중 입니다)**
-- HA/Router/Helm 같은 확장 기능 지원 **(현재 준비중 입니다)**
+- CentOS 7, CentOS 8 Stream, Ubuntu, Debian 
+- 컨테이너 스토리지 시스템 지원
+- High Availability/Ingress/Helm Chart  확장 기능 지원
+- OVN and OVS 지원
 
 ## 알림사항
 
 - CentOS 7/8버전에서 제일 안정적으로 설치가 지원 됩니다.
 - Debian/Ubuntu는 곧 지원할 예정입니다.
+- 업데이트 기능 추가 예정
+- 노드 스케일링(master, worker)추가 예정
   
 ## 컴퓨터 사양
 
