@@ -1,8 +1,8 @@
 subnetnetwork: 10.244.0.0/16
 vip_enabled: false
 
-;; internal, between kubernetes masters and nodes
-internal_nic_dev_name: ens4 
+# internal, between kubernetes masters and nodes
+internal_nic_dev_name: eth1
 
 enabled_metrics: true
 
