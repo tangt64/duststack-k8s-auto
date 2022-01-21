@@ -23,7 +23,7 @@
     permanent: yes
     immediate: yes
     state: enabled
-    zone: public
+    zone: libvirt
 
 - name: copy httpd.py server
   template:

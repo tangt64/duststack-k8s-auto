@@ -15,14 +15,11 @@
 ## 알림사항
 
 - CentOS 7/8버전에서 제일 안정적으로 설치가 지원 됩니다.
-
 - Debian/Ubuntu는 곧 지원할 예정입니다.
   
-  **아직은 개발버전 입니다** 
-
 ## 컴퓨터 사양
 
-* **CPU:** Intel E5 or AMD Ryzen 7 3700X (Physical 8 core)
+* **CPU:** Intel E5 or AMD Ryzen 5 5600X (Physical 6 core)
 * **Memory:** Minimun 8 GiB
 * **Disk:** least 500GiB HDD or SSD 1TiB Recommend
 * **NIC:** least 1GiB 
@@ -47,7 +44,18 @@
 # ansible-playbook -i inventory/kubernetes playbooks/k8s-install.yaml
 ```
 
+## 배포판 지원
+리눅스 배포판은 RHEL, CentOS, Debian, Ubuntu를 지원합니다. 
+배포판 변수는 "group_vars/all/kubernetes"에서 distribution_name 값을 변경 합니다.
 
+
+## 스토리지 구성
+유틸리티 노드가 구성이 되어 있는 경우, 유틸리티 노드에 기본적으로 NFS 스토리지 서버를 구성 합니다.
+NFS스토리는 유틸리티 서버에 /srv/nfs-k8s의 디렉터리를 엑스포팅 합니다.
+
+## master loadablancer mode 
+
+## registry server 
 
 
 
