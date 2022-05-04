@@ -1,11 +1,12 @@
 vip_enabled: false
 vip_lb_mode: haproxy
+subnetnetwork: 10.210.0.0/18
 
 # ubuntu, debian, rhel(centos)
 distribution_name: redhat 
 
 # internal, between kubernetes masters and nodes
-internal_nic_dev_name: eth1
+internal_nic_dev_name: enp0s8
 internal_stroage_dev_name: eth2
 
 enabled_metrics: true
