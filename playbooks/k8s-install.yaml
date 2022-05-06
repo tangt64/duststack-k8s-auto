@@ -10,7 +10,6 @@
   tags: k8s-master
   roles:  
     - k8s-master
-#    - cni-calico
 
 - name: install kubernetes network service
   hosts: k8s_master
@@ -25,9 +24,16 @@
   roles:  
     - k8s-node
 
+- name: install helm on the master node
+  hosts: "{{ groups['k8s_master'] | first }}"
+  roles:
+    - extension-helm/base
+
 - name: install extension compoments
-  hosts: k8s-master
+  hosts: k8s_master
   tags: k8s-extension
   roles:
-    - { role: extension-ingress, when: enabled_ingress is true }
-    - { role: extension-metrics, when: enabled_metrics is true }
+    - { role: extension-ingress, when: enabled_ingress == "enable" }
+    - { role: extension-metrics, when: enabled_metrics == "enable" }
+
+

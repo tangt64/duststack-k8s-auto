@@ -1,5 +1,5 @@
 [k8s_master]
-192.168.100.100 hostname=master.example.com nodename=master1.example.com
+192.168.100.100 hostname=master.example.com nodename=master.example.com
 
 [k8s_node]
 192.168.100.110 hostname=node1.example.com nodename=node1.example.com

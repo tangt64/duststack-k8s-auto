@@ -8,15 +8,6 @@
   register: k8stoken
   when: k8s_proxy_mode == "single"
 
-#
-# If the kubernetes cluster has a VIP master machine
-#
-- name: get token 
-  command: kubeadm token create --print-join-command
-  delegate_to: "{{ groups['k8s_master'] | first }}"
-  register: k8stoken
-  when: k8s_proxy_mode == "ipvs"
-
 - name: copy kubelet config file to /etc/sysconfig
   copy:
     src: kubelet
@@ -46,34 +37,19 @@
     name: kubelet
     state: restarted
 
-    #- name: join to the kubernetes cluster
-    #  command: "{{ k18stoken.stdout }}"
+- debug:
+    var: k8stoken 
 
-- name: join to the cluster 
+- name: join to all of nodes into the cluster
   block:
     - name: apply sysctl
       command: sysctl --system -q
 
-    - name: join to the kubernetes cluster as docker
-      shell: |
-        {{ k8stoken.stdout }}
-      register: node_result
-      when: runtime_environment == "docker"
-
-    - name: join to the kubernetes cluster as crio
-      shell: |
-        {{ k8stoken.stdout }} --cri-socket /var/run/crio/crio.sock
-      register: node_result
-      when: runtime_environment == "crio"
+    - name: crio runtime node join to the cluster
+      shell: "{{ k8stoken.stdout }}"
+      register: node_reg_result
 
     - pause:
         seconds: 30
-        prompt: The nodes successfully cluster joined
+        prompt: the nodes successfully joined to the cluster
 
-  rescue:
-    - name: reset node
-      command: kubeadm reset --force
-      no_log: yes
-    - debug:
-        msg: The nodes has been reseted
-      failed_when: ( master_result.rc in [ 1,2 ] )

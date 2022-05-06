@@ -2,19 +2,26 @@ vip_enabled: false
 vip_lb_mode: haproxy
 subnetnetwork: 10.210.0.0/18
 
+k8s_proxy_mode: single
+
 # ubuntu, debian, rhel(centos)
 distribution_name: redhat 
 
 # internal, between kubernetes masters and nodes
-internal_nic_dev_name: enp0s8
+internal_nic_dev_name: eth1
 internal_stroage_dev_name: eth2
 
-enabled_metrics: true
+enabled_metrics: enable
+enabled_ingress: enable
+
+use_firewalld: disable
 
 k8s_work_dir: /opt/workdir/
 kickstart_address: http://192.168.122.1:8080
 
 runtime_environment: crio
+
+ingress_controller: haproxy
 
 # support calico, flanned
 k8s_network: calico

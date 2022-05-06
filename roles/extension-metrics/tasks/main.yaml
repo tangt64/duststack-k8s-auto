@@ -1,6 +1,6 @@
 - name: copy kubernetes the metrics-server
   copy: 
-    src: metrics.yaml
+    src: metrics2.yaml
     dest: /tmp/metrics.yaml
 
 - name: create the metrics-server compoment
