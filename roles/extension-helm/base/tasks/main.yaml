@@ -14,9 +14,3 @@
 
 - name: edit clusterrolebind permissive-binding
   command: kubectl create clusterrolebinding permissive-binding --clusterrole=cluster-admin --user=admin --user=kubelet --group=system:serviceaccounts
-
-- name: update to helm repository
-  command: helm repo update
-
-#- name: deploy kubernetes metrics service
-#  command: helm install --name metrics-server stable/metrics-server  --namespace metrics --set args={"--kubelet-insecure-tls=true,--kubelet-preferred-address-types=InternalIP\,Hostname\,ExternalIP"}

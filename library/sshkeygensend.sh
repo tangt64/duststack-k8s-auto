@@ -1,5 +1,5 @@
-keyName=$2
-PassName=$3
+keyName=$1
+PassName=$2
 
 echo $keyName
 echo $PassName
@@ -7,7 +7,7 @@ echo $PassName
 case "$1" in
   k8s)
     server=$(awk '{ print $2 }' /etc/hosts | grep -e 'master' -e 'node1' -e 'node2' )
-    password=${PassName}
+    password=$PassName
     ;;
   *)
     echo "Using: k8s {rsa_key_name} {password}"
@@ -15,8 +15,9 @@ case "$1" in
 esac
 
 function sendkeys(){
-  for ipadr in ${server} ; do echo $Server ${server} && sshpass -p ${password} ssh-copy-id -i $HOME/.ssh/$keyName -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@${ipadr} ; done
+  for ipadr in ${server} ; do echo $Server ${server} && sshpass -p $password ssh-copy-id -i $HOME/.ssh/$keyName -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@${ipadr} ; done
   for ipadr in ${server} ; do ssh-keyscan ${server} >> $HOME/.ssh/known_hosts ; done
+  for ipadr in ${server} ; do sshpass -p $password scp /etc/hosts root@${ipadr}:/etc/hosts ; done
 }
 
 function genkeys(){

@@ -8,8 +8,10 @@ k8s_proxy_mode: single
 distribution_name: redhat 
 
 # internal, between kubernetes masters and nodes
-internal_nic_dev_name: eth1
+internal_nic_dev_name: ens192
 internal_stroage_dev_name: eth2
+
+ingress_controller: haproxy
 
 enabled_metrics: enable
 enabled_ingress: enable
@@ -20,8 +22,6 @@ k8s_work_dir: /opt/workdir/
 kickstart_address: http://192.168.122.1:8080
 
 runtime_environment: crio
-
-ingress_controller: haproxy
 
 # support calico, flanned
 k8s_network: calico

@@ -37,9 +37,6 @@
     name: kubelet
     state: restarted
 
-- debug:
-    var: k8stoken 
-
 - name: join to all of nodes into the cluster
   block:
     - name: apply sysctl
