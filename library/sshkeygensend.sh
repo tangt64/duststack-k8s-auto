@@ -1,18 +1,16 @@
 keyName=$2
+PassName=$3
 
 echo $keyName
+echo $PassName
 
 case "$1" in
-  openstack)
-    server=$(awk '{ print $2 }' /etc/hosts | grep -e 'node1' -e 'node2' -e 'node3' -e 'node4' )
-    password=openstack
-    ;;
-  kubernetes)
-    server=$(awk '{ print $2 }' /etc/hosts | grep -e 'master1' -e 'master2' -e 'master3' -e 'node1' -e 'node2' -e 'utility' )
-    password=kubernetes
+  k8s)
+    server=$(awk '{ print $2 }' /etc/hosts | grep -e 'master' -e 'node1' -e 'node2' )
+    password=${PassName}
     ;;
   *)
-    echo "Using: $1 {openstack|kubernetes} {rsa_key_name}"
+    echo "Using: k8s {rsa_key_name} {password}"
     exit 1
 esac
 
