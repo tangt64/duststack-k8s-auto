@@ -1,8 +1,13 @@
 [k8s_master]
-192.168.100.100 hostname=master.example.com nodename=master.example.com
+192.168.100.100 hostname=master1.example.com nodename=master1.example.com
+192.168.100.200 hostname=master2.example.com nodename=master2.example.com
+192.168.100.210 hostname=master3.example.com nodename=master3.example.com
 
 [k8s_node]
 192.168.100.110 hostname=node1.example.com nodename=node1.example.com
 192.168.100.120 hostname=node2.example.com nodename=node2.example.com
 
 [k8s_utility]
+
+[ha]
+192.168.100.250

@@ -2,7 +2,7 @@ vip_enabled: false
 vip_lb_mode: haproxy
 subnetnetwork: 10.210.0.0/18
 
-k8s_proxy_mode: single
+k8s_proxy_mode: multi
 
 # ubuntu, debian, rhel(centos)
 distribution_name: redhat 

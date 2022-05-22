@@ -1,0 +1,7 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: stable
+apiServer:
+  certSANs:
+  - "10.0.2.33"
+controlPlaneEndpoint: "10.0.2.33:6443"

@@ -1,4 +1,7 @@
 - name: install helm on the master node
   hosts: "{{ groups['k8s_master'] | first }}"
   roles:
-    - extension-helm/base
+    - { role: extension-helm/base }
+    - { role: extension-helm/metrics, when: enabled_metrics|bool == yes }
+    - { role: extension-helm/ingress-haproxy, when: enabled_haproxy|bool == yes }
+    - { role: extension-helm/ingress-nginx, when: enabled_nginx|bool == yes }

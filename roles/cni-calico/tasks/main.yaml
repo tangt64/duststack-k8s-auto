@@ -1,7 +1,2 @@
-- name: download the kube-calico YAML file for development
-  get_url:
-    url: https://docs.projectcalico.org/manifests/calico.yaml
-    dest: /tmp/calico.yaml
-
 - name: apply to kube-calico on kubernetes cluster
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/calico.yaml
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f files/calico.yaml
