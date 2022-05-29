@@ -1,11 +1,17 @@
 #!/bin/bash
+
 sudo bash -c 'cat <<EOF>> /etc/hosts
 #
 # kubernetes nodes
+#
 
-192.168.100.100 master.example.com master 
-192.168.100.110 node1.example.com node1 
-192.168.100.120 node2.example.com node2
+192.168.90.100 master1.example.com master1
+192.168.90.110 master2.example.com master2
+192.168.90.120 master3.example.com master3
+192.168.90.130 node1.example.com node1 
+192.168.90.140 node2.example.com node2
+
+192.168.90.250 ha.example.com ha
 EOF'
 
 
