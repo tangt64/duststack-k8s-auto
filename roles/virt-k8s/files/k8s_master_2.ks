@@ -39,16 +39,6 @@ clearpart --all
 part / --fstype="xfs" --size=20000
 
 %post
-hostnamectl set-hostname master2.example.com
-
-cat <<EOF>> /etc/hosts
-192.168.90.210 master1.example.com master1
-192.168.90.220 master2.example.com master2
-192.168.90.230 master3.example.com master3
-192.168.90.240 node1.example.com node1
-192.168.90.250 node2.example.com node2
-192.168.90.200 utility.example.com utility
-EOF
 
 cat <<EOF> /root/.vimrc
 au! BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml foldmethod=indent

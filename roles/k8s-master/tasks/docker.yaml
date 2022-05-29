@@ -24,7 +24,7 @@
       command: sysctl --system -q
 
     - name: install master
-      command: kubeadm init --pod-network-cidr={{ subnetnetwork }} --apiserver-advertise-address={{ item }}
+      command: kubeadm init --pod-network-cidr={{ k8s_pod_cider_cidr }} --apiserver-advertise-address={{ item }}
       register: master_result
       no_log: yes
       with_items:

@@ -1,5 +1,6 @@
 ---
 # tasks file for k18s-prepare
+- import_tasks: hostname.yaml
 - import_tasks: firewalld.yaml
 - import_tasks: swapoff.yaml
 - import_tasks: kernel-mods.yaml
