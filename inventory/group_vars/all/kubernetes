@@ -1,0 +1,26 @@
+# Single or Multi master for kubernetes
+k8s_proxy_mode: multi
+
+# ubuntu, debian, rhel(centos)
+distribution_name: redhat 
+
+# kubernets storage network
+internal_stroage_dev_name: ens4
+
+ingress_controller: haproxy
+
+# firewalld for kubernetes
+use_firewalld: disable
+
+k8s_runtime_environment: crio
+
+# support calico, flanned
+k8s_network: calico
+
+# internal, between kubernetes masters and nodes
+k8s_interface: ens4
+
+k8s_cluster_svc_ip: 10.96.0.1
+k8s_pod_cider_cidr: 10.244.0.0/16
+k8s_svc_node_port_range: 30000-32767
+k8s_cluster_domain: cluster.local
