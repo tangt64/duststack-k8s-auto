@@ -43,7 +43,7 @@
 
 ```bash
 # ansible-playbook playbooks/k8s-install.yaml
-``
+```
 ㅡ 
 ## 문의
 
