@@ -1,17 +1,5 @@
-vip_enabled: false
-vip_lb_mode: haproxy
-subnetnetwork: 10.210.0.0/18
-
-k8s_proxy_mode: single
-
 # ubuntu, debian, rhel(centos)
 distribution_name: redhat 
-
-# internal, between kubernetes masters and nodes
-internal_nic_dev_name: ens192
-internal_stroage_dev_name: eth2
-
-ingress_controller: haproxy
 
 enabled_metrics: enable
 enabled_ingress: enable
@@ -25,21 +13,7 @@ runtime_environment: crio
 
 # support calico, flanned
 k8s_network: calico
-
-ntp_server1: '3.kr.pool.ntp.org'
-ntp_server2: '0.asia.pool.ntp.org'
-time_zone: 'Asia/Seoul'
-
-internal_vip_address: 192.168.90.250
-internal_vip_address_cinder: 24
-
+k8s_proxy_mode: single
 k8s_interface: eth1
-
-k8s_svc_cidr: 10.90.0.0/12
-k8s_cluster_svc_ip: 10.96.0.1
-k8s_cluster_dns_ip: 10.96.0.10
-k8s_pod_cider_cidr: 10.244.0.0/16
-k8s_svc_node_port_range: 30000-32767
-k8s_cluster_domain: cluster.local
-
-KUBE_APISERVER: https://{% if groups['k8s_master'] | length !=1 %}{{ VIP }}:8443{% else %}{{ hostvars[groups['k8s_master'][0]].inventory_hostname }}:6443{% endif %}
+k8s_pod_cidr: 10.210.0.0/18
+k8s_ingress_controller: haproxy
