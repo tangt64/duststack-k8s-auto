@@ -18,6 +18,8 @@
 - CentOS 7/8버전에서 제일 안정적으로 설치가 지원 됩니다.
 - 추가 기능은 **멀티 마스터 노드(multi-master)** 브렌치에서 다운로드 받으세요. 
 
+[멀티 마스터 노드](https://github.com/tangt64/duststack-k8s-auto/tree/multi-master)
+
 ![멀티 마스터 노드](images/multi-master.jpg)
   
 ## 컴퓨터 사양
