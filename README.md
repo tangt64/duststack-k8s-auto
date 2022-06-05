@@ -24,16 +24,18 @@
   
 ## 컴퓨터 사양
 
-* **CPU:** Intel E5 or AMD Ryzen 5 5600X (Physical 6 core)
+* **CPU:** Intel E5 or AMD Ryzen 5 5600X (Physically 4~6 cores)
 * **Memory:** Minimun 8 GiB
 * **Disk:** least 500GiB HDD or SSD 1TiB Recommend
-* **NIC:** least 1GiB 
+* **NIC:** least 1GiB Bandwidth
 
 리눅스 기반으로 구성하시는 경우, libvirt기반으로 가상머신 구성이 가능 합니다. 
 
 ## 가상머신에 설치하는 방법
 
 ### 가상머신 구성
+
+#### 리눅스
 
 가상머신을 생성하려면 다음과 같은 명령어로 실행 합니다.
 
@@ -48,6 +50,10 @@
 ```bash
 # ansible-playbook playbooks/k8s-install.yaml
 ```
+
+#### 윈도우
+
+VMware Workstation Player 혹은 VirtualBox, 권장은 VMware Workstation Player.
 
 ## 문의
 
