@@ -2,3 +2,5 @@
   tasks:
   - name: uninstall kubernetes all nodes
     command: kubeadm reset --force
+    ignore_errors: yes
+    

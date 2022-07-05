@@ -5,6 +5,7 @@
 - import_tasks: kernel-mods.yaml
 - import_tasks: selinux.yaml
 - import_tasks: packages.yaml 
+- import_tasks: nodename.yaml
 
 - import_tasks: crio.yaml
   when: runtime_environment == "crio"
