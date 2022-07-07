@@ -1,0 +1,52 @@
+---
+#
+# If the kubernetes cluster have only an one master machine
+# 
+- name: get token 
+  command: kubeadm token create --print-join-command
+  delegate_to: "{{ groups['k8s_master'] | first }}"
+  register: k8stoken
+  when: k8s_proxy_mode == "single"
+
+- name: copy kubelet config file to /etc/sysconfig
+  copy:
+    src: kubelet
+    dest: /etc/sysconfig/kubelet
+ 
+- name: kernel module up for iptables
+  command: modprobe "{{ item }}"
+  with_items:
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - ip_vs
+    - nf_conntrack_ipv4
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
+ 
+- name: kernel module up for nftables
+  command: modprobe "{{ item }}"
+  with_items:
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - ip_vs
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "8")
+
+- name: restart to kubelet.service
+  service:
+    name: kubelet
+    state: restarted
+
+- name: join to all of nodes into the cluster
+  block:
+    - name: apply sysctl
+      command: sysctl --system -q
+
+    - name: crio runtime node join to the cluster
+      shell: "{{ k8stoken.stdout }}"
+      register: node_reg_result
+
+    - pause:
+        seconds: 30
+        prompt: the nodes successfully joined to the cluster
+

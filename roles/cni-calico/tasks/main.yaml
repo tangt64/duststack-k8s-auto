@@ -1,0 +1,2 @@
+- name: apply to kube-calico on kubernetes cluster
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f files/calico.yaml

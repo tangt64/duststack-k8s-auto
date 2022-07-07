@@ -1,0 +1,31 @@
+- block:
+    - name: setup to hostname for ETCD host
+      hostname: name={{ hostname }}
+    
+    - name: templating to chronyd service configurion file
+      template:
+        src: chronyd.conf.j2
+        dest: /etc/chronyd.conf
+    
+    - name: start and enable to chronyd service
+      systemd:
+        name: chronyd
+        state: restarted
+        enabled: yes
+  when: groups['k8s_etcd'] | intersect(groups['k8s_master']) | length == 0
+
+- name: etcd.sh copy to profile.d
+  template: 
+    src: etcd.sh.j2 
+    dest: /etc/profile.d/etcd.sh
+
+- name: templating to ETCD configure file
+  template:
+    src: etcd.config.yml.j2
+    dest: /etc/etcd/etcd.config.yml
+
+- name: start and enable ETCD service
+  systemd:
+    name: etcd
+    state: restarted
+    enabled: yes

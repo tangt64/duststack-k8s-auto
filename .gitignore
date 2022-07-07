@@ -1,0 +1,6 @@
+*.retry
+*.swp
+*.log
+rsa.yaml
+kubernetes-ansible-playbook.sublime-project
+kubernetes-ansible-playbook.sublime-workspace

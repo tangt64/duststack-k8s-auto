@@ -1,0 +1,3 @@
+- name: relabel a hostname to each of hosts
+  hostname:
+  	name: '{{ nodename }}'

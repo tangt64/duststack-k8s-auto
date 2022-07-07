@@ -1,0 +1,2 @@
+- import_tasks: k8s-prepare-etcd.yaml
+- import_tasks: k8s-etcd.yaml

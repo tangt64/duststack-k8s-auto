@@ -1,0 +1,7 @@
+- name: install tc package for kubernetes
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - iproute
+    - iproute-tc  

@@ -1,0 +1,20 @@
+- name: listing Virtual Machine lists from libvirtd
+  virt:
+    command: list_vms
+    state: running
+  register: running_vms
+
+- debug:
+    msg: "{{ running_vms }}"
+
+- name: make a snapshot each of VMs
+  shell: "virsh snapshot-create-as {{ item }} --name {{ snapname }}"
+  with_items: "{{ running_vms.list_vms }}"
+  when: status == "snapshot"
+  become: yes
+
+- name: restore a snapshot each of VMs
+  shell: "virsh snapshot-revert {{ item }} {{ snapname }}"
+  with_items: "{{ running_vms.list_vms }}"
+  when: status == "restore"
+  become: yes

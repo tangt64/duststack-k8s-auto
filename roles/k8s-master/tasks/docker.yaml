@@ -1,0 +1,42 @@
+---
+- name: copy kubelet config file to /etc/sysconfig
+  copy:
+    src: kubelet
+    dest: /etc/sysconfig/kubelet
+
+    #- name: pull images from a image server for kubernetes service
+    #  docker_images:
+    #    name: "{{ item }}"
+    #    source: pull
+    #  with_items:
+    #    - nginx/nginx-ingress
+    #    - kubernetes-ingress-controller/nginx-ingress-controller:0.31.1
+
+- name: pull images from a image server for kubernetes service
+  command: docker pull {{ item }}
+  with_items:
+    - docker.io/nginx/nginx-ingress
+    - quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.31.1
+
+- name: init kubeadmin with docker
+  block:
+    - name: apply sysctl
+      command: sysctl --system -q
+
+    - name: install master
+      command: kubeadm init --pod-network-cidr={{ k8s_pod_cider_cidr }} --apiserver-advertise-address={{ item }}
+      register: master_result
+      no_log: yes
+      with_items:
+        - "{{ groups['k8s_master'] }}"
+    - pause:
+        seconds: 30
+        prompt: The master nodes successfully installed
+  rescue:
+    - name: reset master
+      command: kubeadm reset --force
+      no_log: yes
+    - debug:
+        msg: The master nodes has been reseted
+      failed_when: ( master_result.rc in [ 1,2 ] )
+

@@ -1,0 +1,8 @@
+- name: prepare for classrom
+  become: root
+  hosts: local_server
+  serial: 1
+  tags: classroom
+  roles:  
+    - { role: virt-k8s }
+

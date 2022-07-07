@@ -1,0 +1,30 @@
+[loadbalancer]
+192.168.90.5 nodename=lb.example.com
+
+[k8s_master]
+<<<<<<< HEAD
+192.168.100.100 nodename=master1.example.com
+192.168.100.200 nodename=master2.example.com
+192.168.100.210 nodename=master3.example.com
+
+[k8s_node]
+192.168.100.110 nodename=node1.example.com
+192.168.100.120 nodename=node2.example.com
+
+[k8s_utility]
+192.168.100.200 nodename=utility.example.com
+
+[ha]
+192.168.100.250 nodename=ha.example.com
+=======
+192.168.90.8 nodename=m1.example.com
+192.168.90.9 nodename=m2.example.com
+192.168.90.4 nodename=m3.example.com
+
+[k8s_node]
+192.168.90.10 nodename=node1.example.com
+192.168.90.6 nodename=node2.example.com
+
+[k8s_storage]
+192.168.90.7 nodename=sti.example.com
+>>>>>>> single-master

@@ -1,0 +1,17 @@
+---
+# tasks file for k18s-prepare
+- import_tasks: hostname.yaml
+- import_tasks: firewalld.yaml
+- import_tasks: swapoff.yaml
+- import_tasks: kernel-mods.yaml
+- import_tasks: selinux.yaml
+- import_tasks: packages.yaml 
+- import_tasks: nodename.yaml
+
+- import_tasks: crio.yaml
+  when: runtime_environment == "crio"
+# - import_tasks: docker.yaml
+#  when: runtime_environment == "docker"
+- import_tasks: kubernetes.yaml
+
+
