@@ -1,7 +1,0 @@
-- name: container registry server
-  hosts: registry_server
-  tags: registry_server
-  roles:
-    - podman
-    - buildah
-    - skopeo
