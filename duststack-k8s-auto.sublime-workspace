@@ -1,0 +1,1333 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"k8s",
+				"k8sSsl"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "Searching 127 files for \"kubeadm\"\n\nH:\\duststack-k8s-auto\\library\\add2vhost:\n    ERROR: Unable to open file\n\nH:\\duststack-k8s-auto\\playbooks\\k8s-uninstall.yaml:\n    2    tasks:\n    3    - name: uninstall kubernetes all nodes\n    4:     command: kubeadm reset --force\n    5      ignore_errors: yes\n    6      \n\nH:\\duststack-k8s-auto\\roles\\cni-calico\\files\\calico.yaml:\n 4119        # Used to discover Typhas.\n 4120        - get\n 4121:   # Pod CIDR auto-detection on kubeadm needs access to config maps.\n 4122    - apiGroups: [\"\"]\n 4123      resources:\n\nH:\\duststack-k8s-auto\\roles\\k8s-master-ha\\files\\kubeadm-config.yaml:\n    1: apiVersion: kubeadm.k8s.io/v1beta2\n    2  kind: ClusterConfiguration\n    3  kubernetesVersion: stable\n\nH:\\duststack-k8s-auto\\roles\\k8s-master-ha\\tasks\\main.yaml:\n    1  - name: copy a master configuration file\n    2    copy:\n    3:     src: kubeadm-config.yaml\n    4      dest: /tmp/\n    5  \n    6: - name: init kubeadmin for the first master node with crio\n    7:   shell: kubeadm init --pod-network-cidr={{ k8s_pod_cider_cidr }} --service-cidr={{ k8s_cluster_svc_ip }} --service-dns-domain={{ k8s_cluster_domain }} --apiserver-advertise-address={{ ansible_facts['default_ipv4']['address'] }} --cri-socket=/var/run/crio/crio.sock\n    8  \n    9  - name: copy kubelet config file to /etc/sysconfig\n   ..\n   16  \n   17  - name: get token from the first master\n   18:   command: kubeadm token create --print-join-command\n   19    register: k8stoken\n   20    delegate_to: \"{{ groups['k8s_master'] | first }}\"\n   ..\n   49  - name:\n   50    shell: |\n   51:     kubeadm join --control-plane\n   52  \n\nH:\\duststack-k8s-auto\\roles\\k8s-master-single\\tasks\\crio.yaml:\n    1: - name: init kubeadmin with crio\n    2    block:\n    3      - name: apply sysctl\n    4        command: sysctl --system -q\n    5  \n    6:     - name: init kubeadmin with crio\n    7:       shell: kubeadm init --pod-network-cidr={{ k8s_pod_cider_cidr }} --apiserver-advertise-address={{ ansible_facts[k8s_interface]['ipv4']['address'] }} --cri-socket=/var/run/crio/crio.sock\n    8        register: kube_discovery\n    9      - debug:\n   ..\n   13    rescue:\n   14      - name: reset master\n   15:       command: kubeadm reset --force\n   16        no_log: yes\n   17  \n\nH:\\duststack-k8s-auto\\roles\\k8s-master-single\\tasks\\docker.yaml:\n   19      - quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.31.1\n   20  \n   21: - name: init kubeadmin with docker\n   22    block:\n   23      - name: apply sysctl\n   ..\n   25  \n   26      - name: install master\n   27:       command: kubeadm init --pod-network-cidr={{ k8s_pod_cider_cidr }} --apiserver-advertise-address={{ item }}\n   28        register: master_result\n   29        no_log: yes\n   ..\n   35    rescue:\n   36      - name: reset master\n   37:       command: kubeadm reset --force\n   38        no_log: yes\n   39      - debug:\n\nH:\\duststack-k8s-auto\\roles\\k8s-node\\tasks\\main.yml:\n    4  # \n    5  - name: get token \n    6:   command: kubeadm token create --print-join-command\n    7    delegate_to: \"{{ groups['k8s_master'] | first }}\"\n    8    register: k8stoken\n\n16 matches across 7 files\n\n\nSearching 126 files for \"k8s_interface\"\n\nH:\\duststack-k8s-auto\\group_vars\\all\\kubernetes:\n   19  \n   20  # internal, between kubernetes masters and nodes\n   21: k8s_interface: ens4\n   22  \n   23  k8s_cluster_svc_ip: 10.96.0.0/16\n\nH:\\duststack-k8s-auto\\inventory\\group_vars\\all\\kubernetes:\n   19  \n   20  # internal, between kubernetes masters and nodes\n   21: k8s_interface: ens4\n   22  \n   23  k8s_cluster_svc_ip: 10.96.0.0/16\n\n2 matches across 2 files\n\n\nSearching 126 files for \"pause\"\n\nH:\\duststack-k8s-auto\\playbooks\\k8s-uninstall.yaml:\n    8      command: reboot\n    9  \n   10:   - pause:\n   11        min\n   12  \n\nH:\\duststack-k8s-auto\\roles\\k8s-master-ha\\tasks\\main.yaml:\n   22    register: master_reg_result\n   23  \n   24: - pause:\n   25      seconds: 30\n   26      prompt: the rest of master nodes successfully joined to the cluster\n\nH:\\duststack-k8s-auto\\roles\\k8s-master-single\\tasks\\docker.yaml:\n   30        with_items:\n   31          - \"{{ groups['k8s_master'] }}\"\n   32:     - pause:\n   33          seconds: 30\n   34          prompt: The master nodes successfully installed\n\nH:\\duststack-k8s-auto\\roles\\k8s-node\\tasks\\main.yml:\n   47        register: node_reg_result\n   48  \n   49:     - pause:\n   50          seconds: 30\n   51          prompt: the nodes successfully joined to the cluster\n\nH:\\duststack-k8s-auto\\roles\\virt-k8s\\tasks\\main.yaml:\n  116  \n  117  - name: wait for build of VMs\n  118:   pause:\n  119      minutes: 30\n  120      prompt: \"Waiting for building to VMs about 30 mins\"\n\n5 matches across 5 files\n",
+			"settings":
+			{
+				"buffer_size": 4672,
+				"line_ending": "Windows",
+				"name": "Find Results",
+				"scratch": true
+			},
+			"undo_stack":
+			[
+			]
+		},
+		{
+			"file": "roles/virt-k8s/tasks/main.yaml",
+			"settings":
+			{
+				"buffer_size": 3318,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "- name:\n  package:\n    name: libvirt-daemon\n    state: latest\n\n- name:\n  \n",
+			"file": "roles/core-virt/tasks/main.yaml",
+			"file_size": 0,
+			"file_write_time": 133019313500000000,
+			"settings":
+			{
+				"buffer_size": 74,
+				"line_ending": "Windows"
+			},
+			"undo_stack":
+			[
+				[
+					3,
+					1,
+					"insert",
+					{
+						"characters": "-"
+					},
+					"AQAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					4,
+					1,
+					"insert",
+					{
+						"characters": " name:"
+					},
+					"BgAAAAEAAAAAAAAAAgAAAAAAAAAAAAAAAgAAAAAAAAADAAAAAAAAAAAAAAADAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAABQAAAAAAAAAAAAAABQAAAAAAAAAGAAAAAAAAAAAAAAAGAAAAAAAAAAcAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAQAAAAAAAAABAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					5,
+					1,
+					"insert",
+					{
+						"characters": "\n\n"
+					},
+					"BQAAAAcAAAAAAAAACAAAAAAAAAAAAAAACAAAAAAAAAAKAAAAAAAAAAAAAAAKAAAAAAAAAAsAAAAAAAAAAAAAAAsAAAAAAAAADQAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAAIAAAAgIA",
+					"AQAAAAAAAAABAAAABwAAAAAAAAAHAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					7,
+					1,
+					"reindent",
+					null,
+					"AQAAAAgAAAAAAAAACgAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAACAAAAAAAAAAIAAAAAAAAAAAAAAAAADJA"
+				],
+				[
+					8,
+					1,
+					"insert",
+					{
+						"characters": "package:"
+					},
+					"CQAAAAoAAAAAAAAACwAAAAAAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAIAAAAgIAsAAAAAAAAADAAAAAAAAAAAAAAADAAAAAAAAAANAAAAAAAAAAAAAAANAAAAAAAAAA4AAAAAAAAAAAAAAA4AAAAAAAAADwAAAAAAAAAAAAAADwAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAABEAAAAAAAAAAAAAABEAAAAAAAAAEgAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAACgAAAAAAAAAKAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					9,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAABIAAAAAAAAAEwAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAEgAAAAAAAAASAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					10,
+					1,
+					"left_delete",
+					null,
+					"AQAAABIAAAAAAAAAEgAAAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAAEwAAAAAAAAATAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					11,
+					1,
+					"insert",
+					{
+						"characters": "\nname:"
+					},
+					"CAAAABIAAAAAAAAAEwAAAAAAAAAAAAAAEwAAAAAAAAAVAAAAAAAAAAAAAAAVAAAAAAAAABcAAAAAAAAAAAAAABcAAAAAAAAAGAAAAAAAAAAAAAAAGAAAAAAAAAAZAAAAAAAAAAAAAAAZAAAAAAAAABoAAAAAAAAAAAAAABoAAAAAAAAAGwAAAAAAAAAAAAAAGwAAAAAAAAAcAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAEgAAAAAAAAASAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					12,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAABwAAAAAAAAAHQAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAHAAAAAAAAAAcAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					17,
+					1,
+					"paste",
+					null,
+					"AQAAAB0AAAAAAAAAKwAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAHQAAAAAAAAAdAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					18,
+					1,
+					"insert",
+					{
+						"characters": "\nstate:"
+					},
+					"CAAAACsAAAAAAAAALAAAAAAAAAAAAAAALAAAAAAAAAAwAAAAAAAAAAAAAAAwAAAAAAAAADEAAAAAAAAAAAAAADEAAAAAAAAAMgAAAAAAAAAAAAAAMgAAAAAAAAAzAAAAAAAAAAAAAAAzAAAAAAAAADQAAAAAAAAAAAAAADQAAAAAAAAANQAAAAAAAAAAAAAANQAAAAAAAAA2AAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAKwAAAAAAAAArAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					19,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAADYAAAAAAAAANwAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAANgAAAAAAAAA2AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					20,
+					1,
+					"insert",
+					{
+						"characters": "latst"
+					},
+					"BQAAADcAAAAAAAAAOAAAAAAAAAAAAAAAOAAAAAAAAAA5AAAAAAAAAAAAAAA5AAAAAAAAADoAAAAAAAAAAAAAADoAAAAAAAAAOwAAAAAAAAAAAAAAOwAAAAAAAAA8AAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAANwAAAAAAAAA3AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					21,
+					5,
+					"left_delete",
+					null,
+					"BQAAADsAAAAAAAAAOwAAAAAAAAABAAAAdDoAAAAAAAAAOgAAAAAAAAABAAAAczkAAAAAAAAAOQAAAAAAAAABAAAAdDgAAAAAAAAAOAAAAAAAAAABAAAAYTcAAAAAAAAANwAAAAAAAAABAAAAbA",
+					"AQAAAAAAAAABAAAAPAAAAAAAAAA8AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					22,
+					1,
+					"insert",
+					{
+						"characters": "latest"
+					},
+					"BgAAADcAAAAAAAAAOAAAAAAAAAAAAAAAOAAAAAAAAAA5AAAAAAAAAAAAAAA5AAAAAAAAADoAAAAAAAAAAAAAADoAAAAAAAAAOwAAAAAAAAAAAAAAOwAAAAAAAAA8AAAAAAAAAAAAAAA8AAAAAAAAAD0AAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAANwAAAAAAAAA3AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					23,
+					1,
+					"insert",
+					{
+						"characters": "\n"
+					},
+					"AgAAAD0AAAAAAAAAPgAAAAAAAAAAAAAAPgAAAAAAAABCAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAPQAAAAAAAAA9AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					24,
+					1,
+					"left_delete",
+					null,
+					"AQAAAEAAAAAAAAAAQAAAAAAAAAACAAAAICA",
+					"AQAAAAAAAAABAAAAQgAAAAAAAABCAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					25,
+					1,
+					"insert",
+					{
+						"characters": "\\"
+					},
+					"AQAAAEAAAAAAAAAAQQAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAQAAAAAAAAABAAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					26,
+					2,
+					"left_delete",
+					null,
+					"AgAAAEAAAAAAAAAAQAAAAAAAAAABAAAAXD4AAAAAAAAAPgAAAAAAAAACAAAAICA",
+					"AQAAAAAAAAABAAAAQQAAAAAAAABBAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					27,
+					1,
+					"insert",
+					{
+						"characters": "\n-"
+					},
+					"AgAAAD4AAAAAAAAAPwAAAAAAAAAAAAAAPwAAAAAAAABAAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAPgAAAAAAAAA+AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					28,
+					1,
+					"insert",
+					{
+						"characters": " name:"
+					},
+					"BgAAAEAAAAAAAAAAQQAAAAAAAAAAAAAAQQAAAAAAAABCAAAAAAAAAAAAAABCAAAAAAAAAEMAAAAAAAAAAAAAAEMAAAAAAAAARAAAAAAAAAAAAAAARAAAAAAAAABFAAAAAAAAAAAAAABFAAAAAAAAAEYAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAQAAAAAAAAABAAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					29,
+					1,
+					"insert",
+					{
+						"characters": "\n"
+					},
+					"AgAAAEYAAAAAAAAARwAAAAAAAAAAAAAARwAAAAAAAABJAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAARgAAAAAAAABGAAAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"file": "inventory/kubernetes",
+			"settings":
+			{
+				"buffer_size": 475,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			},
+			"undo_stack":
+			[
+				[
+					7,
+					1,
+					"insert",
+					{
+						"characters": "\n\nk"
+					},
+					"AwAAABIBAAAAAAAAEwEAAAAAAAAAAAAAEwEAAAAAAAAUAQAAAAAAAAAAAAAUAQAAAAAAABUBAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAEgEAAAAAAAASAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					8,
+					1,
+					"left_delete",
+					null,
+					"AQAAABQBAAAAAAAAFAEAAAAAAAABAAAAaw",
+					"AQAAAAAAAAABAAAAFQEAAAAAAAAVAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					9,
+					1,
+					"insert_snippet",
+					{
+						"contents": "[$0]"
+					},
+					"AQAAABQBAAAAAAAAFgEAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAFAEAAAAAAAAUAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					10,
+					1,
+					"insert",
+					{
+						"characters": "k8s_virt"
+					},
+					"CAAAABUBAAAAAAAAFgEAAAAAAAAAAAAAFgEAAAAAAAAXAQAAAAAAAAAAAAAXAQAAAAAAABgBAAAAAAAAAAAAABgBAAAAAAAAGQEAAAAAAAAAAAAAGQEAAAAAAAAaAQAAAAAAAAAAAAAaAQAAAAAAABsBAAAAAAAAAAAAABsBAAAAAAAAHAEAAAAAAAAAAAAAHAEAAAAAAAAdAQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAFQEAAAAAAAAVAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					12,
+					1,
+					"insert",
+					{
+						"characters": "\n192.168.90"
+					},
+					"CwAAAB4BAAAAAAAAHwEAAAAAAAAAAAAAHwEAAAAAAAAgAQAAAAAAAAAAAAAgAQAAAAAAACEBAAAAAAAAAAAAACEBAAAAAAAAIgEAAAAAAAAAAAAAIgEAAAAAAAAjAQAAAAAAAAAAAAAjAQAAAAAAACQBAAAAAAAAAAAAACQBAAAAAAAAJQEAAAAAAAAAAAAAJQEAAAAAAAAmAQAAAAAAAAAAAAAmAQAAAAAAACcBAAAAAAAAAAAAACcBAAAAAAAAKAEAAAAAAAAAAAAAKAEAAAAAAAApAQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAHgEAAAAAAAAeAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					13,
+					1,
+					"insert",
+					{
+						"characters": ".10"
+					},
+					"AwAAACkBAAAAAAAAKgEAAAAAAAAAAAAAKgEAAAAAAAArAQAAAAAAAAAAAAArAQAAAAAAACwBAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAKQEAAAAAAAApAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					14,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAACwBAAAAAAAALQEAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAALAEAAAAAAAAsAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					27,
+					1,
+					"paste",
+					null,
+					"AgAAAB8BAAAAAAAAbwEAAAAAAAAAAAAAbwEAAAAAAABvAQAAAAAAAA4AAAAxOTIuMTY4LjkwLjEwIA",
+					"AQAAAAAAAAABAAAALQEAAAAAAAAfAQAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"file": "playbooks/k8s-install.yaml",
+			"settings":
+			{
+				"buffer_size": 1501,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "playbooks/k8s-virt-install.yaml",
+			"settings":
+			{
+				"buffer_size": 508,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			},
+			"undo_stack":
+			[
+				[
+					5,
+					3,
+					"left_delete",
+					null,
+					"AwAAAKwBAAAAAAAArAEAAAAAAAAxBAAALSBuYW1lOiBpbnN0YWxsIGt1YmVybmV0ZXMgZm9yIHNpbmdsZSBtYXN0ZXIKICBob3N0czogazhzX21hc3RlclswXQogIHRhZ3M6IGs4cy1tYXN0ZXItc2luZ2xlCiAgcm9sZXM6ICAKICAgIC0geyByb2xlOiBrOHMtbWFzdGVyLXNpbmdsZSwgd2hlbjogazhzX3Byb3h5X21vZGUgPT0gInNpbmdsZSIgfQoKCi0gbmFtZTogaW5zdGFsbCBrdWJlcm5ldGVzIG1hc3RlciBmb3IgdGhlIGZpcnN0IG1hc3RlciBub2RlCiAgaG9zdHM6IGs4c19tYXN0ZXJbMF0KICB0YWdzOiBrOHMtbWFzdGVyLXNpbmdsZQogIHJvbGVzOgogICAgLSB7IHJvbGU6IGs4cy1tYXN0ZXItc2luZ2xlLCB3aGVuOiBrOHNfcHJveHlfbW9kZSA9PSAibXVsdGkiIH0KCi0gbmFtZTogaW5zdGFsbCBrdWJlcm5ldGVzIG1hc3RlciBmb3IgdGhlIHJlc3Qgb2YgbWFzdGVyIG5vZGVzCiAgaG9zdHM6IGs4c19tYXN0ZXJbMTp7eyBNQVNURVJfSE9TVFNfQ09VTlQgfX1dCiAgdGFnczogazhzLW1hc3Rlci1tdWx0aQogIHJvbGVzOgogICAgLSB7IHJvbGU6IGs4cy1tYXN0ZXItaGEsIHdoZW46IGs4c19wcm94eV9tb2RlID09ICJtdWx0aSIgfQogIHZhcnM6CiAgICBNQVNURVJfSE9TVFNfQ09VTlQ6ICJ7eyBncm91cHNbJ2s4c19tYXN0ZXInXSB8IGxlbmd0aCB9fSIKCi0gbmFtZTogaW5zdGFsbCBrdWJlcm5ldGVzIG5ldHdvcmsgc2VydmljZQogIGhvc3RzOiBrOHNfbWFzdGVyWzBdCiAgdGFnczogazhzLW5ldHdvcmsKICByb2xlczogIAogICAgLSB7IHJvbGU6IGNuaS1jYWxpY28sIHdoZW46IGs4c19uZXR3b3JrID09ICJjYWxpY28iIH0KICAgIC0geyByb2xlOiBjbmktZmxhbm5lZCwgd2hlbjogazhzX25ldHdvcmsgPT0gImZsYW5uZWQiIH0KICAgICMgLSB7IHJvbGU6IGNuaS1tdWx0dXMsIHdoZW46IGs4c19uZXR3b3JrID09ICJtdWx0dXMiIH0KICAgICMgLSB7IHJvbGU6IGNuaS1rdWJlb3ZuLCB3aGVuOiBrOHNfbmV0d29yayA9PSAia3ViZW92biIgfQoKLSBuYW1lOiBpbnN0YWxsIGt1YmVybmV0ZXMgbm9kZXMKICBob3N0czogazhzX25vZGUKICB0YWdzOiBrOHMtbm9kZQogIHJvbGVzOiAgCiAgICAtIGs4cy1ub2RlCgqrAQAAAAAAAKsBAAAAAAAAAQAAAAqqAQAAAAAAAKoBAAAAAAAAAQAAAAo",
+					"AQAAAAAAAAABAAAArAEAAAAAAADdBQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					8,
+					2,
+					"left_delete",
+					null,
+					"AgAAACwAAAAAAAAALAAAAAAAAAABAAAAYisAAAAAAAAAKwAAAAAAAAABAAAAbA",
+					"AQAAAAAAAAABAAAALQAAAAAAAAAtAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					9,
+					1,
+					"insert",
+					{
+						"characters": "k8s-"
+					},
+					"BAAAACsAAAAAAAAALAAAAAAAAAAAAAAALAAAAAAAAAAtAAAAAAAAAAAAAAAtAAAAAAAAAC4AAAAAAAAAAAAAAC4AAAAAAAAALwAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAKwAAAAAAAAArAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					10,
+					1,
+					"left_delete",
+					null,
+					"AQAAAC4AAAAAAAAALgAAAAAAAAABAAAALQ",
+					"AQAAAAAAAAABAAAALwAAAAAAAAAvAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					11,
+					1,
+					"insert",
+					{
+						"characters": "_virt"
+					},
+					"BQAAAC4AAAAAAAAALwAAAAAAAAAAAAAALwAAAAAAAAAwAAAAAAAAAAAAAAAwAAAAAAAAADEAAAAAAAAAAAAAADEAAAAAAAAAMgAAAAAAAAAAAAAAMgAAAAAAAAAzAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAALgAAAAAAAAAuAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					22,
+					1,
+					"insert",
+					{
+						"characters": "bvi"
+					},
+					"BAAAAEAAAAAAAAAAQQAAAAAAAAAAAAAAQQAAAAAAAABBAAAAAAAAAAcAAABoYXByb3h5QQAAAAAAAABCAAAAAAAAAAAAAABCAAAAAAAAAEMAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAQAAAAAAAAABHAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					23,
+					3,
+					"left_delete",
+					null,
+					"AwAAAEIAAAAAAAAAQgAAAAAAAAABAAAAaUEAAAAAAAAAQQAAAAAAAAABAAAAdkAAAAAAAAAAQAAAAAAAAAABAAAAYg",
+					"AQAAAAAAAAABAAAAQwAAAAAAAABDAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					24,
+					1,
+					"insert",
+					{
+						"characters": "virt"
+					},
+					"BAAAAEAAAAAAAAAAQQAAAAAAAAAAAAAAQQAAAAAAAABCAAAAAAAAAAAAAABCAAAAAAAAAEMAAAAAAAAAAAAAAEMAAAAAAAAARAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAQAAAAAAAAABAAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					29,
+					1,
+					"insert",
+					{
+						"characters": "virt"
+					},
+					"BQAAAGMAAAAAAAAAZAAAAAAAAAAAAAAAZAAAAAAAAABkAAAAAAAAAAcAAABoYXByb3h5ZAAAAAAAAABlAAAAAAAAAAAAAABlAAAAAAAAAGYAAAAAAAAAAAAAAGYAAAAAAAAAZwAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAYwAAAAAAAABqAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					34,
+					1,
+					"insert",
+					{
+						"characters": "k8s_vi"
+					},
+					"BwAAAG8AAAAAAAAAcAAAAAAAAAAAAAAAcAAAAAAAAABwAAAAAAAAAA4AAABrOHNfcHJveHlfbW9kZXAAAAAAAAAAcQAAAAAAAAAAAAAAcQAAAAAAAAByAAAAAAAAAAAAAAByAAAAAAAAAHMAAAAAAAAAAAAAAHMAAAAAAAAAdAAAAAAAAAAAAAAAdAAAAAAAAAB1AAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAbwAAAAAAAAB9AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					35,
+					1,
+					"insert",
+					{
+						"characters": "r"
+					},
+					"AQAAAHUAAAAAAAAAdgAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAdQAAAAAAAAB1AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					36,
+					3,
+					"left_delete",
+					null,
+					"AwAAAHUAAAAAAAAAdQAAAAAAAAABAAAAcnQAAAAAAAAAdAAAAAAAAAABAAAAaXMAAAAAAAAAcwAAAAAAAAABAAAAdg",
+					"AQAAAAAAAAABAAAAdgAAAAAAAAB2AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					37,
+					1,
+					"insert",
+					{
+						"characters": "virtuali"
+					},
+					"CAAAAHMAAAAAAAAAdAAAAAAAAAAAAAAAdAAAAAAAAAB1AAAAAAAAAAAAAAB1AAAAAAAAAHYAAAAAAAAAAAAAAHYAAAAAAAAAdwAAAAAAAAAAAAAAdwAAAAAAAAB4AAAAAAAAAAAAAAB4AAAAAAAAAHkAAAAAAAAAAAAAAHkAAAAAAAAAegAAAAAAAAAAAAAAegAAAAAAAAB7AAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAcwAAAAAAAABzAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					38,
+					1,
+					"insert",
+					{
+						"characters": "zation"
+					},
+					"BgAAAHsAAAAAAAAAfAAAAAAAAAAAAAAAfAAAAAAAAAB9AAAAAAAAAAAAAAB9AAAAAAAAAH4AAAAAAAAAAAAAAH4AAAAAAAAAfwAAAAAAAAAAAAAAfwAAAAAAAACAAAAAAAAAAAAAAACAAAAAAAAAAIEAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAewAAAAAAAAB7AAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					44,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIEAAAAAAAAAgQAAAAAAAAAMAAAAID09ICJtdWx0aSIg",
+					"AQAAAAAAAAABAAAAgQAAAAAAAACNAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					45,
+					1,
+					"insert",
+					{
+						"characters": "|boolk"
+					},
+					"BgAAAIEAAAAAAAAAggAAAAAAAAAAAAAAggAAAAAAAACDAAAAAAAAAAAAAACDAAAAAAAAAIQAAAAAAAAAAAAAAIQAAAAAAAAAhQAAAAAAAAAAAAAAhQAAAAAAAACGAAAAAAAAAAAAAACGAAAAAAAAAIcAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAgQAAAAAAAACBAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					46,
+					1,
+					"left_delete",
+					null,
+					"AQAAAIYAAAAAAAAAhgAAAAAAAAABAAAAaw",
+					"AQAAAAAAAAABAAAAhwAAAAAAAACHAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					47,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAIYAAAAAAAAAhwAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhgAAAAAAAACGAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					48,
+					1,
+					"insert",
+					{
+						"characters": "is"
+					},
+					"AgAAAIcAAAAAAAAAiAAAAAAAAAAAAAAAiAAAAAAAAACJAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwAAAAAAAACHAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					49,
+					1,
+					"insert",
+					{
+						"characters": " true"
+					},
+					"BQAAAIkAAAAAAAAAigAAAAAAAAAAAAAAigAAAAAAAACLAAAAAAAAAAAAAACLAAAAAAAAAIwAAAAAAAAAAAAAAIwAAAAAAAAAjQAAAAAAAAAAAAAAjQAAAAAAAACOAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQAAAAAAAACJAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					50,
+					7,
+					"left_delete",
+					null,
+					"BwAAAI0AAAAAAAAAjQAAAAAAAAABAAAAZYwAAAAAAAAAjAAAAAAAAAABAAAAdYsAAAAAAAAAiwAAAAAAAAABAAAAcooAAAAAAAAAigAAAAAAAAABAAAAdIkAAAAAAAAAiQAAAAAAAAABAAAAIIgAAAAAAAAAiAAAAAAAAAABAAAAc4cAAAAAAAAAhwAAAAAAAAABAAAAaQ",
+					"AQAAAAAAAAABAAAAjgAAAAAAAACOAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					51,
+					1,
+					"insert",
+					{
+						"characters": "=="
+					},
+					"AgAAAIcAAAAAAAAAiAAAAAAAAAAAAAAAiAAAAAAAAACJAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAhwAAAAAAAACHAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					52,
+					1,
+					"insert",
+					{
+						"characters": " yes"
+					},
+					"BAAAAIkAAAAAAAAAigAAAAAAAAAAAAAAigAAAAAAAACLAAAAAAAAAAAAAACLAAAAAAAAAIwAAAAAAAAAAAAAAIwAAAAAAAAAjQAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAiQAAAAAAAACJAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					53,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAI0AAAAAAAAAjgAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAjQAAAAAAAACNAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					54,
+					1,
+					"left_delete",
+					null,
+					"AQAAAI0AAAAAAAAAjQAAAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAAjgAAAAAAAACOAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					67,
+					1,
+					"insert",
+					{
+						"characters": "containered"
+					},
+					"DAAAAKcBAAAAAAAAqAEAAAAAAAAAAAAAqAEAAAAAAACoAQAAAAAAAAQAAABjcmlvqAEAAAAAAACpAQAAAAAAAAAAAACpAQAAAAAAAKoBAAAAAAAAAAAAAKoBAAAAAAAAqwEAAAAAAAAAAAAAqwEAAAAAAACsAQAAAAAAAAAAAACsAQAAAAAAAK0BAAAAAAAAAAAAAK0BAAAAAAAArgEAAAAAAAAAAAAArgEAAAAAAACvAQAAAAAAAAAAAACvAQAAAAAAALABAAAAAAAAAAAAALABAAAAAAAAsQEAAAAAAAAAAAAAsQEAAAAAAACyAQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAApwEAAAAAAACrAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					74,
+					1,
+					"insert",
+					{
+						"characters": "\n"
+					},
+					"AgAAALUBAAAAAAAAtgEAAAAAAAAAAAAAtgEAAAAAAAC6AQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAtQEAAAAAAAC1AQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					75,
+					1,
+					"paste",
+					null,
+					"AQAAALoBAAAAAAAABQIAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAugEAAAAAAAC6AQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					80,
+					1,
+					"left_delete",
+					null,
+					"AQAAAMkBAAAAAAAAyQEAAAAAAAAKAAAAY29udGFpbmVyZA",
+					"AQAAAAAAAAABAAAAyQEAAAAAAADTAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					81,
+					1,
+					"insert",
+					{
+						"characters": "docker"
+					},
+					"BgAAAMkBAAAAAAAAygEAAAAAAAAAAAAAygEAAAAAAADLAQAAAAAAAAAAAADLAQAAAAAAAMwBAAAAAAAAAAAAAMwBAAAAAAAAzQEAAAAAAAAAAAAAzQEAAAAAAADOAQAAAAAAAAAAAADOAQAAAAAAAM8BAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAyQEAAAAAAADJAQAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					86,
+					1,
+					"insert",
+					{
+						"characters": "docker"
+					},
+					"BwAAAPMBAAAAAAAA9AEAAAAAAAAAAAAA9AEAAAAAAAD0AQAAAAAAAAsAAABjb250YWluZXJlZPQBAAAAAAAA9QEAAAAAAAAAAAAA9QEAAAAAAAD2AQAAAAAAAAAAAAD2AQAAAAAAAPcBAAAAAAAAAAAAAPcBAAAAAAAA+AEAAAAAAAAAAAAA+AEAAAAAAAD5AQAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAA8wEAAAAAAAD+AQAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		},
+		{
+			"file": "roles/core-virt/meta/main.yaml",
+			"settings":
+			{
+				"buffer_size": 27,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			},
+			"undo_stack":
+			[
+				[
+					3,
+					1,
+					"insert",
+					{
+						"characters": "dep"
+					},
+					"AwAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAACAAAAAAAAAAAAAAACAAAAAAAAAAMAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					4,
+					1,
+					"insert",
+					{
+						"characters": "enden"
+					},
+					"BQAAAAMAAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAFAAAAAAAAAAAAAAAFAAAAAAAAAAYAAAAAAAAAAAAAAAYAAAAAAAAABwAAAAAAAAAAAAAABwAAAAAAAAAIAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAAwAAAAAAAAADAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					5,
+					1,
+					"insert",
+					{
+						"characters": "cies:"
+					},
+					"BQAAAAgAAAAAAAAACQAAAAAAAAAAAAAACQAAAAAAAAAKAAAAAAAAAAAAAAAKAAAAAAAAAAsAAAAAAAAAAAAAAAsAAAAAAAAADAAAAAAAAAAAAAAADAAAAAAAAAANAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAACAAAAAAAAAAIAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					6,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAA0AAAAAAAAADgAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAADQAAAAAAAAANAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					7,
+					1,
+					"insert_snippet",
+					{
+						"contents": "[$0]"
+					},
+					"AQAAAA4AAAAAAAAAEAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAADgAAAAAAAAAOAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					10,
+					1,
+					"insert",
+					{
+						"characters": " "
+					},
+					"AQAAAA8AAAAAAAAAEAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAADwAAAAAAAAAPAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					11,
+					1,
+					"left_delete",
+					null,
+					"AQAAAA8AAAAAAAAADwAAAAAAAAABAAAAIA",
+					"AQAAAAAAAAABAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					12,
+					1,
+					"insert_snippet",
+					{
+						"contents": "'$0'"
+					},
+					"AQAAAA8AAAAAAAAAEQAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAADwAAAAAAAAAPAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					13,
+					1,
+					"insert",
+					{
+						"characters": "ci"
+					},
+					"AgAAABAAAAAAAAAAEQAAAAAAAAAAAAAAEQAAAAAAAAASAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					14,
+					2,
+					"left_delete",
+					null,
+					"AgAAABEAAAAAAAAAEQAAAAAAAAABAAAAaRAAAAAAAAAAEAAAAAAAAAABAAAAYw",
+					"AQAAAAAAAAABAAAAEgAAAAAAAAASAAAAAAAAAAAAAAAAAPC/"
+				],
+				[
+					15,
+					1,
+					"insert",
+					{
+						"characters": "core-crio"
+					},
+					"CQAAABAAAAAAAAAAEQAAAAAAAAAAAAAAEQAAAAAAAAASAAAAAAAAAAAAAAASAAAAAAAAABMAAAAAAAAAAAAAABMAAAAAAAAAFAAAAAAAAAAAAAAAFAAAAAAAAAAVAAAAAAAAAAAAAAAVAAAAAAAAABYAAAAAAAAAAAAAABYAAAAAAAAAFwAAAAAAAAAAAAAAFwAAAAAAAAAYAAAAAAAAAAAAAAAYAAAAAAAAABkAAAAAAAAAAAAAAA",
+					"AQAAAAAAAAABAAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAPC/"
+				]
+			]
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/H/duststack-k8s-auto",
+		"/H/duststack-k8s-auto/inventory",
+		"/H/duststack-k8s-auto/inventory/group_vars",
+		"/H/duststack-k8s-auto/inventory/group_vars/all",
+		"/H/duststack-k8s-auto/playbooks",
+		"/H/duststack-k8s-auto/roles",
+		"/H/duststack-k8s-auto/roles/virt-k8s"
+	],
+	"file_history":
+	[
+		"/H/duststack-k8s-auto/inventory/group_vars/all/kubernetes",
+		"/H/duststack-k8s-auto/group_vars/all/ha",
+		"/H/duststack-k8s-auto/group_vars/all/kubernetes",
+		"/H/duststack-k8s-auto/inventory/group_vars/all/updates",
+		"/H/duststack-k8s-auto/inventory/group_vars/all/extensions",
+		"/H/duststack-k8s-auto/roles/k8s-prepare/tasks/main.yml",
+		"/H/duststack-k8s-auto/inventory/group_vars/all/ha",
+		"/H/duststack-k8s-auto/roles/k8s-master-ha/files/kubeadm-config.yaml",
+		"/H/duststack-k8s-auto/playbooks/k8s-uninstall.yaml",
+		"/H/duststack-k8s-auto/roles/core-haproxy/templates/haproxy.conf.j2",
+		"/H/duststack-k8s-auto/roles/core-haproxy/tasks/main.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-prepare/tasks/packages.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-prepare/tasks/kubernetes.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-prepare/templates/100-crio-bridge.conf.j2",
+		"/H/duststack-k8s-auto/roles/core-crio/tasks/main.yml",
+		"/H/duststack-k8s-auto/roles/k8s-master-ha/files/kubelet",
+		"/H/duststack-k8s-auto/roles/k8s-master-single/tasks/docker.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-master-single/files/kubelet",
+		"/H/duststack-k8s-auto/roles/k8s-master-single/tasks/crio.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-master-ha/vars/master_node_count.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-node/tasks/main.yml",
+		"/H/duststack-k8s-auto/roles/cni-calico/tasks/main.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-master-ha/tasks/main.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-prepare/tasks/hostname.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-prepare/tasks/nodename.yaml",
+		"/H/duststack-k8s-auto/README.md",
+		"/H/duststack-k8s-auto/inventory/kubernetes",
+		"/H/duststack-k8s-auto/playbooks/k8s-install.yaml",
+		"/H/duststack-k8s-auto/roles/k8s-master/tasks/main.yml",
+		"/C/Users/bebop/OneDrive/바탕 화면/training_memos/README.md",
+		"/C/Users/bebop/OneDrive/바탕 화면/skt-shell-ansble.md",
+		"/F/duststack-k8s-auto/roles/k8s-master/tasks/crio.yaml",
+		"/F/duststack-k8s-auto/inventory/group_vars/all/kubernetes",
+		"/F/duststack-k8s-auto/roles/k8s-prepare/templates/100-crio-bridge.conf.j2",
+		"/F/duststack-k8s-auto/roles/k8s-master/tasks/docker.yaml",
+		"/F/duststack-k8s-auto/group_vars/all/extensions",
+		"/F/duststack-k8s-auto/group_vars/classroom/kickstart",
+		"/F/duststack-k8s-auto/group_vars/classroom/materials",
+		"/F/duststack-k8s-auto/group_vars/all/ha",
+		"/F/duststack-k8s-auto/group_vars/all/ntp",
+		"/F/duststack-k8s-auto/roles/k8s-master/tasks/calico.yaml",
+		"/F/duststack-k8s-auto/roles/k8s-prepare/tasks/hostname.yaml",
+		"/F/duststack-k8s-auto/inventory/kubernetes",
+		"/F/duststack-k8s-auto/group_vars/all/kubernetes",
+		"/F/duststack-k8s-auto/playbooks/k8s-install.yaml",
+		"/F/duststack-k8s-auto/roles/k8s-master-ha/tasks/main.yaml",
+		"/F/duststack-k8s-auto/library/add2vhost",
+		"/F/duststack-k8s-auto/inventory/group_vars/all/ha",
+		"/F/duststack-k8s-auto/roles/k8s-prepare/tasks/main.yml",
+		"/C/Users/bebop/Downloads/iris.data",
+		"/C/Users/bebop/Downloads/bezdekIris.data",
+		"/C/Users/bebop/Downloads/iris.names",
+		"/C/Users/bebop/Downloads/DL_01_height_weight_regression.ipynb",
+		"/C/Users/bebop/Downloads/DL_02_iris_classification.ipynb",
+		"/?wsl.localhost/Ubuntu-20.04/home/tang/whisper-chat-example/src/main.js",
+		"/?wsl.localhost/Ubuntu-20.04/home/tang/whisper-chat-example/src/WhisperChat.vue",
+		"/C/Users/bebop/OneDrive/Documents/GitHub/decentralized-chat/dist/index.html",
+		"/C/Users/bebop/OneDrive/Documents/GitHub/blockchain-chat/bundle.js",
+		"/C/Users/bebop/Downloads/kickstart.cfg",
+		"/C/Users/bebop/OneDrive/Documents/GitHub/decentralized-chat/README.md",
+		"/C/Users/bebop/Downloads/kickstart (2).cfg",
+		"/C/Users/bebop/Downloads/kickstart (1).cfg",
+		"/C/Users/bebop/AppData/Local/Temp/7zO8EE43E0A/lab",
+		"/C/Users/bebop/Downloads/genesis.json",
+		"/C/Users/bebop/OneDrive/Documents/GitHub/keis-container-devops/README.md",
+		"/C/Users/bebop/Downloads/deliverymain/delivery.js",
+		"/C/Users/bebop/OneDrive/바탕 화면/sdsdsdsds",
+		"/?wsl.localhost/CentOS8/root/keis-container-devops/README.md.txt",
+		"/C/Users/bebop/Downloads/오늘 수업의 예제 프로그램-20211028/device/measure.py"
+	],
+	"find":
+	{
+		"height": 28.0
+	},
+	"find_in_files":
+	{
+		"height": 104.0,
+		"where_history":
+		[
+			"H:\\duststack-k8s-auto,<project filters>"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"pause",
+			"k8s_interface",
+			"k8s_pod_cider_cidr",
+			"kubeadm",
+			"k8s_k8s_runtime_environment",
+			"runtime_environment",
+			"192.168.100."
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"k8s_pod_cidr",
+			"k8s_runtime_environment",
+			"192.168.90."
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4672,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										244,
+										251
+									],
+									[
+										464,
+										471
+									],
+									[
+										639,
+										646
+									],
+									[
+										868,
+										875
+									],
+									[
+										939,
+										946
+									],
+									[
+										1001,
+										1008
+									],
+									[
+										1403,
+										1410
+									],
+									[
+										1582,
+										1589
+									],
+									[
+										1703,
+										1710
+									],
+									[
+										1844,
+										1851
+									],
+									[
+										1884,
+										1891
+									],
+									[
+										2197,
+										2204
+									],
+									[
+										2429,
+										2436
+									],
+									[
+										2569,
+										2576
+									],
+									[
+										2806,
+										2813
+									],
+									[
+										2981,
+										2988
+									],
+									[
+										3300,
+										3313
+									],
+									[
+										3499,
+										3512
+									],
+									[
+										3726,
+										3731
+									],
+									[
+										3872,
+										3877
+									],
+									[
+										4131,
+										4136
+									],
+									[
+										4342,
+										4347
+									],
+									[
+										4553,
+										4558
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								3757,
+								3757
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 3,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 2585.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "roles/virt-k8s/tasks/main.yaml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3318,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 171.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "roles/core-virt/tasks/main.yaml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 74,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								74,
+								74
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "inventory/kubernetes",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 475,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								367,
+								367
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "playbooks/k8s-install.yaml",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 1501,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "playbooks/k8s-virt-install.yaml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 508,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								505,
+								505
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "roles/core-virt/meta/main.yaml",
+					"selected": true,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 27,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								25,
+								25
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"stack_multiselect": false,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 28.0
+	},
+	"input":
+	{
+		"height": 40.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "duststack-k8s-auto.sublime-project",
+	"replace":
+	{
+		"height": 52.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 276.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
