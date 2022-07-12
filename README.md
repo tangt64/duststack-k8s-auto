@@ -74,6 +74,7 @@ __->유튜브 왜 자주 안올려주시나요?__
 #### 윈도우
 
 VMware Workstation Player 혹은 VirtualBox, 권장은 VMware Workstation Player.
+
 추후에 Hyper-V Server에서 자동설치를 앤서블로 지원할 예정 입니다.
 
 ## 문의
@@ -81,6 +82,7 @@ VMware Workstation Player 혹은 VirtualBox, 권장은 VMware Workstation Player
 다른 문의사항이 있으시면 아래로 연락 주세요! :)
 
 **E-Mail:** <bluehelix@gmail.com>
+
 **Name:** 최국현(Choi Gook Hyun)
 
 ## License
