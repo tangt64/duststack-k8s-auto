@@ -1,61 +1,21 @@
-- name: copy a master configuration file
-  copy:
-    src: kubeadm-config.yaml
-    dest: /tmp/
-
-
-- name: count total of master nodes
-  debug:
-    var: '{{ MASTER_TOTAL_COUNT }}'
-
-- name: init kubeadmin for the first master node with crio
-  shell: kubeadm init --pod-network-cidr={{ k8s_pod_cider_cidr }} --service-cidr={{ k8s_cluster_svc_ip }} --service-dns-domain={{ k8s_cluster_domain }} --apiserver-advertise-address={{ ansible_facts[k8s_interface]['ipv4']['address'] }} --cri-socket=/var/run/crio/crio.sock
+- name:
+  shell: kubeadm init phase upload-certs --upload-certs | tail -1
+  register: k8sTls
   delegate_to: "{{ groups['k8s_master'] | first }}"
-
-- name: init kubeadmin for rest of master nodes with crio
-  shell: kubeadm init --pod-network-cidr={{ k8s_pod_cider_cidr }} --service-cidr={{ k8s_cluster_svc_ip }} --service-dns-domain={{ k8s_cluster_domain }} --apiserver-advertise-address={{ ansible_facts[k8s_interface]['ipv4']['address'] }} --cri-socket=/var/run/crio/crio.sock
-  delegate_to: "{{ groups['k8s_master'][ item ]}}"
-  with_sequence:
-    - start: 1
-    - end: {{ MASTER_TOTAL_COUNT }}
-
-
-- name: copy kubelet config file to /etc/sysconfig
-  copy:
-    src: files/kubelet
-    dest: /etc/sysconfig/kubelet
-- pause:
-    seconds: 30
+  run_once: true
 
 - name: get token
   command: kubeadm token create --print-join-command
   register: k8stoken
   delegate_to: "{{ groups['k8s_master'] | first }}"
+  run_once: true
 
 - name: join the rest of master nodes into first master node cluster
-  shell: "{{ k8stoken.stdout }} --control-plane"
+  shell: "{{ k8stoken.stdout }} --control-plane --certificate-key {{ k8sTls.stdout }}"
   register: master_reg_result
-  delegate_to: "{{ groups['k8s_master'] }}"
 
 - pause:
     seconds: 30
     prompt: the rest of master nodes successfully joined to the cluster
 
-- name:
-  copy: 
-    src: "/etc/kubernetes/{{ item }}"
-    dest: /etc/kubernetes/
-    mode: 0700
-  loop:
-    - pki/ca.crt
-    - pki/ca.key
-    - pki/sa.key
-    - pki/sa.pub
-    - pki/front-proxy-ca.crt
-    - pki/front-proxy-ca.key
-    - etcd/ca.crt
-    - etcd/ca.key
-    - admin.conf
-- name:
-  shell: |
-    kubeadm join --control-plane
+

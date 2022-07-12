@@ -1,10 +1,26 @@
-- name: install haproxy
-  yum:
-    name: haproxy
+- name: install haproxy and keepalived
+  package:
+    name: "{{ item }}"
     state: latest
+  loop:
+    - haproxy
+    - keepalived
 
-- name: start and enable haproxy service
+- name: configuration to haproxy as loadbalance
+  template:
+    src: haproxy.conf.j2
+    dest: /etc/haproxy/haproxy.cfg
+
+- name: configuration to keepalived as VIP
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+
+- name: start and enable haproxy and keepalived service
   service:
-    name: haproxy
+    name: "{{ item }}"
     state: started
     enabled: yes
+  loop:
+    - haproxy
+    - keepalived

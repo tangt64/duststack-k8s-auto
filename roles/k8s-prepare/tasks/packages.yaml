@@ -5,3 +5,8 @@
   loop:
     - iproute
     - iproute-tc  
+
+- name: install the kubeadm package for install
+  package:
+    name: kubeadm
+    state: present

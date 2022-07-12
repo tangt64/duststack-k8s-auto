@@ -6,8 +6,7 @@
   command: kubeadm token create --print-join-command
   delegate_to: "{{ groups['k8s_master'] | first }}"
   register: k8stoken
-  when: k8s_proxy_mode == "single"
-
+  
 - name: copy kubelet config file to /etc/sysconfig
   copy:
     src: kubelet

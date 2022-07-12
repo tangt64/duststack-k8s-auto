@@ -3,4 +3,11 @@
   - name: uninstall kubernetes all nodes
     command: kubeadm reset --force
     ignore_errors: yes
-    
+
+  - name: delete to old configuration and certification files
+    file:
+      state: absent
+      path: "{{ item }}"
+    loop:
+      - /etc/kubernetes/
+      - ~/.kube

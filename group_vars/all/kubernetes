@@ -18,9 +18,9 @@ k8s_runtime_environment: crio
 k8s_network: calico
 
 # internal, between kubernetes masters and nodes
-k8s_interface: ens4
+k8s_interface: ens3
 
-k8s_cluster_svc_ip: 10.96.0.1
-k8s_pod_cider_cidr: 10.244.0.0/16
+k8s_cluster_svc_ip: 10.96.0.0/16
+k8s_pod_cidr: 10.244.0.0/16
 k8s_svc_node_port_range: 30000-32767
 k8s_cluster_domain: cluster.local

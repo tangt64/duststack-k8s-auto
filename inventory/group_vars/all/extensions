@@ -1,2 +1,4 @@
 enabled_metrics: enable
 enabled_ingress: enable
+# kubernetes virtualization enabled
+enabled_virtual: enable

@@ -1,2 +1,12 @@
+- name:
+  get_url:
+    url: https://docs.projectcalico.org/manifests/calico.yaml
+    dest: /tmp/calico.yaml
+
 - name: apply to kube-calico on kubernetes cluster
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f files/calico.yaml
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/calico.yaml
+
+- name: 
+  file:
+    path: /tmp/calico.yaml
+    state: absent  
