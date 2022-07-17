@@ -1,3 +1,7 @@
+# ssh public key file location
+#
+private_key_file: ~/.ssh/id_rsa
+
 # Single or Multi master for kubernetes
 k8s_proxy_mode: multi
 
@@ -10,7 +14,7 @@ internal_stroage_dev_name: ens4
 ingress_controller: haproxy
 
 # firewalld for kubernetes
-use_firewalld: disable
+use_firewalld: no
 
 k8s_runtime_environment: crio
 
