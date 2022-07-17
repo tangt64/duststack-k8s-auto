@@ -10,3 +10,10 @@
   package:
     name: kubeadm
     state: present
+
+- name: install the selinux packages
+  package:
+    name: "{{ item }}"
+  loop:
+    - python3-libselinux
+    - python3-libsemanage

@@ -13,7 +13,7 @@
     - "10255/tcp"
     - "30000-32767/tcp"
     - "179/tcp"
-  when: use_firewalld == "enable"
+  when: use_firewalld == "yes"
 
 - name: disabled to the firewalld service permanently
   service:

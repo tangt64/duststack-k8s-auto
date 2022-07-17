@@ -1,23 +1,23 @@
-- name: haproxy install and setup
-  hosts: lb
-  tags: k8s-haproxy
-  roles:  
-    - { role: core-haproxy, when: k8s_proxy_mode == "multi"  }
-
 - name: install and enable to cri-o,docker enviroment
   hosts: k8s_master:k8s_node
   tags: k8s-prepare
   roles:  
     - { role: k8s-prepare }    
     - { role: core-crio, when: k8s_runtime_environment == "crio" }
-    - { role: core-containerd, when: k8s_runtime_environment == "crio" }
+    - { role: core-containerd, when: k8s_runtime_environment == "containerd" }
+
+- name: haproxy install and setup
+  hosts: lb
+  tags: k8s-haproxy
+  roles:  
+    - { role: k8s-prepare }
+    - { role: core-haproxy, when: k8s_proxy_mode == "multi"  }
 
 - name: install kubernetes for single master
   hosts: k8s_master[0]
   tags: k8s-master-single
   roles:  
     - { role: k8s-master-single, when: k8s_proxy_mode == "single" }
-
 
 - name: install kubernetes master for the first master node
   hosts: k8s_master[0]
@@ -48,3 +48,8 @@
   roles:  
     - k8s-node
 
+- name: label to kubernetes worker nodes
+  hosts: k8s_node
+  tags: k8s-node-label
+  roles:  
+    - k8s-post-config

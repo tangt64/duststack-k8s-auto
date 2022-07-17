@@ -18,4 +18,4 @@
     seconds: 30
     prompt: the rest of master nodes successfully joined to the cluster
 
-
+- import_tasks: kubelet.yaml

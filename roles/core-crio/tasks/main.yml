@@ -20,17 +20,18 @@
     - devel_kubic_libcontainers_stable.repo
 
 - name: install to cri-o
-  yum:
+  package:
     name: cri-o
     state: latest
 
 - name: update to system packages
-  yum:
+  package:
     name: '*'
     state: latest
     exclude:
       - kernel*
       - kubelet*
+  when: update_all_packages == "yes"
 
 - name: net.bridge.bridge-nf-call-iptables, net.ipv4.ip_forward, net.bridge.bridge-nf-call-ip6tables
   lineinfile:

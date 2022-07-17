@@ -1,5 +1,6 @@
 ---
-# tasks file for k18s-prepare
+- import_tasks: kubernetes-repository.yaml
+
 - import_tasks: hostname.yaml
 - import_tasks: firewalld.yaml
 - import_tasks: swapoff.yaml
@@ -8,10 +9,7 @@
 - import_tasks: packages.yaml 
 - import_tasks: nodename.yaml
 
-- import_tasks: crio.yaml
-  when: k8s_runtime_environment == "crio"
-# - import_tasks: docker.yaml
-#  when: k8s_runtime_environment == "docker"
-- import_tasks: kubernetes.yaml
-
-
+#- import_tasks: crio.yaml
+#  when: k8s_runtime_environment == "crio"
+#- import_tasks: containerd.yaml
+#  when: k8s_runtime_environment == "containerd"

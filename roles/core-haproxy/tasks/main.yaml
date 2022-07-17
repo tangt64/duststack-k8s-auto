@@ -24,3 +24,6 @@
   loop:
     - haproxy
     - keepalived
+
+- import_tasks: hostname.yaml
+- import_tasks: selinux.yaml
