@@ -1,0 +1,5 @@
+- name: setup to selinux boolean for haproxy
+  ansible.posix.seboolean:
+    name: haproxy_connect_any
+    state: yes
+    persistent: true

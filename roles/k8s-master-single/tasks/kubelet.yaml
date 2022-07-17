@@ -1,0 +1,6 @@
+- name: enable and start kubetlet service
+  service:
+    name: kubelet
+    state: started
+    enabled: yes
+

@@ -1,0 +1,6 @@
+---
+- hosts: all
+
+  tasks:
+  - command: sshpass -p centos ssh-copy-id -i /home/tang/.ssh/id_rsa.pub -o StrictHostKeyChecking=no {{ ansible_hostname }}
+

@@ -1,0 +1,5 @@
+- name: install the virtctl command
+  copy:
+    src: virtctl-v0.54.0
+    dest: /usr/local/virtctl
+    mode: 0700

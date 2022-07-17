@@ -1,0 +1,31 @@
+- name: precheck kubernetes virtualization as workder node
+  hosts: k8s_virt
+  tags: k8s-virt
+  roles:  
+    - { role: core-virt-precheck, when: enabled_virtual == "yes" }
+
+- name: install to kubernetes for kube-virt controller
+  hosts: k8s_master[0]
+  tags: k8s-virt
+  roles:  
+    - { role: core-virt, when: enabled_virtual == "yes" }
+
+- name: configure to kubernetes virtualization  
+  hosts: k8s_virt
+  tags: k8s-virt
+  roles:  
+    - { role: core-virt-config, when: enabled_virtual == "yes" }
+
+- name: install and enable to cri-o,docker enviroment
+  hosts: k8s_master:k8s_node
+  tags: k8s-prepare
+  roles:  
+    - { role: core-crio, when: k8s_runtime_environment == "crio" }
+    - { role: core-containerd, when: k8s_runtime_environment == "containered" }
+    - { role: core-docker, when: k8s_runtime_environment == "docker" }
+
+- name: install the kubevirt command tools
+  hosts: console
+  tags: k8s-console
+  roles:
+    - { role: extension-kubevirt, when: enabled_virtual = "yes" }
