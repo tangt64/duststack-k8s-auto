@@ -24,3 +24,6 @@ k8s_cluster_svc_ip: 10.96.0.0/16
 k8s_pod_cidr: 10.244.0.0/16
 k8s_svc_node_port_range: 30000-32767
 k8s_cluster_domain: cluster.local
+
+container_worker_node_name: worker
+virtual_worker_node_name: vm

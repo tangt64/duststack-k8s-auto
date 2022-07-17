@@ -1,22 +1,25 @@
 [lb]
-192.168.90.5 nodename=lb.example.com
+192.168.90.65 nodename=lb.example.com
+
+[console]
+192.168.90.65 nodename=lb.example.com
 
 [k8s_master]
-192.168.90.8 nodename=master1.example.com
-192.168.90.9 nodename=master2.example.com
-192.168.90.4 nodename=master3.example.com
+192.168.90.64 nodename=master1.example.com
+192.168.90.69 nodename=master2.example.com
+192.168.90.67 nodename=master3.example.com
 
 [k8s_node]
-192.168.90.10 nodename=node1.example.com
-192.168.90.6 nodename=node2.example.com
+192.168.90.66 nodename=node1.example.com
+192.168.90.70 nodename=node2.example.com
 
 [k8s_virt]
-192.168.90.10 nodename=node1.example.com
-192.168.90.6 nodename=node2.example.com
+192.168.90.66 nodename=node1.example.com
+192.168.90.70 nodename=node2.example.com
 
 [k8s_utility]
-192.168.90.7 nodename=sti.example.com
+192.168.90.68 nodename=sti.example.com
 
 [k8s_storage]
-192.168.90.7 nodename=sti.example.com
+192.168.90.68 nodename=sti.example.com
 
