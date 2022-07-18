@@ -8,9 +8,20 @@
 
 - name: install the kubeadm package for install
   package:
-    name: kubeadm
+    name: "{{ item }}-{{ k8s_version }}"
     state: present
+  loop:
+    - kubeadm
+    - kubelet
+    - kubectl
 
+- name: install the CNI package for install
+  package:
+    name: "kubernetes-cni-{{ k8s_cni_version }}"
+    state: present
+  loop:
+    - kubernetes-cni
+ 
 - name: install the selinux packages
   package:
     name: "{{ item }}"
