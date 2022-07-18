@@ -1,6 +1,9 @@
 # Single or Multi master for kubernetes
 k8s_proxy_mode: multi
 
+k8s_version: 1.24.3
+k8s_cni_version: 1.0.0
+
 # ubuntu, debian, rhel(centos)
 distribution_name: redhat 
 
