@@ -4,6 +4,8 @@ k8s_proxy_mode: multi
 k8s_version: 1.24.3
 k8s_cni_version: 1.0.0
 
+k8s_public_rsa_locate: /.ssh/id_rsa.pub
+
 # ubuntu, debian, rhel(centos)
 distribution_name: redhat 
 

@@ -2,5 +2,6 @@
 - hosts: all
 
   tasks:
-  - command: sshpass -p centos ssh-copy-id -i /home/tang/.ssh/id_rsa.pub -o StrictHostKeyChecking=no {{ ansible_hostname }}
-
+  - authorized_key:
+      user: "{{ ansible_user }}"
+      key: "{{ lookup('file', '/home/' + lookup('env', 'USER') + '{{ k8s_public_rsa_locate }}') }}"
