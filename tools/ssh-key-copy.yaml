@@ -1,0 +1,7 @@
+---
+- hosts: all
+
+  tasks:
+  - authorized_key:
+      user: "{{ ansible_user }}"
+      key: "{{ lookup('file', '/home/' + lookup('env', 'USER') + '{{ k8s_public_rsa_locate }}') }}"
