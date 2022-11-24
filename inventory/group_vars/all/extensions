@@ -1,4 +1,8 @@
-enabled_metrics: enable
-enabled_ingress: enable
+# kubernetes ingress enabled
+enabled_ingress: no
+
 # kubernetes virtualization enabled
-enabled_virtual: enable
+enabled_virtual: no
+
+enabled_dashboard: no
+enabled_helm: no

@@ -1,0 +1,7 @@
+- name: install runtime package on {{ inventory_hostname }} as {{ k8s_runtime_environment }}
+  package:
+    name: containerd
+    state: present
+
+- name: regenerate to containerd.io config.toml
+  command: containerd config default > /etc/containerd/config.toml

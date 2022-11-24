@@ -4,5 +4,4 @@
   serial: 1
   tags: classroom
   roles:  
-    - { role: virt-k8s }
-
+    - { role: virtualizations/virt-k8s }

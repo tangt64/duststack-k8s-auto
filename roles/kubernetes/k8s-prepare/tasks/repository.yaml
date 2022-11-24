@@ -1,0 +1,38 @@
+---
+- name: repository kubernetes for YUM
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: import kubernetes GPG key file from kubernetes server
+  command: rpmkeys --import https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+- name: copy a containerd repository file
+  copy:
+    src: containerd.repo
+    dest: /etc/yum.repos.d/containerd.repo
+  when: k8s_runtime_environment == "containerd"
+
+- name: disbaled to the ansible-26 repository file if exist
+  file:
+    path: /etc/yum.repos.d/CentOS-ANSIBLE.repo
+    state: absent
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" )
+
+- name: enable repository for cri-o
+  copy:
+    src: "{{ item }}"
+    dest: /etc/yum.repos.d/
+  with_items:
+    - devel_kubic_libcontainers_stable_cri-o_1.18_1.18.3.repo
+    - devel_kubic_libcontainers_stable.repo
+  when: k8s_runtime_environment == "crio"
+
+- name: register docker repository in yum.repos.d
+  yum_repository:
+    name: docker-ce
+    description: docker CE repository
+    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
+    gpgcheck: no
+    enabled: yes
+  when: k8s_runtime_environment == "containerd"    

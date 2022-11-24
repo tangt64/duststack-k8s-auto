@@ -1,0 +1,12 @@
+---
+# tasks file for crio
+- name: install to cri-o
+  package:
+    name: cri-o
+    state: latest
+
+- name: enable and start to cri-o .service
+  service:
+    name: crio
+    enabled: yes
+    state: started

@@ -1,0 +1,12 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: JoinConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    enable-controller-attach-detach: "false"
+    node-labels: "{{ nodename }}"
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: {{ groups['k8s_master'][0] }}:6443
+    token: {{ k8s_token.stdout }}
+    caCertHashes:
+    - {{ k8s_ca_cert_hash.stdout }}

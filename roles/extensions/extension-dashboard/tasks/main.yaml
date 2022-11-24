@@ -1,0 +1,33 @@
+- name: copy dashboard materials on master 
+  copy:
+    src: "{{ item }}"
+    dest: /tmp/
+  with_items:
+    - dashboard.yaml
+    - dashboard-rbac.yaml
+    - dashboard-read-only.yaml
+
+- name: create kubernetes dashboard rbac
+  command: kubectl apply -f /tmp/dashboard-rbac.yaml
+
+- name: enable kubernetes dashboard
+  command: kubectl apply -f /tmp/dashboard.yaml
+
+- name: create read only user for dashboard
+  command: kubectl apply -f /tmp/dashboard-read-only.yaml
+
+- name: get token for access to kubernetes dashboard
+  shell: kubectl -n kube-system describe $(kubectl -n kube-system get secret -o name | grep namespace) | grep token
+  register: k8s_token
+
+- name: get token for read only user
+  shell: kubectl get secret -n kubernetes-dashboard $(kubectl get serviceaccount read-only-user -n kubernetes-dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+  register: k8s_ro_token
+
+- name: show the token for access to kubernetes dashboard
+  debug:
+    msg: "{{ k8s_token }}"  
+
+- name: show the token read-only token for kubernetes dashboard
+  debug:
+    msg: "{{ k8s_ro_token }}"

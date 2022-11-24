@@ -1,0 +1,10 @@
+- name: install to the containerd
+  package:
+    name: containerd
+    state: present
+
+- name: enable and restart to the containerd.service
+  systemd:
+    name: containerd
+    enabled: yes
+    state: restarted

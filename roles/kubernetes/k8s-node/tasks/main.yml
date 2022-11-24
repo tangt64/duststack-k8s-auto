@@ -1,0 +1,44 @@
+- name: get token 
+  command: kubeadm token create
+  delegate_to: "{{ groups['k8s_master'] | first }}"
+  register: k8s_token
+
+- name: get sha256
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* /sha256:/'
+  delegate_to: "{{ groups['k8s_master'] | first }}"
+  register: k8s_ca_cert_hash
+
+# - name: stop all type container runtime
+#   systemd:
+#     name: "{{ item }}"
+#     state: stopped
+#   loop:
+#     - containerd
+#     - crio
+#     - docker
+#   ignore_errors: yes
+
+# - name: before join to the cluster restart to kubelet and {{ k8s_runtime_environment }} services
+#   service:
+#     name: "{{ item }}"
+#     state: restarted
+#   loop:
+#     - "{{ k8s_runtime_environment }}"
+#     - kubelet
+
+- name: template and join into the cluster with node-config
+  block:
+  - name: make a template file for kubernetes
+    template:
+      src: kubeadm-join.yaml
+      dest: /tmp/kubeadm-join.yaml
+  - name: a worker node join to the cluster as compute
+    command: kubeadm join --config /tmp/kubeadm-join.yaml
+
+- name: worker node join to the cluster as compute
+  command: "{{ k8stoken.stdout }}"
+  register: node_reg_result
+  when: k8s_instmethod =="cmd"
+- pause:
+    seconds: 10
+    prompt: the nodes successfully joined to the cluster

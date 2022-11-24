@@ -1,0 +1,7 @@
+kubeadm_bootstrap_token: 9a08jv.c0izixklcxtmnze7
+kubeadm_join_token: 783bde.3f89s0fje9f38fhf
+
+k8s_core_packages:
+  - kubeadm-{{ k8s_version }}
+  - kubelet-{{ k8s_version }}
+  - kubectl-{{ k8s_version }}

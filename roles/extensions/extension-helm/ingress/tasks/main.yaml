@@ -1,0 +1,24 @@
+- name: nginx global configuration
+  block:
+    - name: add and install helm chart for Nginx
+      shell: |
+        /usr/local/bin/helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace 
+  when: ingress_controller == "nginx"
+
+- name: haproxy global configuration
+  block:
+    - name: copy haproxy-ingress YAML file
+      copy:
+        src: haproxy-ingress-values.yaml
+        dest: /tmp/haproxy-ingress-values.yaml
+
+    - name: add helm chart for HAProxy
+      shell: /usr/local/bin/helm repo add haproxy-ingress https://haproxy-ingress.github.io/charts
+
+    - name: install helm chart for HAProxy
+      shell: |
+        /usr/local/bin/helm install haproxy-ingress haproxy-ingress/haproxy-ingress\
+           --create-namespace --namespace=ingress-controller\
+           --version 0.13.6\
+           -f /tmp/haproxy-ingress-values.yaml
+  when: ingress_controller == "haproxy"

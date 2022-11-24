@@ -1,0 +1,9 @@
+#- name: set to a controller api pod working on control plane
+#  shell: "kubectl patch -n kubevirt kubevirt kubevirt --type merge --patch '{"spec": {"infra": {"nodePlacement": {"nodeSelector": {"node-role.kubernetes.io/control-plane": ""}}}}}'""
+
+#- name: set to a virtual machine of node selector
+#  shell: "kubectl patch -n kubevirt kubevirt kubevirt --type merge --patch '{"spec": {"workloads": {"nodePlacement": {"nodeSelector": {"virtual": "vm"}}}}}'""
+
+#- name: label to kubernetes virtual machine to worker nodes
+#  shell: kubectl label node {{ nodename }} node-role.kubernetes.io/virtual=vm --overwrite
+#  delegate_to: "{{ groups['k8s_master'][0] }}"

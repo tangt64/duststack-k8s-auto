@@ -1,31 +1,46 @@
 # Single or Multi master for kubernetes
-k8s_proxy_mode: multi
-
+# for LoadBalance mode is "yes", Single mode is "no"
+k8s_proxy_mode: no
 k8s_version: 1.24.3
 k8s_cni_version: 1.0.0
+k8s_api_domain: api.example.com
+k8s_endpoint_port: 6443
+k8s_clusterName: dustbox.kr
 
+# config, cmd
+k8s_instmethod: config
+
+# /home/<USER>/<k8s_public_rsa_locate>
+#
 k8s_public_rsa_locate: /.ssh/id_rsa.pub
 
-# ubuntu, debian, rhel(centos)
+# ubuntu/debian, rhel/centos/rocky)
 distribution_name: redhat 
 
 # kubernets storage network
-internal_stroage_dev_name: ens4
+internal_storage_dev_name: ens5
 
+# internal, between kubernetes masters and nodes
+k8s_interface: eth1
+k8s_interface_type: ethernet
+k8s_ip4_network_addr: 192.160.90.0
+k8s_ip4_gw: 0.0.0.0
+k8s_ip4_cidr: /24
+k8s_ip4_autoconnection: no
+k8s_ip4_def_gw: no
+
+# HAProxy, Nginx
 ingress_controller: haproxy
 
 # firewalld for kubernetes
-use_firewalld: disable
+use_firewalld: no
 
+# containerd, crio, docker
 k8s_runtime_environment: crio
 
 # support calico, flanned
 k8s_network: calico
-
-# internal, between kubernetes masters and nodes
-k8s_interface: ens3
-
-k8s_cluster_svc_ip: 10.96.0.0/16
+k8s_cluster_svc_ip: 10.96.0.0/12
 k8s_pod_cidr: 10.244.0.0/16
 k8s_svc_node_port_range: 30000-32767
 k8s_cluster_domain: cluster.local

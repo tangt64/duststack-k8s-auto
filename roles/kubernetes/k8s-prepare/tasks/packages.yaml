@@ -1,0 +1,55 @@
+- name: update to system packages
+  package:
+    name: '*'
+    state: latest
+    exclude:
+      - kernel*
+      - kubelet*
+  when: update_all_packages == "yes"
+
+- name: install needed network manager libs
+  package:
+    name:
+      - NetworkManager-libnm
+      - nm-connection-editor
+      - libsemanage
+      - policycoreutils
+    state: present
+
+- name: install tc package for kubernetes
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - iproute
+
+- name: remove the kubeadm/let/ctl packages before installing
+  yum:
+    name: "{{ item }}"
+    state: absent
+    disable_excludes: kubernetes
+  loop:
+    - "{{ k8s_core_packages }}"
+
+- name: install the kubeadm package for install
+  yum:
+    name: "{{ item }}"
+    state: present
+    disable_excludes: kubernetes
+  loop:
+    - "{{ k8s_core_packages }}"
+
+- name: install the CNI package for install
+  yum:
+    name: "kubernetes-cni"
+    state: present
+  loop:
+    - kubernetes-cni
+ 
+- name: install the selinux packages
+  yum:
+    name: "{{ item }}"
+  loop:
+    - python3-libselinux
+    - python3-libsemanage
+  when: ( ansible_distribution == "CentOS" and ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9" )

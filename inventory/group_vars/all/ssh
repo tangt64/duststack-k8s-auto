@@ -1,0 +1,2 @@
+ssh_remote_user: root
+ssh_remote_password: centos

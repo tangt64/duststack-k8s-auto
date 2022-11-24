@@ -1,0 +1,129 @@
+- name: check to installed libvirt daemon
+  yum:
+    name: "{{ packages }}"
+  register: install_status
+  vars:
+    packages:
+    - libvirt
+    - libvirt-daemon-kvm
+    - libvirt-client
+    - virt-install
+    - virt-manager
+    - python3
+
+- name: install libvirt daemon 
+  yum:
+    name: ['libvirt-daemon-*']
+    state: latest
+  when: install_status.rc == 0
+
+- name: allow http service to firewalld service
+  firewalld:
+    port: 8080/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+    zone: libvirt
+
+- name: copy httpd.py server
+  template:
+    src: httpd.py
+    dest: "{{ k8s_work_dir }}"
+
+- name: start python httpd server
+  shell: "nohup python3 {{ k8s_work_dir }}/httpd.py &"
+
+- name: start libvirt daemon
+  service:
+    name: libvirtd
+    state: started
+    enabled: yes
+
+- name: get list of VMs from libvirtd
+  virt:
+    command: list_vms
+  register: virt_vms
+
+- name: copy a anaconda files to {{ k8s_work_dir }}
+  copy:
+    src: "{{ item }}.ks"
+    dest: "{{ k8s_work_dir }}{{ item }}.ks"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - "{{ k8s_master_nodes }}"
+    - "{{ k8s_utility_nodes }}"
+    - "{{ k8s_nodes }}"
+
+- name: adjust to kickstart .ks file permission 
+  file:
+    path: "{{ k8s_work_dir }}{{ item }}.ks"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - "{{ k8s_master_nodes }}"
+    - "{{ k8s_utility_nodes }}"
+    - "{{ k8s_nodes }}"
+
+- name: create a master node VM virtual disk
+  command: qemu-img create -f {{ virt_disk_format }} {{ virt_disk_image_path }}{{ item }}.{{ virt_disk_format }} {{ virt_disk_size }}
+  with_items:
+    - "{{ k8s_master_nodes }}"
+    - "{{ k8s_utility_nodes }}"
+    - "{{ k8s_nodes }}"
+
+- name: check to internal network device
+  shell: "virsh net-list | grep internal | awk '{ print $1 }'"
+  register: verify_internal
+
+- debug: 
+    msg: "{{ verify_internal }}"
+
+- name: create a internal virtual network
+  virt_net:
+    command: define
+    name: internal
+    xml: "{{ lookup('template', 'internal.xml.j2') }}"
+    autostart: yes
+  when: verify_internal.rc == 0
+
+- name: starting to internal virtual network
+  virt_net:
+    command: start
+    name: internal
+    autostart: yes
+  ignore_errors: true
+
+- name: change ownership to the virtual disk images
+  file:
+    path: "{{ virt_disk_image_path }}{{ item }}.{{ virt_disk_format }}"
+    owner: qemu
+    group: qemu
+    mode: 0644
+  with_items:
+    - "{{ k8s_master_nodes }}"
+    - "{{ k8s_utility_nodes }}"
+    - "{{ k8s_nodes }}"
+
+- name: install virtual machine on libvirt daemon 
+  shell: virt-install -n {{ item }} -r {{ vmem }} --cpu host-passthrough --vcpus {{ vcpu }} -l {{ repository_url }} --network network={{ nic1 }} --network network={{ nic2 }} --graphics {{ virt_graphics }} -v --disk=path={{ virt_disk_image_path }}{{ item }}.{{ virt_disk_format }},format={{ virt_disk_format }} --noautoconsole -x ks="{{ kickstart_address }}/{{ item }}.ks"
+  with_items:
+    - "{{ k8s_master_nodes }}"
+    - "{{ k8s_utility_nodes }}"
+    - "{{ k8s_nodes }}"
+
+- name: wait for build of VMs
+  pause:
+    minutes: 30
+    prompt: "Waiting for building to VMs about 30 mins"
+
+- name: starting to master/utility/node VMs
+  virt:
+    name: "{{ item }}"
+    command: start 
+  with_items:
+    - "{{ k8s_master_nodes }}"
+    - "{{ k8s_utility_nodes }}"
+    - "{{ k8s_nodes }}"

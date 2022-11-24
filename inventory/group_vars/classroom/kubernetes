@@ -19,8 +19,7 @@ libvirt_owner: qemu
 libvirt_group: qemu
 
 vcpu: 2
-vmem: 8192
-vmem_compute: 4096
+vmem: 4096
 nic1: default
 nic2: internal
 virt_type: kvm

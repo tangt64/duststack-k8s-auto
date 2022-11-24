@@ -1,8 +1,0 @@
-- name: add the k8s metric repository
-  shell: /usr/local/bin/helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-
-- name: create a namespace for metrics service
-  shell: kubectl create namespace kube-metrics
-
-- name: install the k8s metric service by chart
-  shell: /usr/local/bin/helm upgrade --install metrics-server metrics-server/metrics-server --namespace=kube-metrics --set args={"--kubelet-insecure-tls,--kubelet-preferred-address-types=InternalIP\,Hostname\,ExternalIP,--secure-port=4443,--metric-resolution=15s"}

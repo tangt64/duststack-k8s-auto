@@ -1,0 +1,49 @@
+- name: kernel module up for iptables
+  command: modprobe "{{ item }}"
+  with_items:
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - ip_vs
+    - nf_conntrack_ipv4
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
+ 
+- name: kernel module up for nftables
+  command: modprobe "{{ item }}"
+  with_items:
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - ip_vs
+  when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9"  )
+
+- name: uploading to overlay, br_netfilter modules
+  command: modprobe "{{ item }}"
+  with_items:
+    - overlay
+    - br_netfilter
+
+- name: net.bridge.bridge-nf-call-iptables, net.ipv4.ip_forward, net.bridge.bridge-nf-call-ip6tables
+  lineinfile:
+    path: /etc/sysctl.d/99-kubernetes-cri.conf
+    state: present
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - "net.bridge.bridge-nf-call-iptables  = 1"
+    - "net.ipv4.ip_forward                 = 1"
+    - "net.bridge.bridge-nf-call-ip6tables = 1"
+
+- name: permanently module loaded when boot up
+  copy: 
+    src: k8s-modules.conf
+    dest: /etc/modules-load.d/k8s-modules.conf
+
+- name: apply sysctl configuration files
+  command: sysctl --system -f
+
+- name: reload to the modules-load.d configuration files
+  service:
+    name: systemd-modules-load
+    state: restarted
+    enabled: yes

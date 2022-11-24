@@ -1,0 +1,10 @@
+- name: prepare helm YAML files to the first master node
+  copy:
+    src: "{{ item }}"
+    dest: /tmp/
+  with_items:
+    - helm.sh
+    - rbac-config.yaml
+
+- name: prepare helm package manager
+  shell: bash /tmp/helm.sh

@@ -1,0 +1,11 @@
+- name: install ETCD service
+  yum:
+    name: etcd
+    state: latest
+
+- name: start and enable ETCD service
+  systemd:
+    name: etcd 
+    state: restarted 
+    enabled: yes 
+    daemon_reload: yes

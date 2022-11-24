@@ -1,0 +1,34 @@
+---
+- name: check to docker if already install remove from a host
+  block:
+    - name: install new docker-ce version
+      yum:
+        name: docker
+        state: present
+      register: docker_result
+
+    - debug:
+        msg: "{{ docker_result }}"
+
+    - name: remove old docker version
+      yum:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - docker
+        - docker-common
+      when: docker_result.rc == 0
+  rescue: 
+    - fail:
+        msg: docker install and remove are failed
+
+- name: install docker-ce version
+  yum:
+    name: docker-ce
+    state: latest
+
+- name: enabled and started to docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes

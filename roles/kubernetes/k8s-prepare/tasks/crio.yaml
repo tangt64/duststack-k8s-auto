@@ -1,0 +1,13 @@
+- name: copy a kubelet configuration file to /etc/sysconfig/kubelet
+  copy:
+    src: kubelet-crio
+    dest: /etc/sysconfig/kubelet
+ 
+- name: cri-o bridge network file
+  block:
+  - file:
+      path: /etc/cni/net.d/
+      state: directory
+  - template:
+      src: 100-crio-bridge.conf.j2
+      dest: /etc/cni/net.d/100-crio-bridge.conf

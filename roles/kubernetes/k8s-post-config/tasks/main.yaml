@@ -1,0 +1,10 @@
+- name: label to kubernetes container worker nodes
+  shell: kubectl label node {{ nodename }} node-role.kubernetes.io/worker=worker --overwrite
+  delegate_to: "{{ groups['k8s_master'][0] }}"
+  ignore_errors: yes
+
+- name: enabled to kubernetes metric service 
+  copy:
+    src: metrics.yaml
+    dest: /tmp/metrics.yaml
+- command: kubectl create -f /tmp/metrics.yaml  

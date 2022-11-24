@@ -1,0 +1,15 @@
+- name: copy the calico.yaml to /tmp/
+  copy: 
+    src: tigera-operator.yaml
+    dest: /tmp/calico.yaml
+
+- name: apply to kube-calico-operator on kubernetes cluster
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl create -f /tmp/calico.yaml
+
+- name: template to kube-calico-crd resource
+  template:
+    src: custom-resources.yaml
+    dest: /tmp/custom-resources.yaml
+- shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/custom-resources.yaml
+
+    

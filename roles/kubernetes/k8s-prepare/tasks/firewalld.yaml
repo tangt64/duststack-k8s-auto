@@ -1,0 +1,74 @@
+- name: start and config to ports for kubernetes
+  block:
+  - name: start firewalld service
+    service:
+      name: firewalld
+      state: started
+      enabled: yes
+
+  - name: enable masquerade to firewalld
+    firewalld:
+      masquerade: yes
+      zone: public
+      state: enabled
+      permanent: yes
+      
+  - name: add ports to firewalld for controller and worker nodes
+    firewalld:
+      port: "{{ item }}"
+      state: enabled
+      permanent: yes
+      immediate: yes
+      zone: public
+    with_items:
+      - "10250/tcp"
+      - "10251/tcp"
+      - "10252/tcp"
+      - "10255/tcp"
+      - "30000-32767/tcp"
+      - "8472/udp"
+
+  - name: add ports to firewalld for calico
+    firewalld:
+      port: "{{ item }}"
+      state: enabled
+      permanent: yes
+      immediate: yes
+      zone: public
+    with_items:      
+      - "179/tcp"
+      - "4789/udp"
+      - "5473/tcp"
+      - "51820/udp"
+      - "51821/udp"
+      - "4789/udp"
+      - "443/tcp"
+      - "6443/tcp"
+      - "6443/tcp"
+      - "2379-2380/tcp"
+    when: k8s_network =="calico"
+
+  - name: add an interface to firewalld
+    firewalld:
+      interface: "{{ k8s_interface }}"
+      permanent: yes
+      immediate: yes
+      state: enabled
+      zone: public
+
+  - name: add an rich rule for worker node address to firewalld
+    firewalld:
+      rich_rule: rule family=ipv4 source address={{ k8s_ip4_network_addr }}{{ k8s_ip4_cidr }} accept
+      permanent: yes
+      immediate: yes
+      state: enabled
+      zone: public
+  when: use_firewalld
+
+- name: disabled to the firewalld service permanently
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  when: not use_firewalld
+   

@@ -1,0 +1,23 @@
+- name: set to an IP Address for {{ inventory_hostname }}
+  nmcli:
+    type: "{{ item.ifname }}"
+    conn_name: "{{ item.conn_name }}"
+    ip4: "{{ item.ip4 }}{{ item.ip4_cidr }}"
+    gw4: "{{ item.gw4 }}"
+    state: present
+    autoconnect: "{{ item.autocon }}"
+    gw4_ignore_auto: "{{ item.gw4_no_default }}"
+  with_items:
+    - "{{ nmcli_ethernet }}"
+
+- name: deactive and active to the kubernetes internal interface
+  block:
+    - command: nmcli con down {{ k8s_interface }}
+    - command: nmcli con up {{ k8s_interface }}
+
+- name: add the kubernetes internal interface to firewalld
+  firewalld:
+    interface: "{{ k8s_interface }}"
+    permanent: yes
+    state: enabled
+    zone: public

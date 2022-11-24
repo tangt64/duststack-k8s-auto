@@ -1,0 +1,27 @@
+- name: init kubeadmin with containerd(single in cmd)
+  block:
+    - name: install master as single
+      command: kubeadm init --pod-network-cidr={{ k8s_pod_cidr }} --apiserver-advertise-address={{ ansible_facts[k8s_interface]['ipv4']['address'] }}
+      register: master_result
+      when: not k8s_proxy_mode
+    - pause:
+        seconds: 10
+        prompt: The master nodes successfully installed
+  when: k8s_instmethod == "cmd"       
+
+  block:
+    - name: install master as single(single in kubeadm-config)
+      command: kubeadm init --config /tmp/kubeadm-config.yaml
+      register: master_result
+      when: not k8s_proxy_mode
+    - pause:
+        seconds: 10
+        prompt: The master nodes successfully installed
+  when: k8s_instmethod == "config"       
+  rescue:
+    - name: reset master
+      command: kubeadm reset --force
+      
+    - debug:
+        msg: The master nodes has been reseted
+      failed_when: ( master_result.rc in [ 1,2 ] )

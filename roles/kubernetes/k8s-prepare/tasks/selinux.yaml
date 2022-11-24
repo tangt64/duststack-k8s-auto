@@ -1,0 +1,23 @@
+- name: disable selinux
+  selinux:
+    policy: targeted
+    state: permissive
+    
+- name: kubernetes auditor
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/kubernetes/
+    - /var/log/kubernetes/audit
+
+- name: copy the kubernetes auditor YAML
+  copy:
+    src: audit-policy.yaml
+    dest: /etc/kubernetes/audit-policy.yaml
+
+- name: create a manifest directory into /etc/kubernetes/
+  file:
+    path: /etc/kubernetes/manifests
+    state: directory
+    mode: 0644    

@@ -1,0 +1,4 @@
+- name: make a template file for kubernetes installation(kubeadm-config)
+  template:
+    src: kubeadm-config.yaml
+    dest: /tmp/kubeadm-config.yaml

@@ -1,1 +1,0 @@
-KUBELET_EXTRA_ARGS=--cgroup-driver=systemd --container-runtime=remote --container-runtime-endpoint="criSocket:///var/run/crio/crio.sock"
