@@ -1,6 +1,7 @@
 nmcli_ethernet:
   - conn_name: "{{ k8s_interface }}"
-    ifname: "{{ k8s_interface_type }}"
+    ifname: "{{ k8s_interface }}"
+    type: "{{ k8s_interface_type }}"
     ip4: "{{ k8s_ip4 }}"
     ip4_cidr: "{{ k8s_ip4_cidr }}"
     gw4: "{{ k8s_ip4_gw }}"

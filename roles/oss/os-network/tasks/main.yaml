@@ -1,12 +1,13 @@
 - name: set to an IP Address for {{ inventory_hostname }}
   nmcli:
-    type: "{{ item.ifname }}"
+    type: "{{ itme.type }}"
     conn_name: "{{ item.conn_name }}"
+    ifname: "{{ item.ifname }}"
     ip4: "{{ item.ip4 }}{{ item.ip4_cidr }}"
     gw4: "{{ item.gw4 }}"
     state: present
     autoconnect: "{{ item.autocon }}"
-    gw4_ignore_auto: "{{ item.gw4_no_default }}"
+#    gw4_ignore: "{{ item.gw4_no_default }}"
   with_items:
     - "{{ nmcli_ethernet }}"
 
