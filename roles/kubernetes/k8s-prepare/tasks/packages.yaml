@@ -33,7 +33,7 @@
 
 - name: install the kubeadm package for install
   yum:
-    name: "{{ item }}-{{ k8s_version }}"
+    name: "{{ item }}"
     state: present
     disable_excludes: kubernetes
   loop:

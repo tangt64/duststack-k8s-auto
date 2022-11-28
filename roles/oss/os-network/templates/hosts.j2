@@ -2,7 +2,7 @@
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 
 {% for host in groups['all'] %}
-{% if hostvars[host]['ansible_eth1']['active'] %}
-{{ hostvars[host]['ansible_default']['ipv4']['address'] }} {{ hostvars[host]['ansible_fqdn'] }} {{ hostvars[host]['ansible_hostname'] }}
+{% if hostvars[inventory_hostname]['ansible_'+k8s_interface]['active'] %}
+{{ hostvars[inventory_hostname]['ansible_'+k8s_interface]['ipv4']['address'] }} {{ hostvars[inventory_hostname]['ansible_facts']['hostname'] }} {{ hostvars[inventory_hostname]['ansible_facts']['fqdn'] }}
 {% endif %}
 {% endfor %}
