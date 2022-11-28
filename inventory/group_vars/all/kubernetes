@@ -26,8 +26,6 @@ k8s_interface_type: ethernet
 k8s_ip4_network_addr: 192.160.90.0
 k8s_ip4_gw: 0.0.0.0
 k8s_ip4_cidr: /24
-k8s_ip4_autoconnection: no
-k8s_ip4_def_gw: no
 
 # HAProxy, Nginx
 ingress_controller: haproxy

@@ -1,0 +1,1 @@
+ocm_join_command: "{{ lookup('file', '/tmp/ocm_manage.txt') }}"

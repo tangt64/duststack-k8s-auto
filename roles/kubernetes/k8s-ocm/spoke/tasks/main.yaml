@@ -1,0 +1,8 @@
+- name: copy the OCM clusteradm file
+  copy:
+    src: clusteradm
+    dest: /usr/local/bin/clusteradm
+
+- name: read to the command file for join to hub-cluster
+  command: "{{ lookup('file', '/tmp/ocm_manage.txt') }}"
+  delegate_to: "{{ groups['k8s_hub'] | first }}"

@@ -4,5 +4,5 @@ nmcli_ethernet:
     ip4: "{{ k8s_ip4 }}"
     ip4_cidr: "{{ k8s_ip4_cidr }}"
     gw4: "{{ k8s_ip4_gw }}"
-    gw4_no_default: "{{ k8s_ip4_def_gw }}"
-    autocon: "{{ k8s_ip4_autoconnection }}"
+    gw4_no_default: yes
+    autocon: yes

@@ -58,3 +58,15 @@
     - { role: extensions/extension-dashboard, when: enabled_dashboard, tags: dashboard }
     - { role: extensions/extension-kubevirt, when: enabled_virtual, tags: virt}
   run_once: yes
+
+- name: install the OCM HUB
+  hosts: k8s_hub
+  tags: ocm-hub
+  roles:
+    - { role: kubernetes/k8s-ocm/hub }
+
+- name: install the OCM HUB
+  hosts: k8s_spoke
+  tags: ocm-spoke
+  roles:
+    - { role: kubernetes/k8s-ocm/spoke }

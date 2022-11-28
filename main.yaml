@@ -1,0 +1,20 @@
+- name: copy the OCM clusteradm file
+  copy:
+    src: clusteradm
+    dest: /usr/local/bin/clusteradm
+
+- name: deployment OCM hub node on {{ inventory_hostname }}
+  shell: clusteradm init --wait --image-registry={{ ocm_registry }} --bundle-version={{ v0.6.0 }} --output-join-command-file={{ ocm_join_file }}
+
+- name:
+  replace:
+    path: "{{ ocm_join_file }}"
+    regexp: '^$1'
+    replace:  ''
+
+- name: read to the command file for join to hub-cluster
+  command: {{ join_command }}
+
+
+- name: deployment OCM hub node on {{ inventory_hostname }}
+  shell: clusteradm init --wait --image-registry={{ ocm_registry }} --bundle-version={{ v0.6.0 }}  

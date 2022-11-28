@@ -1,0 +1,5 @@
+k8s_vm_cluster_name: Default
+k8s_vm_pool_name: kubernetes-cluster-1
+k8s_template_name: skt-lab-centos-7
+k8s_vm_counter: 3
+k8s_pre_start_vm: 3

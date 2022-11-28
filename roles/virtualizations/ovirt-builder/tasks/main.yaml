@@ -1,0 +1,27 @@
+- name: create VM pool from template
+  ovirt.ovirt.ovirt_vmpool:
+    cluster: "{{ k8s_vm_cluster_name }}"
+    name: "{{ k8s_vm_pool_name }}"
+    template: "{{ k8s_template_name }}"
+    vm_count: "{{ k8s_vm_counter }}"
+    prestarted: "{{ k8s_pre_start_vm }}"
+    vm:
+      memory: "{{ k8s_vm_memory }}"
+      memory_guaranteed: "{{ k8s_vm_memory }}"
+      memory_max: "{{ k8s_vm_memory }}"
+#      comment: vncomment
+      cloud_init:
+        nic_boot_protocol: static
+        nic_ip_address: "{{ k8s_default_ip4 }}"
+        nic_netmask: 255.255.252.0
+        nic_gateway: 10.34.63.254
+        nic_name: eth1
+        host_name: example.com
+        custom_script: |
+          write_files:
+           - content: |
+               Hello, world!
+             path: /tmp/greeting.txt
+             permissions: '0644'
+        user_name: root
+        root_password: centos
