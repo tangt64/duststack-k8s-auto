@@ -13,7 +13,7 @@
       yum:
         name: "{{ item }}"
         state: absent
-      with_items:
+      loop:
         - docker
         - docker-common
       when: docker_result.rc == 0
