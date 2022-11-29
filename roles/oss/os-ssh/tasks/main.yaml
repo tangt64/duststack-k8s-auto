@@ -1,5 +1,5 @@
 - name: copy the public ssh key file
   authorized_key:
     user: "{{ ansible_user }}"
-    key: "{{ lookup('file', lookup('env', 'USER') + '/.ssh/id_rsa.pub') }}"
+    key: "{{ lookup('file', '/' + lookup('env', 'USER') + '/.ssh/id_rsa.pub') }}"
   delegate_to: localhost

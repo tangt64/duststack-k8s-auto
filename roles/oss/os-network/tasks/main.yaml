@@ -1,6 +1,6 @@
 - name: set to an IP Address for {{ inventory_hostname }}
   nmcli:
-    type: "{{ itme.type }}"
+    type: "{{ item.type }}"
     conn_name: "{{ item.conn_name }}"
     ifname: "{{ item.ifname }}"
     ip4: "{{ item.ip4 }}{{ item.ip4_cidr }}"
