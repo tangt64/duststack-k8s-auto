@@ -14,7 +14,7 @@
   hosts: lb
   tags: k8s-haproxy
   roles:  
-    - { role: cores/core-haproxy, when: k8s_proxy_mode, tags: multi }
+    - { role: core/core-haproxy, when: k8s_proxy_mode, tags: multi }
 
 - name: install kubernetes for the first master node
   hosts: k8s_master[0]
