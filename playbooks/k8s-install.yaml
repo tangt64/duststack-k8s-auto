@@ -63,10 +63,10 @@
   hosts: k8s_hub
   tags: ocm-hub
   roles:
-    - { role: kubernetes/k8s-ocm/hub }
+    - { role: kubernetes/k8s-ocm/hub, when: ocm_hub }
 
 - name: install the OCM HUB
   hosts: k8s_spoke
   tags: ocm-spoke
   roles:
-    - { role: kubernetes/k8s-ocm/spoke }
+    - { role: kubernetes/k8s-ocm/spoke, when: ocm_hub  

@@ -1,3 +1,4 @@
 ocm_version: v0.6.0
 ocm_cluster_name: hub
 ocm_registry: quay.io/open-cluster-management
+ocm_hub: no

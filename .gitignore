@@ -2,7 +2,5 @@
 *.swp
 *.log
 rsa.yaml
-kubernetes-ansible-playbook.sublime-project
-kubernetes-ansible-playbook.sublime-workspace
-duststack-k8s-auto.sublime-project
-duststack-k8s-auto.sublime-workspace
+*.sublime-project
+*.sublime-workspace
