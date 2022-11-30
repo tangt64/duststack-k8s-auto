@@ -13,12 +13,12 @@ bootstrap:
 #    192.168.90.250:
 console:
   hosts:
-    192.168.90.75:
+    172.19.136.42:
 k8s_master:
   hosts:
-    192.168.90.75:
+    172.19.136.42:
       nodename: master1.example.com
-      k8s_ip4: 192.168.100.75
+      k8s_ip4: 192.168.100.42
 #    192.168.90.80:
 #      nodename: master2.example.com
 #      k8s_ip4: 10.10.10.80
@@ -27,16 +27,16 @@ k8s_master:
 #      k8s_ip4: 10.10.10.81
 k8s_node:
   hosts:
-    192.168.90.92:
+    172.19.142.239:
       nodename: node1.example.com
-      k8s_ip4: 192.168.100.92
-    192.168.90.102:
+      k8s_ip4: 192.168.100.239
+    172.19.134.97:
       nodename: node2.example.com
-      k8s_ip4: 192.168.100.102
+      k8s_ip4: 192.168.100.97
 k8s_virt:
-   # hosts:
-   #   192.168.90.94:
-   #   192.168.90.96:
+   hosts:
+#    192.168.90.94:
+#    192.168.90.96:
 k8s_utility:
   hosts:
 #     192.168.90.68
