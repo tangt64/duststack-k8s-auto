@@ -69,4 +69,4 @@
   hosts: k8s_spoke
   tags: ocm-spoke
   roles:
-    - { role: kubernetes/k8s-ocm/spoke, when: ocm_hub  
+    - { role: kubernetes/k8s-ocm/spoke, when: ocm_hub }  
