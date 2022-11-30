@@ -1,8 +1,0 @@
-# kubernetes ingress enabled
-enabled_ingress: no
-
-# kubernetes virtualization enabled
-enabled_virtual: no
-
-enabled_dashboard: no
-enabled_helm: no

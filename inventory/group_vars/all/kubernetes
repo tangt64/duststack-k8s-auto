@@ -1,3 +1,25 @@
+#
+# extension
+
+# kubernetes ingress enabled
+enabled_ingress: no
+
+# kubernetes virtualization enabled
+enabled_virtual: no
+
+enabled_dashboard: no
+enabled_helm: no
+
+ssh_remote_user: root
+ssh_remote_password: centos
+
+ocm_version: v0.6.0
+ocm_cluster_name: hub
+ocm_registry: quay.io/open-cluster-management
+ocm_hub: no
+
+update_all_packages: no
+
 # Single or Multi master for kubernetes
 # for LoadBalance mode is "yes", Single mode is "no"
 k8s_proxy_mode: no
@@ -12,7 +34,8 @@ k8s_instmethod: config
 
 # /home/<USER>/<k8s_public_rsa_locate>
 #
-k8s_public_rsa_locate: /.ssh/id_rsa.pub
+k8s_public_rsa_locate: /root/.ssh/id_rsa.pub
+k8s_private_rsa_locate: /root/.ssh/id_rsa
 
 # ubuntu/debian, rhel/centos/rocky)
 distribution_name: redhat 
@@ -45,3 +68,10 @@ k8s_cluster_domain: cluster.local
 
 container_worker_node_name: worker
 virtual_worker_node_name: vm
+
+#
+# NTP
+#
+ntp_server1: '3.kr.pool.ntp.org'
+ntp_server2: '0.asia.pool.ntp.org'
+time_zone: 'Asia/Seoul'

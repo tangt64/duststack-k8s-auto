@@ -1,3 +1,8 @@
+- name: generate to ssh key for private and public
+  community.crypto.openssh_keypair:
+    path: "{{ k8s_private_rsa_locate }}"
+    force: True  
+
 - name: copy the public ssh key file
   authorized_key:
     user: "{{ ansible_user }}"

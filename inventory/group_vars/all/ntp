@@ -1,3 +1,0 @@
-ntp_server1: '3.kr.pool.ntp.org'
-ntp_server2: '0.asia.pool.ntp.org'
-time_zone: 'Asia/Seoul'

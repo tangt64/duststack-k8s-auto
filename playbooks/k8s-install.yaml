@@ -2,26 +2,26 @@
   hosts: k8s_master, k8s_node, k8s_virt
   tags: k8s-prepare
   roles: 
-    - { role: oss/os-prepare }
-    - { role: oss/os-ssh }
-    - { role: oss/os-network } 
+    - { role: os/os-prepare }
+    - { role: os/os-ssh }
+    - { role: os/os-network } 
     - { role: kubernetes/k8s-prepare }    
-    - { role: oss/cores/core-crio, when: k8s_runtime_environment == "crio" }
-    - { role: oss/cores/core-containerd, when: k8s_runtime_environment == "containerd" }
+    - { role: core/core-crio, when: k8s_runtime_environment == "crio" }
+    - { role: core/core-containerd, when: k8s_runtime_environment == "containerd" }
 #    - { role: oss/cores/core-virt-precheck, when: enabled_virtual  }
 
 - name: haproxy install and setup
   hosts: lb
   tags: k8s-haproxy
   roles:  
-    - { role: oss/cores/core-haproxy, when: k8s_proxy_mode, tags: multi }
+    - { role: cores/core-haproxy, when: k8s_proxy_mode, tags: multi }
 
 - name: install kubernetes for the first master node
   hosts: k8s_master[0]
   tags: k8s-master-single
   roles:
    - { role: kubernetes/k8s-master-single, when: not k8s_proxy_mode, tags: multi }
-   - { role: oss/cores/core-virt, when: enabled_virtual, tags: virt }
+   - { role: core/core-virt, when: enabled_virtual, tags: virt }
 
 - name: install kubernetes master for the rest of master nodes
   hosts: k8s_master[1:{{ MASTER_HOSTS_COUNT }}]
@@ -36,14 +36,14 @@
   tags: k8s-node
   roles:  
     - { role: kubernetes/k8s-node }
-    - { role: oss/cores/core-virt-config, when: enabled_virtual, tags: virt  }
+    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
 
 - name: install kubernetes network service
   hosts: k8s_master
   tags: k8s-network
   roles:  
-    - { role: cnis/cni-calico, when: k8s_network == "calico" }
-    - { role: cnis/cni-flanned, when: k8s_network == "flanned" }
+    - { role: cni/cni-calico, when: k8s_network == "calico" }
+    - { role: cni/cni-flanned, when: k8s_network == "flanned" }
     # - { role: cni-multus, when: k8s_network == "multus" }
     # - { role: cni-kubeovn, when: k8s_network == "kubeovn" }
   run_once: yes
@@ -53,10 +53,10 @@
   tags: k8s-post
   roles:  
     - { role: kubernetes/k8s-post-config }
-    - { role: extensions/extension-helm/base, when: enabled_helm, tags: helm }
-    - { role: extensions/extension-helm/ingress, when: enabled_ingress, tags: ingress }    
-    - { role: extensions/extension-dashboard, when: enabled_dashboard, tags: dashboard }
-    - { role: extensions/extension-kubevirt, when: enabled_virtual, tags: virt}
+    - { role: extension/extension-helm/base, when: enabled_helm, tags: helm }
+    - { role: extension/extension-helm/ingress, when: enabled_ingress, tags: ingress }    
+    - { role: extension/extension-dashboard, when: enabled_dashboard, tags: dashboard }
+    - { role: extension/extension-kubevirt, when: enabled_virtual, tags: virt}
   run_once: yes
 
 - name: install the OCM HUB
