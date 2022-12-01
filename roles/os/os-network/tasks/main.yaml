@@ -22,9 +22,9 @@
 
 - name: deactive and active to the kubernetes internal interface
   block:
-    - command: nmcli con mod {{ k8s_interface_int }} ipv4.method manual
-    - command: nmcli con down {{ k8s_interface_int }}
-    - command: nmcli con up {{ k8s_interface_int }}
+    - command: nmcli con mod {{ k8s_interface }} ipv4.method manual
+    - command: nmcli con down {{ k8s_interface }}
+    - command: nmcli con up {{ k8s_interface }}
 
 - name: add the kubernetes internal interface to firewalld
   firewalld:
