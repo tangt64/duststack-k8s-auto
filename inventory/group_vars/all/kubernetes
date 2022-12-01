@@ -60,7 +60,7 @@ k8s_ip4_cidr: /24
 ingress_controller: haproxy
 
 # firewalld for kubernetes
-use_firewalld: no
+use_firewalld: yes
 
 # containerd, crio, docker
 k8s_runtime_environment: crio
