@@ -47,7 +47,7 @@ internal_storage_dev_name: ens5
 k8s_interface_ext: eth0
 k8s_interface_type_ext: ethernet
 k8s_ip4_gw_ext: 172.23.48.1
-k8s_ip4_cidr_ext: /24
+k8s_ip4_cidr_ext: /20
 
 # internal, between kubernetes masters and nodes
 k8s_interface: eth1
