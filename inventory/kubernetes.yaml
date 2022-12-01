@@ -5,7 +5,7 @@ all:
 
 lb:
   hosts:
-#   192.168.90.171 
+   172.19.136.250:
 #     nodename: lb.example.com
 #     k8s_ip4: 10.10.10.65
 bootstrap:
@@ -18,21 +18,21 @@ k8s_master:
   hosts:
     172.19.136.42:
       nodename: master1.example.com
-      k8s_ip4: 192.168.100.42
-#    192.168.90.80:
-#      nodename: master2.example.com
-#      k8s_ip4: 10.10.10.80
-#    192.168.90.81:
-#      nodename: master3.example.com
-#      k8s_ip4: 10.10.10.81
+      k8s_ip4: 192.168.100.42/20
+    172.23.61.221:
+      nodename: master2.example.com
+      k8s_ip4: 192.168.100.221/20
+    172.23.53.137:
+      nodename: master3.example.com
+      k8s_ip4: 192.168.100.137/20
 k8s_node:
   hosts:
     172.19.142.239:
       nodename: node1.example.com
-      k8s_ip4: 192.168.100.239
+      k8s_ip4: 192.168.100.239/20
     172.19.134.97:
       nodename: node2.example.com
-      k8s_ip4: 192.168.100.97
+      k8s_ip4: 192.168.100.97/20
 k8s_virt:
    hosts:
 #    192.168.90.94:

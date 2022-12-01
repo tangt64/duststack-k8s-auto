@@ -1,4 +1,4 @@
-- name: set to an IP Address for {{ inventory_hostname }}
+- name: set to an IP Address for {{ inventory_hostname }} for eth1
   nmcli:
     type: "{{ item.type }}"
     conn_name: "{{ item.conn_name }}"
@@ -7,9 +7,18 @@
     gw4: "{{ item.gw4 }}"
     state: present
     autoconnect: "{{ item.autocon }}"
-#    gw4_ignore: "{{ item.gw4_no_default }}"
   with_items:
     - "{{ nmcli_ethernet }}"
+
+- name: set to an IP address for {{ inventory_hostname }} for eth0
+  nmcli:
+    type: "{{ k8s_interface_type_ext }}"
+    conn_name: "{{ k8s_interface_ext }}"
+    ifname: "{{ k8s_interface_ext }}"
+    ip4: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}{{ k8s_ip4_cidr_ext }}"
+    gw4: "{{ k8s_ip4_gw_ext }}"
+    state: present
+    autoconnect: "yes"
 
 - name: deactive and active to the kubernetes internal interface
   block:
@@ -23,6 +32,7 @@
     permanent: yes
     state: enabled
     zone: public
+  when: use_firewalld
 
 - name: set to a hostname
   hostname:
