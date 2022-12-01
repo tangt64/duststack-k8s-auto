@@ -3,10 +3,11 @@
     type: "{{ item.type }}"
     conn_name: "{{ item.conn_name }}"
     ifname: "{{ item.ifname }}"
-    ip4: "{{ item.ip4 }}{{ item.ip4_cidr }}"
+    ip4: "{{ item.ip4 }}"
     gw4: "{{ item.gw4 }}"
     state: present
     autoconnect: "{{ item.autocon }}"
+    method4: manual
   with_items:
     - "{{ nmcli_ethernet }}"
 
@@ -15,14 +16,15 @@
     type: "{{ k8s_interface_type_ext }}"
     conn_name: "{{ k8s_interface_ext }}"
     ifname: "{{ k8s_interface_ext }}"
-    ip4: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}{{ k8s_ip4_cidr_ext }}"
+    ip4: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}/{{ k8s_ip4_cidr_ext }}"
     gw4: "{{ k8s_ip4_gw_ext }}"
     state: present
     autoconnect: "yes"
+    method4: manual
 
 - name: deactive and active to the kubernetes internal interface
   block:
-    - command: nmcli con mod {{ k8s_interface }} ipv4.method manual
+#    - command: nmcli con mod {{ k8s_interface }} ipv4.method manual
     - command: nmcli con down {{ k8s_interface }}
     - command: nmcli con up {{ k8s_interface }}
 
