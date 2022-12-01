@@ -8,24 +8,6 @@
   delegate_to: "{{ groups['k8s_master'] | first }}"
   register: k8s_ca_cert_hash
 
-# - name: stop all type container runtime
-#   systemd:
-#     name: "{{ item }}"
-#     state: stopped
-#   loop:
-#     - containerd
-#     - crio
-#     - docker
-#   ignore_errors: yes
-
-# - name: before join to the cluster restart to kubelet and {{ k8s_runtime_environment }} services
-#   service:
-#     name: "{{ item }}"
-#     state: restarted
-#   loop:
-#     - "{{ k8s_runtime_environment }}"
-#     - kubelet
-
 - name: template and join into the cluster with node-config
   block:
   - name: make a template file for kubernetes

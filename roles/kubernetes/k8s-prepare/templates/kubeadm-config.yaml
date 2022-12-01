@@ -28,7 +28,7 @@ kubernetesVersion: "{{ k8s_version }}"
 apiServer:
   certSANs:
   - "127.0.0.1"
-  - "{{ k8s_api_domain }}" # change according to your requirements
+  - "{{ k8s_api_domain }}" 
   - "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
   - "{{ ansible_facts['default_ipv4']['address'] }}"
   # extraArgs:
@@ -50,12 +50,12 @@ apiServer:
   #   pathType: DirectoryOrCreate
   timeoutForControlPlane: 4m0s
 certificatesDir: /etc/kubernetes/pki
-clusterName: {{ k8s_clusterName }}
-controlPlaneEndpoint: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}:{{ k8s_endpoint_port }}
+clusterName: "{{ k8s_clusterName }}"
+controlPlaneEndpoint: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}:{{ k8s_endpoint_port }}"
 controllerManager: 
   extraArgs:
     feature-gates: "TTLAfterFinished=true"
-    bind-address: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
+    bind-address: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}""
 etcd:
   local:
     dataDir: /var/lib/etcd
