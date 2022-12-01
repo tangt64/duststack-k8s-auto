@@ -1,1 +1,8 @@
 - include_tasks: ssh.yaml
+
+- name: install python packages for anisble
+  yum:
+    name: 
+      - python-ipaddr
+      - python-netaddr
+    state: present
