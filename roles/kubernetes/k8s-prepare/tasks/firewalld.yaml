@@ -58,7 +58,7 @@
 
   - name: add an rich rule for worker node address to firewalld
     firewalld:
-      rich_rule: rule family=ipv4 source address={{ k8s_ip4_network_addr }}{{ k8s_ip4_cidr }} accept
+      rich_rule: rule family=ipv4 source address={{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ipaddr('network/prefix') }} accept
       permanent: yes
       immediate: yes
       state: enabled

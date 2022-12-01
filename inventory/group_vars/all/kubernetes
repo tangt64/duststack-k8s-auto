@@ -55,11 +55,12 @@ k8s_interface_type: ethernet
 k8s_ip4_gw: 0.0.0.0
 k8s_ip4_cidr: /24
 
+
 # HAProxy, Nginx
 ingress_controller: haproxy
 
 # firewalld for kubernetes
-use_firewalld: yes
+use_firewalld: no
 
 # containerd, crio, docker
 k8s_runtime_environment: crio
