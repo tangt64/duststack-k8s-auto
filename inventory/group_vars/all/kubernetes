@@ -22,7 +22,7 @@ update_all_packages: no
 
 # Single or Multi master for kubernetes
 # for LoadBalance mode is "yes", Single mode is "no"
-k8s_proxy_mode: no
+k8s_proxy_mode: yes
 k8s_version: 1.24.3
 k8s_cni_version: 1.0.0
 k8s_api_domain: api.example.com

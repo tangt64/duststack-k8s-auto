@@ -1,3 +1,10 @@
+- name: install python library for SELinux
+  yum:
+    name: 
+      - python3-libsemange
+      - libsemanage-python
+    state: present
+
 - name: setup to selinux boolean for haproxy
   ansible.posix.seboolean:
     name: haproxy_connect_any
