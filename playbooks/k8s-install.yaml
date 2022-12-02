@@ -20,7 +20,7 @@
   hosts: k8s_master[0]
   tags: k8s-master-single
   roles:
-   - { role: kubernetes/k8s-master-single, when: not k8s_proxy_mode, tags: multi }
+   - { role: kubernetes/k8s-master-single, tags: multi }
    - { role: core/core-virt, when: enabled_virtual, tags: virt }
 
 - name: install kubernetes master for the rest of master nodes

@@ -4,18 +4,34 @@
   delegate_to: "{{ groups['k8s_master'] | first }}"
   run_once: yes
 
-- name: get token
-  command: kubeadm token create --print-join-command
-  register: k8stoken
-  delegate_to: "{{ groups['k8s_master'] | first }}"
-  run_once: yes
+- name: init kubeadmin with containerd(single in cmd)
+  block:
+    - name: get token
+      command: kubeadm token create --print-join-command
+      register: k8stoken
+      delegate_to: "{{ groups['k8s_master'] | first }}"
+      run_once: yes
 
-- name: join the rest of master nodes into first master node cluster
-  shell: "{{ k8stoken.stdout }} --control-plane --certificate-key {{ k8sTls.stdout }}"
-  register: master_reg_result
+    - name: join the rest of master nodes into first master node cluster
+      shell: "{{ k8stoken.stdout }} --control-plane --certificate-key {{ k8sTls.stdout }}"
+      register: master_reg_result
+  when: k8s_instmethod == "cmd"       
 
-- pause:
-    seconds: 30
-    prompt: the rest of master nodes successfully joined to the cluster
-
-- import_tasks: kubelet.yaml
+  block:
+    - name: install master as single(single in kubeadm-config)
+      command: kubeadm init --config /tmp/kubeadm-config.yaml
+      register: master_result
+      when: not k8s_proxy_mode
+    - pause:
+        seconds: 10
+        prompt: The master nodes successfully installed
+  when: k8s_instmethod == "config"       
+  rescue:
+    - name: reset master
+      command: kubeadm reset --force
+      
+    - debug:
+        msg: The master nodes has been reseted
+      failed_when: ( master_result.rc in [ 1,2 ] )
+      
+# - import_tasks: kubelet.yaml
