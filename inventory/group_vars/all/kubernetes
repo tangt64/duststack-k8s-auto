@@ -18,8 +18,7 @@ ocm_hub: no
 
 update_all_packages: no
 
-# Single or Multi master for kubernetes
-# for LoadBalance mode is "yes", Single mode is "no"
+# Loadbalance mode
 k8s_proxy_mode: yes
 k8s_version: 1.24.3
 k8s_cni_version: 1.0.0

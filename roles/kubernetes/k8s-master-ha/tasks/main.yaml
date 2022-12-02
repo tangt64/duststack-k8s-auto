@@ -1,9 +1,3 @@
-# - name:
-#   shell: kubeadm init phase upload-certs --upload-certs | tail -1
-#   register: k8sTls
-#   delegate_to: "{{ groups['k8s_master'] | first }}"
-#   run_once: yes
-
 - name: init kubeadmin with containerd(single in cmd)
   block:
     - name: get token
@@ -12,9 +6,19 @@
       delegate_to: "{{ groups['k8s_master'] | first }}"
       run_once: yes
 
+    - name: upload TLS certifications
+      shell: kubeadm init phase upload-certs --upload-certs | tail -1
+      register: k8sTls
+      delegate_to: "{{ groups['k8s_master'] | first }}"
+      run_once: yes      
+
     - name: join the rest of master nodes into first master node cluster
       shell: "{{ k8stoken.stdout }} --control-plane --certificate-key {{ k8sTls.stdout }}"
       register: master_reg_result
+
+    - pause:
+        seconds: 10
+        prompt: The master nodes successfully installed      
   when: k8s_instmethod == "cmd"       
 
   block:
