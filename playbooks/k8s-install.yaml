@@ -1,5 +1,5 @@
 - name: install and enable to cri-o,docker enviroment
-  hosts: k8s_master, k8s_node, k8s_virt
+  hosts: all
   tags: k8s-prepare
   roles: 
     - { role: os/os-prepare }

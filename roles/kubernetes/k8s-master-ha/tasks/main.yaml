@@ -1,8 +1,8 @@
-- name:
-  shell: kubeadm init phase upload-certs --upload-certs | tail -1
-  register: k8sTls
-  delegate_to: "{{ groups['k8s_master'] | first }}"
-  run_once: yes
+# - name:
+#   shell: kubeadm init phase upload-certs --upload-certs | tail -1
+#   register: k8sTls
+#   delegate_to: "{{ groups['k8s_master'] | first }}"
+#   run_once: yes
 
 - name: init kubeadmin with containerd(single in cmd)
   block:
@@ -26,6 +26,7 @@
         seconds: 10
         prompt: The master nodes successfully installed
   when: k8s_instmethod == "config"       
+ 
   rescue:
     - name: reset master
       command: kubeadm reset --force
@@ -33,5 +34,5 @@
     - debug:
         msg: The master nodes has been reseted
       failed_when: ( master_result.rc in [ 1,2 ] )
-      
+
 # - import_tasks: kubelet.yaml

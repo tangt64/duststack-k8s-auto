@@ -45,20 +45,3 @@
     state: present
   loop:
     - kubernetes-cni
- 
-
-
-- name: install the selinux packages
-  yum:
-    name: "{{ item }}"
-  loop:
-    - python3-libselinux
-    - python3-libsemanage
-  when: ( ansible_distribution == "CentOS" and ansible_distribution_major_version == "8" or ansible_distribution_major_version == "9" )
-
-- name: install the selinux packages
-  yum:
-    name: "{{ item }}"
-  loop:
-    - libsemanage-python
-  when: ( ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
