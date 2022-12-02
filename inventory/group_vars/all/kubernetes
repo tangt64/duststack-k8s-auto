@@ -1,8 +1,7 @@
 #
 # extension
-
-# kubernetes ingress enabled
-enabled_ingress: no
+# HAProxy, Nginx
+ingress_controller: haproxy
 
 # kubernetes virtualization enabled
 enabled_virtual: no
@@ -54,10 +53,6 @@ k8s_interface: eth1
 k8s_interface_type: ethernet
 k8s_ip4_gw: 0.0.0.0
 k8s_ip4_cidr: /24
-
-
-# HAProxy, Nginx
-ingress_controller: haproxy
 
 # firewalld for kubernetes
 use_firewalld: yes
