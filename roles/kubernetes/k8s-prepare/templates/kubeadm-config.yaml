@@ -19,13 +19,13 @@ bootstrapTokens:
 #     service-node-port-range: 80-32767
 #   imagePullPolicy: "IfNotPresent"
 localAPIEndpoint:
-  advertiseAddress: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
+  advertiseAddress: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
   bindPort: 6443
 certificateKey: "e6a2eb8581237ab72a4f494f30285ec12a9694d750b9785706a83bfcbbbd2204"
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
-kubernetesVersion: "{{ k8s_version }}"
+kubernetesVersion: {{ k8s_version }}
 apiServer:
   certSANs:
   - 127.0.0.1
@@ -51,24 +51,24 @@ apiServer:
   #   pathType: DirectoryOrCreate
   timeoutForControlPlane: 4m0s
 certificatesDir: /etc/kubernetes/pki
-clusterName: "{{ k8s_clusterName }}"
-controlPlaneEndpoint: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}:{{ k8s_endpoint_port }}"
+clusterName: {{ k8s_clusterName }}
+controlPlaneEndpoint: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}:{{ k8s_endpoint_port }}
 controllerManager: 
   extraArgs:
-    feature-gates: "TTLAfterFinished=true"
-    bind-address: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}""
+    feature-gates: TTLAfterFinished=true
+    bind-address: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
 etcd:
   local:
     dataDir: /var/lib/etcd
 imageRepository: k8s.gcr.io
 networking:
-  dnsDomain: "{{ k8s_cluster_domain }}"
-  podSubnet: "{{ k8s_pod_cidr }}"
-  serviceSubnet: "{{ k8s_cluster_svc_ip }}"
+  dnsDomain: {{ k8s_cluster_domain }}
+  podSubnet: {{ k8s_pod_cidr }}
+  serviceSubnet: {{ k8s_cluster_svc_ip }}
 scheduler:
   extraArgs:
-    feature-gates: "TTLAfterFinished=true"
-    bind-address: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
+    feature-gates: TTLAfterFinished=true
+    bind-address: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
