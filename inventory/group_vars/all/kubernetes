@@ -7,7 +7,7 @@ ingress_controller: haproxy
 enabled_virtual: no
 enabled_dashboard: no
 enabled_helm: no
-
+enabled_ingress: no
 ssh_remote_user: root
 ssh_remote_password: centos
 
