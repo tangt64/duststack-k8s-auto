@@ -8,7 +8,7 @@
 
   - name: enable masquerade to firewalld
     firewalld:
-      masquerade: True
+      masquerade: "True"
       zone: public
       state: enabled
       permanent: yes

@@ -1,5 +1,5 @@
 - name: set to an IP Address for {{ inventory_hostname }} for eth1
-  nmcli:
+  community.general.nmcli:
     type: "{{ item.type }}"
     conn_name: "{{ item.conn_name }}"
     ifname: "{{ item.ifname }}"
@@ -11,7 +11,7 @@
     - "{{ nmcli_ethernet }}"
 
 - name: set to an IP address for {{ inventory_hostname }} for eth0
-  nmcli:
+  community.general.nmcli:
     type: "{{ k8s_interface_type_ext }}"
     conn_name: "{{ k8s_interface_ext }}"
     ifname: "{{ k8s_interface_ext }}"
