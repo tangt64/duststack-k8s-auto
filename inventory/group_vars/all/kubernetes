@@ -38,7 +38,7 @@ k8s_private_rsa_locate: /root/.ssh/id_rsa
 distribution_name: redhat 
 
 # kubernets storage network
-internal_storage_dev_name: ens5
+internal_storage_dev_name: eth1
 
 # external,
 k8s_interface_ext: eth0

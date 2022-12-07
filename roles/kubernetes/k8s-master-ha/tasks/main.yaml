@@ -1,4 +1,4 @@
-- name: init kubeadmin with containerd(single in cmd)
+- name: reset master nodes joins into the first master
   block:
     - name: get token
       command: kubeadm token create --print-join-command
@@ -19,17 +19,6 @@
     - pause:
         seconds: 10
         prompt: The master nodes successfully installed      
-  when: k8s_instmethod == "cmd"       
-
-  block:
-    - name: install master as single(single in kubeadm-config)
-      command: kubeadm init --config /tmp/kubeadm-config.yaml
-      register: master_result
-      when: not k8s_proxy_mode
-    - pause:
-        seconds: 10
-        prompt: The master nodes successfully installed
-  when: k8s_instmethod == "config"       
  
   rescue:
     - name: reset master
