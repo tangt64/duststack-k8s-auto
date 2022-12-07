@@ -7,7 +7,7 @@
     gw4: "{{ item.gw4 }}"
     state: present
     autoconnect: "{{ item.autocon }}"
-    method6: disabled
+    method6: ignore
     method4: manual
   with_items:
     - "{{ nmcli_ethernet }}"
@@ -21,7 +21,7 @@
     gw4: "{{ k8s_ip4_gw_ext }}"
     state: present
     method4: manual
-    method6: disabled
+    method6: ignore
     autoconnect: "yes"
 
 # - name: deactive and active to the kubernetes internal interface
