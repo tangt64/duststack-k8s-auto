@@ -7,6 +7,8 @@
     gw4: "{{ item.gw4 }}"
     state: present
     autoconnect: "{{ item.autocon }}"
+    method6: disabled
+    method4: manual
   with_items:
     - "{{ nmcli_ethernet }}"
 
@@ -17,8 +19,9 @@
     ifname: "{{ k8s_interface_ext }}"
     ip4: "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ipaddr('network/prefix') }}"
     gw4: "{{ k8s_ip4_gw_ext }}"
-    state: presen
+    state: present
     method4: manual
+    method6: disabled
     autoconnect: "yes"
 
 # - name: deactive and active to the kubernetes internal interface
