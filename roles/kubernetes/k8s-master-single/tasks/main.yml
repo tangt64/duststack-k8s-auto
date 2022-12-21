@@ -5,7 +5,7 @@
 #- import_tasks: docker.yaml
 #  when: k8s_runtime_environment == "docker"
 
-- import_tasks: runtime.yaml
+- import_tasks: crio.yaml
 
 - import_tasks: kubeconfig.yaml
 - import_tasks: kubelet.yaml

@@ -1,10 +1,4 @@
-# - name:
-#   shell: kubeadm init phase upload-certs --upload-certs | tail -1
-#   register: k8sTls
-#   delegate_to: "{{ groups['k8s_master'] | first }}"
-#   run_once: yes
-
-- name: init kubeadmin with containerd(single in cmd)
+- name: reset master nodes joins into the first master
   block:
     - name: get token
       command: kubeadm token create --print-join-command
@@ -12,20 +6,19 @@
       delegate_to: "{{ groups['k8s_master'] | first }}"
       run_once: yes
 
+    - name: upload TLS certifications
+      shell: kubeadm init phase upload-certs --upload-certs | tail -1
+      register: k8sTls
+      delegate_to: "{{ groups['k8s_master'] | first }}"
+      run_once: yes      
+
     - name: join the rest of master nodes into first master node cluster
       shell: "{{ k8stoken.stdout }} --control-plane --certificate-key {{ k8sTls.stdout }}"
       register: master_reg_result
-  when: k8s_instmethod == "cmd"       
 
-  block:
-    - name: install master as single(single in kubeadm-config)
-      command: kubeadm init --config /tmp/kubeadm-config.yaml
-      register: master_result
-      when: not k8s_proxy_mode
     - pause:
         seconds: 10
-        prompt: The master nodes successfully installed
-  when: k8s_instmethod == "config"       
+        prompt: The master nodes successfully installed      
  
   rescue:
     - name: reset master
