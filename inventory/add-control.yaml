@@ -1,0 +1,56 @@
+all:
+  vars:
+    ansible_user: "{{ ssh_remote_user }}"
+    ansible_password: "{{ ssh_remote_password }}"
+
+lb:
+  hosts:
+   # 172.23.53.9:
+   #   nodename: lb.example.com
+   #   k8s_ip4: 192.168.100.9/20
+bootstrap:
+  hosts:
+    # 172.23.61.189:
+console:
+  hosts:
+    192.168.90.233:
+k8s_master:
+  hosts:
+    192.168.90.233:
+      nodename: master1.example.com
+      k8s_ip4: 192.168.100.233/20
+    # 172.23.61.221:
+    #   nodename: master2.example.com
+    #   k8s_ip4: 192.168.100.221/20
+    # 172.23.53.137:
+    #   nodename: master3.example.com
+    #   k8s_ip4: 192.168.100.137/20
+k8s_node:
+  hosts:
+    192.168.90.204:
+      nodename: node1.example.com
+      k8s_ip4: 192.168.100.204/20
+    192.168.90.203:
+      nodename: node2.example.com
+      k8s_ip4: 192.168.100.203/20
+k8s_virt:
+   hosts:
+#    192.168.90.94:
+#    192.168.90.96:
+k8s_utility:
+  hosts:
+#     192.168.90.68
+#       nodename: sti.example.com
+#       k8s_ip4: 10.10.10.68 
+k8s_storage:
+  hosts:
+#     192.168.90.68:
+#       nodename: sti.example.com
+#       k8s_ip4: 10.10.10.68
+k8s_hub:
+  hosts:
+#    192.168.90.75:
+k8s_spoke:
+  hosts:
+    # 192.168.90.92:
+    # 192.168.90.102:

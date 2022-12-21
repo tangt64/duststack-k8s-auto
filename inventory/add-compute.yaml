@@ -1,0 +1,13 @@
+all:
+  vars:
+    ansible_user: "{{ ssh_remote_user }}"
+    ansible_password: "{{ ssh_remote_password }}"
+
+k8s_node:
+  hosts:
+    192.168.90.204:
+      nodename: node1.example.com
+      k8s_ip4: 192.168.100.204/20
+    192.168.90.203:
+      nodename: node2.example.com
+      k8s_ip4: 192.168.100.203/20
