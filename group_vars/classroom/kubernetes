@@ -1,0 +1,30 @@
+k8s_master_nodes:
+  - k8s_master_1
+  - k8s_master_2
+  - k8s_master_3
+k8s_utility_nodes:
+  - k8s_utility_node
+k8s_nodes:
+  - k8s_node_1
+  - k8s_node_2
+
+virt_disk_format: qcow2
+virt_disk_image_path: /var/lib/libvirt/images/
+virt_disk_size: 20G
+
+local_apache_htdoc_directory: /var/www/html/
+repository_url: http://mirror.kakao.com/centos/7/os/x86_64/
+
+libvirt_owner: qemu
+libvirt_group: qemu
+
+vcpu: 2
+vmem: 4096
+nic1: default
+nic2: internal
+virt_type: kvm
+virt_hypervisor: hvm
+virt_graphics: spice
+
+os_type: linux
+os_variant: centos7
