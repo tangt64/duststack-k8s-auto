@@ -31,19 +31,17 @@ k8s_instmethod: config
 
 # /home/<USER>/<k8s_public_rsa_locate>
 #
-k8s_public_rsa_locate: /root/.ssh/id_rsa.pub
-k8s_private_rsa_locate: /root/.ssh/id_rsa
+k8s_public_rsa_locate: /home/tang/.ssh/k8s_id_rsa.pub
+k8s_private_rsa_locate: /home/tang/.ssh/k8s_id_rsa
 
-# ubuntu/debian, rhel/centos/rocky)
+# ubuntu, debian, rhel, centos, rocky
 distribution_name: redhat 
 
-# kubernets storage network
-internal_storage_dev_name: eth1
 
-# external,
+# external
 k8s_interface_ext: eth0
 k8s_interface_type_ext: ethernet
-k8s_ip4_gw_ext: 172.23.48.1
+k8s_ip4_gw_ext: 192.168.90.250
 k8s_ip4_cidr_ext: /20
 
 # internal, between kubernetes masters and nodes

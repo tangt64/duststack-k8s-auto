@@ -1,10 +1,13 @@
 - include_tasks: ssh.yaml
-- include_tasks: deploy_hosts_j2.yaml
+#- include_tasks: deploy_hosts_j2.yaml
 
 - name: install python packages for anisble
   yum:
-    name: 
-      - python-ipaddr
-      - python-netaddr
-      - python36-netaddr
+    name: "{{ item }}"
     state: present
+  loop:
+    - python-ipaddr
+    - python-netaddr
+    - python3-netaddr
+    - python2-ipaddress
+  ignore_errors: yes
