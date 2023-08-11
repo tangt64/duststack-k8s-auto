@@ -1,12 +1,22 @@
 ---
 # tasks file for crio
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: remove cri-o if installed
+  package:
+    name: cri-o
+    state: absent
+  when: "'cri-o' in ansible_facts.packages"
+
 - name: install to cri-o
   package:
     name: cri-o
-    state: latest
+    state: present
 
 - name: enable and start to cri-o .service
   service:
     name: crio
-    enabled: yes
+    enabled: true
     state: started

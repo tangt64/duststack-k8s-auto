@@ -1,0 +1,17 @@
+- name: check to the compute node for virtualization
+  command: virt-host-validate qemu
+  register: result_vhv
+
+- name: install kube-virt operator and CR
+  k8s:
+    state: present
+    src: "{{ item }}"
+  loop:
+    - kube-virt-operator.yaml
+    - kube-virt-cr.yaml
+
+- name: install the virtctl command
+  copy:
+    src: virtctl-v0.54.0
+    dest: /usr/local/virtctl
+    mode: 0700

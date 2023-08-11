@@ -1,14 +1,29 @@
-- include_tasks: ssh.yaml
+# include_tasks: ssh.yaml
 #- include_tasks: deploy_hosts_j2.yaml
+- name: install systemd-networkd package for network
+    package: 
+      name: "{{ item }}"
+      state: present
+    loop
+      - epel-release:
+      - systemd-networkd
+
+- name: started to the systemd-networkd service
+  systemd:
+    name: systemd-networkd
+    state: started
+    enabled: true
 
 - name: install python package for IP Address templating
   yum:
     name: "{{ item }}"
     state: present
   loop:
-    - python-ipaddr
-    - python-netaddr
-    - python3-netaddr
-    - python2-ipaddress
     - python3-types-ipaddress
-  ignore_errors: yes
+    - python3-netaddr
+  ignore_errors: true
+
+- name: configure to sudoers for none password requirement
+  copy:
+    src: nopasswd
+    dest: /etc/sudoers.d/nopasswd

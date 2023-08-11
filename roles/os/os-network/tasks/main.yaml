@@ -12,23 +12,22 @@
   with_items:
     - "{{ nmcli_ethernet }}"
 
-- name: set to an IP address for {{ inventory_hostname }} for eth0
-  community.general.nmcli:
-    type: "{{ k8s_interface_type_ext }}"
-    conn_name: "{{ k8s_interface_ext }}"
-    ifname: "{{ k8s_interface_ext }}"
-    ip4: "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ipaddr('network/prefix') }}"
-    gw4: "{{ k8s_ip4_gw_ext }}"
-    state: present
-    method4: manual
-    method6: ignore
-    autoconnect: "yes"
+# - name: set to an IP address for {{ inventory_hostname }} for eth0
+#   community.general.nmcli:
+#     type: "{{ k8s_interface_type_ext }}"
+#     conn_name: "{{ k8s_interface_ext }}"
+#     ifname: "{{ k8s_interface_ext }}"
+#     ip4: "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ansible.utils.ipaddr('network/prefix') }}"
+#     gw4: "{{ k8s_ip4_gw_ext }}"
+#     state: present
+#     method4: manual
+#     method6: ignore
+#     autoconnect: "yes"
 
-# - name: deactive and active to the kubernetes internal interface
-#   block:
-#     - command: nmcli con mod {{ k8s_interface }} ipv4.method manual
-#     - command: nmcli con down {{ k8s_interface }}
-#     - command: nmcli con up {{ k8s_interface }}
+- name: deactive and active to the kubernetes internal interface {{ inventory_hostname }}
+  systemd:
+    name: systemd-networkd
+    state: reloaded
 
 - name: add the kubernetes internal interface to firewalld
   firewalld:

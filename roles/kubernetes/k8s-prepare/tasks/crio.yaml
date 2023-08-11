@@ -1,4 +1,4 @@
-- name: copy a kubelet configuration file to /etc/sysconfig/kubelet
+  - name: copy a kubelet configuration file to /etc/sysconfig/kubelet
   copy:
     src: kubelet-crio
     dest: /etc/sysconfig/kubelet
