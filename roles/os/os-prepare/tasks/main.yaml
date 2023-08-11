@@ -5,7 +5,7 @@
     name: "{{ item }}"
     state: present
   loop
-  - epel-release:
+  - epel-release
   - systemd-networkd
 
 - name: started to the systemd-networkd service
