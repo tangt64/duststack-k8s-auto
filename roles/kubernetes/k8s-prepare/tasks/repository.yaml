@@ -18,7 +18,7 @@
     src: "{{ item }}"
     dest: /etc/yum.repos.d/
   with_items:
-    - devel_kubic_libcontainers_stable_cri-o.repo
+    - devel_kubic_libcontainers_stable_crio.repo
     - devel_kubic_libcontainers_stable.repo
   when: k8s_runtime_environment == "crio"
 
