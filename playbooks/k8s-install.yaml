@@ -3,7 +3,7 @@
   tags: k8s-prepare
   roles: 
     - { role: os/os-prepare }
-    - { role: os/os-ssh }
+#    - { role: os/os-ssh }
     - { role: os/os-network } 
     - { role: kubernetes/k8s-prepare }    
     - { role: core/core-crio, when: k8s_runtime_environment == "crio" }

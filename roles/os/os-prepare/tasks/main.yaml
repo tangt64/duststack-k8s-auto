@@ -1,12 +1,12 @@
 # include_tasks: ssh.yaml
 #- include_tasks: deploy_hosts_j2.yaml
 - name: install systemd-networkd package for network
-    package: 
-      name: "{{ item }}"
-      state: present
-    loop
-      - epel-release:
-      - systemd-networkd
+  package: 
+    name: "{{ item }}"
+    state: present
+  loop
+    - epel-release:
+    - systemd-networkd
 
 - name: started to the systemd-networkd service
   systemd:
