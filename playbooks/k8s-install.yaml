@@ -53,10 +53,10 @@
   tags: k8s-post
   roles:  
     - { role: kubernetes/k8s-post-config }
-    - { role: extension/extension-helm/base, when: enabled_helm, tags: helm }
-    - { role: extension/extension-helm/ingress, when: enabled_ingress, tags: ingress }    
-    - { role: extension/extension-dashboard, when: enabled_dashboard, tags: dashboard }
-    - { role: extension/extension-kubevirt, when: enabled_virtual, tags: virt}
+    - { role: extension/helm, when: enabled_helm, tags: helm }
+    - { role: extension/ingress, when: enabled_ingress, tags: ingress }    
+    - { role: extension/dashboard, when: enabled_dashboard, tags: dashboard }
+    - { role: extension/kubevirt, when: enabled_virtual, tags: virt}
   run_once: yes
 
 - name: install the OCM HUB
