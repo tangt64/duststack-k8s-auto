@@ -4,7 +4,7 @@
   package: 
     name: "{{ item }}"
     state: present
-  loop
+  loop:
   - epel-release
   - systemd-networkd
 
