@@ -1,5 +1,5 @@
-[devel_kubic_libcontainers_stable]
-name=Stable Releases of Upstream github.com/containers packages (CentOS_9_Stream)
+[libcontainers_stable]
+name=devel_kubic_libcontainers_stable
 type=rpm-md
 baseurl=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_9_Stream/
 gpgcheck=1
