@@ -1,11 +1,8 @@
 ---
 - name: repository kubernetes for YUM
-  copy:
-    src: kubernetes.repo
+  template:
+    src: kubernetes.repo.j2
     dest: /etc/yum.repos.d/kubernetes.repo
-
-- name: import kubernetes GPG key file from kubernetes server
-  command: rpmkeys --import https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
 - name: copy a containerd repository file
   copy:
