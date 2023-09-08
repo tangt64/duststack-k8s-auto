@@ -1,4 +1,4 @@
-- name: copy kube-flannel.yml file to root home directory
+- name: copy to kube-flannel.yml 
   copy:
    src: flanned.yaml
    dest: /tmp/flanned.yaml
