@@ -20,7 +20,7 @@ update_all_packages: no
 
 # Loadbalance mode
 k8s_proxy_mode: yes
-k8s_version: 1.24.3
+k8s_version: v1.28
 k8s_cni_version: 1.0.0
 k8s_api_domain: api.example.com
 k8s_endpoint_port: 6443
