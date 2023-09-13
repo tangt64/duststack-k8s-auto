@@ -1,0 +1,27 @@
+- name: copy tekton CD interface YAML file
+  copy: 
+    src: "{{ item }}"
+    dest: /tmp/{{ item }}
+  loop:
+    - tekton-cide.yaml
+    - tekton-dashboard.yaml
+
+- name: install tekton CD interface in kubernetes cluster
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ item }}"
+  loop: 
+      - /tmp/tekton-cicd.yaml
+      - /tmp/tekton-dashboard.yaml
+
+- name: install tkn client tool
+  copy:
+    src: tkn_0.32.0_Linux_x86_64.tar.gz
+    dest: /tmp/tkn_0.32.0_Linux_x86_64.tar.gz
+  when: k8s_offline_install
+
+- name: extract tkn client tool into /usr/local/bin
+  archive:
+    src: https://github.com/tektoncd/cli/releases/download/v0.32.0/tkn_0.32.0_Linux_x86_64.tar.gz
+    dest: /usr/local/bin
+    remote_src: true
