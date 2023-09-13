@@ -9,7 +9,7 @@ enabled_dashboard: no
 enabled_helm: no
 enabled_ingress: no
 ssh_remote_user: root
-ssh_remote_password: centos
+ssh_remote_password: rocky
 
 ocm_version: v0.6.0
 ocm_cluster_name: hub
@@ -20,11 +20,13 @@ update_all_packages: no
 
 # Loadbalance mode
 k8s_proxy_mode: yes
-k8s_version: v1.28
+k8s_repo_image_addr: registry.k8s.io
+k8s_version: 1.24.0
+k8s_repo_version: 1.24
 k8s_cni_version: 1.0.0
 k8s_api_domain: api.example.com
 k8s_endpoint_port: 6443
-k8s_clusterName: dustbox.kr
+k8s_cluster_name: dustbox.kr
 
 # config, cmd
 k8s_instmethod: config
@@ -57,7 +59,7 @@ use_firewalld: yes
 k8s_runtime_environment: crio
 
 # support calico, flanned
-k8s_network: calico
+k8s_network: flanned
 k8s_cluster_svc_ip: 10.96.0.0/12
 k8s_pod_cidr: 10.244.0.0/16
 k8s_svc_node_port_range: 30000-32767
@@ -74,4 +76,4 @@ ntp_server2: '0.asia.pool.ntp.org'
 time_zone: 'Asia/Seoul'
 
 # Kubernetes Metrics
-k8s_metric_server_version: 
+k8s_metric_server_version: 0.6.1
