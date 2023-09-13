@@ -16,9 +16,9 @@ console:
     # 192.168.90.44:
 k8s_master:
   hosts:
-    192.168.90.44:
+    192.168.68.104:
       nodename: master1.example.com
-      k8s_ip4: 192.168.100.44/20
+      k8s_ip4: 192.168.90.250/20
     # 172.23.61.221:
     #   nodename: master2.example.com
     #   k8s_ip4: 192.168.100.221/20
@@ -27,12 +27,12 @@ k8s_master:
     #   k8s_ip4: 192.168.100.137/20
 k8s_node:
   hosts:
-    192.168.90.25:
+    192.168.68.105:
       nodename: node1.example.com
-      k8s_ip4: 192.168.100.25/20
-#    192.168.90.203:
-#      nodename: node2.example.com
-#      k8s_ip4: 192.168.100.203/20
+      k8s_ip4: 192.168.90.110/20
+    192.168.68.103:
+      nodename: node2.example.com
+      k8s_ip4: 192.168.90.120/20
 k8s_virt:
    hosts:
 #    192.168.90.94:

@@ -11,3 +11,10 @@
     loop:
       - /etc/kubernetes/
       - ~/.kube
+  - name: delete the cni.d configureation files
+    shell: rm -f /etc/cni/net.d/*
+  
+  - name: reboot to all nodes
+    reboot:
+      reboot_timeout: 3600
+

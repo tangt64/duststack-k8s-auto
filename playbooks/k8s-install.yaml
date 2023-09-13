@@ -39,13 +39,14 @@
     - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
 
 - name: install kubernetes network service
-  hosts: k8s_master
+  hosts: k8s_master[0]
   tags: k8s-network
   roles:  
     - { role: cni/cni-calico, when: k8s_network == "calico" }
     - { role: cni/cni-flanned, when: k8s_network == "flanned" }
     # - { role: cni-multus, when: k8s_network == "multus" }
     # - { role: cni-kubeovn, when: k8s_network == "kubeovn" }
+    # - { role: cni-kubeovn, when: k8s_network == "multius" }
   run_once: yes
 
 - name: label to kubernetes worker nodes
