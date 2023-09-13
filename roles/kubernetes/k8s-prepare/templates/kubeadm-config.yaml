@@ -2,10 +2,10 @@
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 bootstrapTokens:
-- token: "9a08jv.c0izixklcxtmnze7"
+- token: "{{ kubeadm_bootstrap_token }}"
   description: "kubeadm bootstrap token"
   ttl: "24h"
-- token: "783bde.3f89s0fje9f38fhf"
+- token: "{{ kubeadm_join_token }}"
   description: "another bootstrap token"
   usages:
   - authentication
@@ -21,17 +21,17 @@ bootstrapTokens:
 localAPIEndpoint:
   advertiseAddress: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
   bindPort: 6443
-certificateKey: "e6a2eb8581237ab72a4f494f30285ec12a9694d750b9785706a83bfcbbbd2204"
+certificateKey: "{{ e6a2eb8581237ab72a4f494f30285ec12a9694d750b9785706a83bfcbbbd2204 }}"
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 kubernetesVersion: {{ k8s_version }}
 apiServer:
   certSANs:
-  - 127.0.0.1
-  - {{ k8s_api_domain }}
-  - {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
-  - {{ ansible_facts['default_ipv4']['address'] }}
+  - "127.0.0.1"
+  - "{{ k8s_api_domain }}"
+  - "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
+  - "{{ ansible_facts['default_ipv4']['address'] }}""
   # extraArgs:
   #   authorization-mode: Node,RBAC
   #   feature-gates: "TTLAfterFinished=true"

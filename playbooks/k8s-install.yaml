@@ -3,12 +3,10 @@
   tags: k8s-prepare
   roles: 
     - { role: os/os-prepare }
-#    - { role: os/os-ssh }
     - { role: os/os-network } 
     - { role: kubernetes/k8s-prepare }    
     - { role: core/core-crio, when: k8s_runtime_environment == "crio" }
     - { role: core/core-containerd, when: k8s_runtime_environment == "containerd" }
-#    - { role: oss/cores/core-virt-precheck, when: enabled_virtual  }
 
 - name: haproxy install and setup
   hosts: lb
