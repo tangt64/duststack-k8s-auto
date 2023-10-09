@@ -5,9 +5,9 @@ install
 # Keyboard layouts
 keyboard 'us'
 # Root password
-rootpw --iscrypted $6$AvdjZxuqmPqE0Kqe$ATNI9NVyRF/o4b9OfNGFjxB8zRBqE46G0khMOxxemf/7Cz./7jM5EccXf1fJ9H0UsNwdKQoQL1skkqIMjnTlu1
+rootpw --iscrypted $1$vZhANTdH$a5juvIOCLLNWs2Xc2UU3v1
 # Use network installation
-url --url="http://mirror.kakao.com/centos/7/os/x86_64/"
+repo --name="AppStream" --baseurl="http://mirror.kakao.com/centos/8-stream/"
 # System language
 lang en_US
 # System authorization information
@@ -23,9 +23,8 @@ skipx
 # Firewall configuration
 firewall --disabled
 # Network information
-network  --bootproto=static --device=eth0 --gateway=192.168.122.1 --ip=192.168.122.150 --nameserver=8.8.8.8 --netmask=255.255.255.0 --hostname=node3.example.com
-network  --bootproto=static --device=eth1 --ip=192.168.90.150 --netmask=255.255.255.0 --nodefroute --nameserver=192.168.122.200
-
+network  --bootproto=static --device=eth0 --gateway=192.168.122.1 --ip=192.168.122.140 --nameserver=8.8.8.8 --netmask=255.255.255.0 --hostname=node7.example.com
+network  --bootproto=static --device=eth1 --ip=192.168.90.140 --netmask=255.255.255.0 --nodefroute
 # Reboot after installation
 reboot
 # System timezone
@@ -40,12 +39,12 @@ clearpart --all
 part / --fstype="xfs" --size=20000
 
 %post
-cat <<EOF> /root/.vimrc
-au! BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml foldmethod=indent
-autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+hostnamectl set-hostname storage1.example.com
+
+cat <<EOF>> /etc/hosts
+192.168.90.110 node1.example.com node1
+192.168.90.120 node2.example.com node2
+192.168.90.130 node3.example.com node3
+192.168.90.140 node4.example.com node4
 EOF
-
-yum install vim nfs-utils -y
-
-systemctl enable firewalld
 %end

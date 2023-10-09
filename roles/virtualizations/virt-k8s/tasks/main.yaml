@@ -1,5 +1,5 @@
 - name: check to installed libvirt daemon
-  yum:
+  dnf:
     name: "{{ packages }}"
   register: install_status
   vars:
@@ -12,7 +12,7 @@
     - python3
 
 - name: install libvirt daemon 
-  yum:
+  dnf:
     name: ['libvirt-daemon-*']
     state: latest
   when: install_status.rc == 0
@@ -31,7 +31,7 @@
     dest: "{{ k8s_work_dir }}"
 
 - name: start python httpd server
-  shell: "nohup python3 {{ k8s_work_dir }}/httpd.py &"
+  shell: "nohup python {{ k8s_work_dir }}/httpd.py"
 
 - name: start libvirt daemon
   service:

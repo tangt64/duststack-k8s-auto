@@ -1,0 +1,158 @@
+- name: check to installed libvirt daemon
+  yum:
+    name: "{{ packages }}"
+  register: install_status
+  vars:
+    packages:
+    - libvirt
+    - libvirt-daemon-kvm
+    - libvirt-client
+
+- name: start libvirt daemon
+  service:
+    name: libvirtd
+    state: started
+    enabled: yes
+
+- name: create a openstack workdir
+  file:
+    path: "{{ openstack_work_dir }}"
+    mode: 0644
+    recurse: yes
+    
+- name: copy httpd.py server
+  template:
+    src: httpd.py
+    dest: "{{ openstack_work_dir }}"
+
+- name: start python httpd server
+  shell: "nohup python3 {{ openstack_work_dir }}/httpd.py &"
+
+- name: get list of VMs from libvirtd
+  virt:
+    command: list_vms
+  register: virt_vms
+
+- name: copy a anaconda files to "{{ openstack_work_dir }}"
+  copy:
+    src: "{{ item }}.ks"
+    dest: "{{ openstack_work_dir }}{{ item }}.ks"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - "{{ openstack_nodes }}"
+
+- name: adjust to kickstart .ks file permission 
+  file:
+    path: "{{ openstack_work_dir }}{{ item }}.ks"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - "{{ openstack_nodes }}"
+
+- name: create a OpenStack VMs for LAB virtual disk
+  command: qemu-img create -f {{ virt_disk_format }} {{ virt_disk_image_path }}{{ item }}.{{ virt_disk_format }} {{ virt_disk_size }}
+  loop:
+    - "{{ openstack_nodes }}"  
+
+- name: check to internal network device
+  shell: "virsh net-list | grep internal | awk '{ print $1 }'"
+  register: verify_internal
+
+- debug: 
+    msg: "{{ verify_internal }}"
+
+- name: create a internal virtual network
+  virt_net:
+    command: define
+    name: internal
+    xml: "{{ lookup('template', 'internal.xml.j2') }}"
+    autostart: yes
+  when: verify_internal.rc == 0
+
+- name: create vdb disk for compute
+  command: qemu-img create -f {{ virt_disk_format }} {{ virt_disk_image_path }}{{ item }}-{{ virt_vdb_postfix }}.{{ virt_disk_format }} {{ virt_disk_size }}
+  loop:
+    - "{{ vdb_nodes }}"
+
+- name: starting to internal virtual network
+  virt_net:
+    command: start
+    name: internal
+    autostart: yes
+  ignore_errors: true
+
+- name: change ownership to the virtual disk images
+  file:
+    path: "{{ virt_disk_image_path }}{{ item }}.{{ virt_disk_format }}"
+    owner: qemu
+    group: qemu
+    mode: 0644
+  loop:
+    - "{{ openstack_nodes }}"
+
+- name: install control/network/storage virtual machine on libvirt daemon 
+  shell: virt-install -n {{ item }} -r {{ vmem }} --cpu host-passthrough --vcpus {{ vcpu }} -l {{ repository_url }} --network network={{ nic1 }} --network network={{ nic2 }} --graphics {{ virt_graphics }} -v --disk=path={{ virt_disk_image_path }}{{ item }}.{{ virt_disk_format }},format={{ virt_disk_format }} --noautoconsole -x ks="{{ kickstart_address }}/{{ item }}.ks {{ kargs }}"
+  loop:
+    - "{{ openstack_nodes }}"
+
+- name: wait for build to VMs
+  pause:
+    minutes: 20
+    prompt: "Waiting for building to VMs about 30 mins"
+
+- block:
+    - name: starting to control/compute/storage VMs
+      virt:
+        name: "{{ item }}"
+        command: start 
+      loop:
+        - "{{ openstack_nodes }}"
+      no_log: true
+
+  rescue:
+    - name: some VMs has been failed
+      pause:
+        minutes: 5
+        prompt: "Waiting more 5 mins"
+
+    - name: again start to VMs
+      virt:
+        name: "{{ item }}"
+        command: start 
+      loop:
+        - "{{ openstack_nodes }}"
+      ignore_errors: yes
+
+- name: wait for boot up all of VMs in 30 second
+  pause:
+    seconds: 30
+
+- name: attach a disk to compute node as vdb
+  command: virsh attach-disk {{ item }} --source {{ virt_disk_image_path }}{{ item }}-{{ virt_vdb_postfix }}.{{ virt_disk_format }} --target {{ virt_vdb_postfix }} --subdriver qcow2 --targetbus virtio --cache none --persistent
+  loop:
+    - "{{ vdb_nodes }}"
+
+- name: stop to compute VMs for attach to vdb disk
+  virt:
+    name: "{{ item }}"
+    command: destroy 
+  loop:
+    - "{{ vdb_nodes }}"
+
+- name: wait for boot up all of VMs in 30 second
+  pause:
+    seconds: 30
+
+- name: start to compute VMs again
+  virt:
+    name: "{{ item }}"
+    command: start 
+  loop:
+    - "{{ vdb_nodes }}"
+
+- name: wait for boot up all of VMs in 30 second
+  pause:
+    seconds: 30

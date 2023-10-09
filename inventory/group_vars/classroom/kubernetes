@@ -12,7 +12,6 @@ virt_disk_format: qcow2
 virt_disk_image_path: /var/lib/libvirt/images/
 virt_disk_size: 20G
 
-local_apache_htdoc_directory: /var/www/html/
 repository_url: http://mirror.kakao.com/centos/7/os/x86_64/
 
 libvirt_owner: qemu
@@ -24,7 +23,7 @@ nic1: default
 nic2: internal
 virt_type: kvm
 virt_hypervisor: hvm
-virt_graphics: spice
+virt_graphics: vnc
 
 os_type: linux
 os_variant: centos7

@@ -1,5 +1,5 @@
 - name: prepare for classrom
-  become: root
+  remote_user: tang
   hosts: local_server
   serial: 1
   tags: classroom

@@ -1,0 +1,17 @@
+<network>
+  <name>internal</name>
+  <uuid>96334a4a-f8a2-46f8-bf8a-2e7ff937caf2</uuid>
+  <forward mode="nat">
+    <nat>
+      <port start="1024" end="65535"/>
+    </nat>
+  </forward>
+  <bridge name="virbr1" stp="on" delay="0"/>
+  <mac address="52:54:00:7f:27:c7"/>
+  <domain name="internal"/>
+  <ip address="192.168.90.1" netmask="255.255.255.0">
+    <dhcp>
+      <range start="192.168.90.2" end="192.168.90.254"/>
+    </dhcp>
+  </ip>
+</network>
