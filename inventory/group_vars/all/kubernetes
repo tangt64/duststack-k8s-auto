@@ -36,21 +36,10 @@ k8s_instmethod: config
 k8s_public_rsa_locate: /home/tang/.ssh/k8s_id_rsa.pub
 k8s_private_rsa_locate: /home/tang/.ssh/k8s_id_rsa
 
-# ubuntu, debian, rhel, centos, rocky
+#
+# ubuntu, debian, rhel, centos, rocky for container image based installation
+#
 distribution_name: redhat 
-
-
-# external
-k8s_interface_ext: eth0
-k8s_interface_type_ext: ethernet
-k8s_ip4_gw_ext: 192.168.90.250
-k8s_ip4_cidr_ext: /20
-
-# internal, between kubernetes masters and nodes
-k8s_interface: eth1
-k8s_interface_type: ethernet
-k8s_ip4_gw: 0.0.0.0
-k8s_ip4_cidr: /24
 
 # firewalld for kubernetes
 use_firewalld: yes
@@ -59,11 +48,18 @@ use_firewalld: yes
 k8s_runtime_environment: crio
 
 # support calico, flanned
+
+k8s_interface: eth1
+
+#
+# calico, flanned
+#
 k8s_network: flanned
 k8s_cluster_svc_ip: 10.96.0.0/12
-k8s_pod_cidr: 10.244.0.0/16
+k8s_pod_cidr: 10.10.0.0/16
 k8s_svc_node_port_range: 30000-32767
 k8s_cluster_domain: cluster.local
+k8s_vip_address: 10.10.10.10
 
 container_worker_node_name: worker
 virtual_worker_node_name: vm

@@ -1,12 +1,12 @@
 - name: copy to kube-flannel.yml 
-  copy:
-   src: kube-flannel.yml
-   dest: /tmp/kube-flannel.yml
+  template:
+   src: flanned-config.yaml
+   dest: /tmp/kube-flannel.yaml
 
 - name: apply to kube-flannel on kubernetes cluster
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/kube-flannel.yml
+  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/kube-flannel.yaml
 
 - name: delete to the flanned.yml file
   file:
-    path: /tmp/kube-flannel.ymlflanned.yml
+    path: /tmp/kube-flannel.yaml
     state: absent

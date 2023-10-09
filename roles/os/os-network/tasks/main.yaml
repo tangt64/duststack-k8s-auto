@@ -1,4 +1,4 @@
-- name: set to an IP Address for {{ inventory_hostname }} for eth1
+- name: set to an IP Address
   community.general.nmcli:
     type: "{{ item.type }}"
     conn_name: "{{ item.conn_name }}"
@@ -7,12 +7,12 @@
     gw4: "{{ item.gw4 }}"
     state: present
     autoconnect: "{{ item.autocon }}"
-    method6: ignore
+    method6: disabled
     method4: manual
   with_items:
     - "{{ nmcli_ethernet }}"
 
-# - name: set to an IP address for {{ inventory_hostname }} for eth0
+# - name: set to an IP addres
 #   community.general.nmcli:
 #     type: "{{ k8s_interface_type_ext }}"
 #     conn_name: "{{ k8s_interface_ext }}"

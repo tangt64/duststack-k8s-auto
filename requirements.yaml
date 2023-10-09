@@ -3,3 +3,5 @@ collections:
   - ansible.posix
   - community.crypto
   - community.general
+  - ansible.utils
+  - kubernetes.core

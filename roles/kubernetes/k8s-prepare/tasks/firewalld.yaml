@@ -13,20 +13,38 @@
       state: enabled
       permanent: yes
       
-  - name: add ports to firewalld for controller and worker nodes
+  - name: add ports to firewalld for controller 
     firewalld:
-      port: "{{ item }}"
+      service: "{{ item }}"
       state: enabled
       permanent: yes
       immediate: yes
       zone: public
     with_items:
-      - "10250/tcp"
-      - "10251/tcp"
-      - "10252/tcp"
-      - "10255/tcp"
-      - "30000-32767/tcp"
-      - "8472/udp"
+      - kube-api
+      - kube-apiserver
+      - kube-control-plane
+      - kube-control-plane-secure
+      - kube-controller-manager
+      - kube-controller-manager-secure 
+      - kube-scheduler
+      - kube-scheduler-secure
+      - kubelet
+      - kubelet-readonly
+    when: "{{ groups['k8s_master'] }}"
+
+  - name: add ports to firewalld for worker
+    firewalld:
+      service: "{{ item }}"
+      state: enabled
+      permanent: yes
+      immediate: yes
+      zone: public
+    with_items:
+      - kube-nodeport-services
+      - kube-worker
+      - kubelet-worker
+    when: "{{ groups['k8s_node'] }}"
 
   - name: add ports to firewalld for calico
     firewalld:
@@ -47,14 +65,6 @@
       - "6443/tcp"
       - "2379-2380/tcp"
     when: k8s_network =="calico"
-
-  - name: add an interface to firewalld
-    firewalld:
-      interface: "{{ k8s_interface }}"
-      permanent: yes
-      immediate: yes
-      state: enabled
-      zone: public
 
   - name: add an rich rule for worker node address to firewalld
     firewalld:

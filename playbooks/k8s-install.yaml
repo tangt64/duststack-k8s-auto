@@ -3,7 +3,7 @@
   tags: k8s-prepare
   roles: 
     - { role: os/os-prepare }
-    - { role: os/os-network } 
+      #    - { role: os/os-network } 
     - { role: kubernetes/k8s-prepare }    
     - { role: core/core-crio, when: k8s_runtime_environment == "crio" }
     - { role: core/core-containerd, when: k8s_runtime_environment == "containerd" }
@@ -16,14 +16,14 @@
 
 - name: install kubernetes for the first master node
   hosts: k8s_master[0]
-  tags: k8s-master-single
+  tags: k8s-controller
   roles:
    - { role: kubernetes/k8s-master-single, tags: multi }
    - { role: core/core-virt, when: enabled_virtual, tags: virt }
 
 - name: install kubernetes master for the rest of master nodes
   hosts: k8s_master[1:{{ MASTER_HOSTS_COUNT }}]
-  tags: k8s-master-multi
+  tags: k8s-controller-multi
   roles:
     - { role: kubernetes/k8s-master-ha, when: k8s_proxy_mode, tags: multi }
   vars:
