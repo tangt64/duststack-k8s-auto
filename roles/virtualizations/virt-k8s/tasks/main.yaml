@@ -31,7 +31,7 @@
     dest: "{{ k8s_work_dir }}"
 
 - name: start python httpd server
-  shell: "nohup python {{ k8s_work_dir }}/httpd.py"
+  shell: "nohup python {{ k8s_work_dir }}httpd.py &"
 
 - name: start libvirt daemon
   service:
