@@ -12,11 +12,8 @@
 
 - name: enable repository for cri-o
   copy:
-    src: "{{ item }}"
+    src: cri-o.repo
     dest: /etc/yum.repos.d/
-  with_items:
-    - devel_kubic_libcontainers_stable_crio.repo
-    - devel_kubic_libcontainers_stable.repo
   when: k8s_runtime_environment == "crio"
 
 - name: register docker repository in yum.repos.d

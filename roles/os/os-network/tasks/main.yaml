@@ -1,33 +1,17 @@
-- name: set to an IP Address
-  community.general.nmcli:
-    type: "{{ item.type }}"
-    conn_name: "{{ item.conn_name }}"
-    ifname: "{{ item.ifname }}"
-    ip4: "{{ item.ip4 }}"
-    gw4: "{{ item.gw4 }}"
+- dnf:
+    name: epel-release
     state: present
-    autoconnect: "{{ item.autocon }}"
-    method6: disabled
-    method4: manual
-  with_items:
-    - "{{ nmcli_ethernet }}"
 
-# - name: set to an IP addres
-#   community.general.nmcli:
-#     type: "{{ k8s_interface_type_ext }}"
-#     conn_name: "{{ k8s_interface_ext }}"
-#     ifname: "{{ k8s_interface_ext }}"
-#     ip4: "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ansible.utils.ipaddr('network/prefix') }}"
-#     gw4: "{{ k8s_ip4_gw_ext }}"
-#     state: present
-#     method4: manual
-#     method6: ignore
-#     autoconnect: "yes"
+- name: install systemd-networkd for networking
+  package:
+    name: systemd-networkd
+    state: present
 
-- name: deactive and active to the kubernetes internal interface {{ inventory_hostname }}
+- name: start to systemd-networkd service
   systemd:
     name: systemd-networkd
-    state: reloaded
+    state: started
+    enabled: true
 
 - name: add the kubernetes internal interface to firewalld
   firewalld:
@@ -40,7 +24,8 @@
 - name: set to a hostname
   hostname:
     name: "{{ nodename }}"
-#- name: set to a /etc/hosts file
-#  template:
-#    src: hosts.j2
-#    dest: /etc/hosts
+
+- name: deactive and active to the kubernetes internal interface {{ inventory_hostname }}
+  systemd:
+    name: systemd-networkd
+    state: reloaded

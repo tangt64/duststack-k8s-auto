@@ -31,7 +31,7 @@
       - kube-scheduler-secure
       - kubelet
       - kubelet-readonly
-    when: "{{ groups['k8s_master'] }}"
+    when: groups['k8s_master']
 
   - name: add ports to firewalld for worker
     firewalld:
@@ -44,7 +44,7 @@
       - kube-nodeport-services
       - kube-worker
       - kubelet-worker
-    when: "{{ groups['k8s_node'] }}"
+    when: groups['k8s_node']
 
   - name: add ports to firewalld for calico
     firewalld:

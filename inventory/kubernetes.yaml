@@ -2,37 +2,46 @@ all:
   vars:
     ansible_user: "{{ ssh_remote_user }}"
     ansible_password: "{{ ssh_remote_password }}"
-
+    k8s_external_nic: eth0
+    k8s_external_gw: 192.168.10.1
+    k8s_internal_nic: eth1
+    k8s_internal_gw: ""
 lb:
   hosts:
-   # 172.23.53.9:
-   #   nodename: lb.example.com
-   #   k8s_ip4: 192.168.100.9/20
+    192.168.10.250:
+      nodename: lb.example.com
+      k8s_ip4: 10.10.10.250/24
 bootstrap:
   hosts:
-    # 172.23.61.189:
+    192.168.10.10:
 console:
   hosts:
-    # 192.168.90.44:
+    192.168.10.10:
 k8s_master:
   hosts:
-    192.168.122.226:
-      nodename: master.example.com
+    192.168.10.10:
+      nodename: master1.example.com
       k8s_ip4: 10.10.10.10/24
-    # 172.23.61.221:
-    #   nodename: master2.example.com
-    #   k8s_ip4: 192.168.100.221/20
-    # 172.23.53.137:
-    #   nodename: master3.example.com
-    #   k8s_ip4: 192.168.100.137/20
+      keepalived_node: master
+      keepalived_pri: 100
+#    192.168.10.20:
+#      nodename: master2.example.com
+#      k8s_ip4: 10.10.10.20/24
+#      keepalived_node: backup
+#      keepalived_pri: 99
+#     192.168.10.30:
+#      nodename: master3.example.com
+#      k8s_ip4: 10.10.10.30/24
+#      keepalived_node: backup
+#      keepalived_pri: 99
 k8s_node:
   hosts:
-    192.168.122.151:
+    192.168.10.40:
       nodename: node1.example.com
-      k8s_ip4: 10.10.10.110/24
-    192.168.122.82:
+      k8s_ip4: 10.10.10.40/24
+    192.168.10.50:
       nodename: node2.example.com
-      k8s_ip4: 10.10.10.120/24
+      k8s_ip4: 10.10.10.50/24
 k8s_virt:
    hosts:
 #    192.168.90.94:
@@ -42,11 +51,10 @@ k8s_utility:
 #     192.168.90.68
 #       nodename: sti.example.com
 #       k8s_ip4: 10.10.10.68 
-k8s_storage:
+k8s_storage_nfs:
   hosts:
-#     192.168.90.68:
-#       nodename: sti.example.com
-#       k8s_ip4: 10.10.10.68
+    192.168.90.250:
+       k8s_ip4: 10.10.10.250
 k8s_hub:
   hosts:
 #    192.168.90.75:

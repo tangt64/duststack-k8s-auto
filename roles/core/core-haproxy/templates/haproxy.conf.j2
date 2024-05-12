@@ -32,7 +32,7 @@ defaults
 # apiserver frontend which proxys to the masters
 #---------------------------------------------------------------------
 frontend kubernetes
-    bind *:'{{ APISERVER_DEST_PORT }}'
+    bind *:'{{ k8s_endpoint_port }}'
     mode tcp
     option tcplog
     default_backend kubernetes-master-nodes
@@ -47,5 +47,5 @@ backend kubernetes-master-nodes
     option ssl-hello-chk
     balance     roundrobin
     {% for host in groups['k8s_master'] %}
-       server {{ hostvars[host]['nodename']|default(host) }} {{ hostvars[host]['ansible_host']|default(host) }}:{{ APISERVER_SRC_PORT }} check fall 3 rise 2
+       server {{ hostvars[host]['nodename']|default(host) }} {{ hostvars[host]['ansible_host']|default(host) }}:{{ k8s_endpoint_port }} check fall 3 rise 2
     {% endfor %}

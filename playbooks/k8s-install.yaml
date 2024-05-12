@@ -1,9 +1,11 @@
 - name: install and enable to cri-o,docker enviroment
-  hosts: all
+  hosts: 
+    - k8s_master
+    - k8s_node
   tags: k8s-prepare
   roles: 
-    - { role: os/os-prepare }
-      #    - { role: os/os-network } 
+    - { role: os/os-prepare, tags: k8s-os }
+    - { role: os/os-network, tags: k8s-network } 
     - { role: kubernetes/k8s-prepare }    
     - { role: core/core-crio, when: k8s_runtime_environment == "crio" }
     - { role: core/core-containerd, when: k8s_runtime_environment == "containerd" }
@@ -12,7 +14,21 @@
   hosts: lb
   tags: k8s-haproxy
   roles:  
-    - { role: core/core-haproxy, when: k8s_proxy_mode, tags: multi }
+    - role: core/core-haproxy
+      when: 
+        - k8s_proxy_mode_enable
+        - k8s_proxy_mode == "haproxy"
+      tags: multi }
+
+- name: haproxy install and setup
+  hosts: k8s_master
+  tags: k8s-keepalived
+  roles:  
+    - role: core/core-keepalived
+      when: 
+        - k8s_proxy_mode_enable
+        - k8s_proxy_mode == "keepalived"
+      tags: multi
 
 - name: install kubernetes for the first master node
   hosts: k8s_master[0]
@@ -25,7 +41,7 @@
   hosts: k8s_master[1:{{ MASTER_HOSTS_COUNT }}]
   tags: k8s-controller-multi
   roles:
-    - { role: kubernetes/k8s-master-ha, when: k8s_proxy_mode, tags: multi }
+    - { role: kubernetes/k8s-master-ha, when: k8s_proxy_mode_enable, tags: multi }
   vars:
     MASTER_HOSTS_COUNT: "{{ groups['k8s_master'] | length }}"
 
@@ -55,8 +71,12 @@
     - { role: extension/helm, when: enabled_helm, tags: helm }
     - { role: extension/ingress, when: enabled_ingress, tags: ingress }    
     - { role: extension/dashboard, when: enabled_dashboard, tags: dashboard }
-    - { role: extension/kubevirt, when: enabled_virtual, tags: virt}
+    - { role: extension/kubevirt, when: enabled_virtual, tags: virt }
+    - { role: cicd/tekton, when: enabled_cicd_tekton, tags: tekton }
   run_once: yes
+
+# - name: install and configure NFS storage 
+#  hosts: k8s_storage_nfs
 
 - name: install the OCM HUB
   hosts: k8s_hub

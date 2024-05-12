@@ -7,15 +7,6 @@
       - kubelet*
   when: update_all_packages == "yes"
 
-- name: install needed network manager libs
-  package:
-    name:
-      - NetworkManager-libnm
-      - nm-connection-editor
-      - libsemanage
-      - policycoreutils
-    state: present
-
 - name: install tc package for kubernetes
   package:
     name: "{{ item }}"
