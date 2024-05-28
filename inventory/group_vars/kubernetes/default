@@ -1,0 +1,79 @@
+#
+# extension for ingress
+# HAProxy, Nginx
+ingress_controller: haproxy
+
+# kubernetes virtualization enabled
+enabled_virtual: no
+enabled_dashboard: no
+enabled_helm: no
+enabled_cicd_tekton: no
+enabled_ingress: no
+ssh_remote_user: root
+ssh_remote_password: k8s
+ansible_ssh_private_key_file: k8s.pem
+
+ocm_version: v0.6.0
+ocm_cluster_name: hub
+ocm_registry: quay.io/open-cluster-management
+ocm_hub: no
+
+update_all_packages: no
+
+# Loadbalance mode for kubernetes cluster
+# haproxy
+# keepalived
+k8s_proxy_mode: haproxy
+k8s_proxy_mode_enable: yes
+k8s_repo_image_addr: registry.k8s.io
+k8s_version: 1.28.0
+k8s_repo_version: 1.28
+k8s_cni_version: 1.0.0
+k8s_api_domain: api.example.com
+k8s_endpoint_port: 6443
+k8s_cluster_name: dustbox.kr
+
+# config, cmd
+k8s_instmethod: config
+
+# /home/<USER>/<k8s_public_rsa_locate>
+#
+k8s_public_rsa_locate: /home/tang/.ssh/k8s_id_rsa.pub
+k8s_private_rsa_locate: /home/tang/.ssh/k8s_id_rsa
+
+#
+# ubuntu, debian, rhel, centos, rocky for container image based installation
+#
+distribution_name: redhat 
+
+# firewalld for kubernetes
+use_firewalld: yes
+
+# containerd, crio, docker
+k8s_runtime_environment: crio
+
+# support calico, flanned, kubernetes API interface, keepalived, haproxy
+k8s_interface: eth1
+
+#
+# calico, flanned
+#
+k8s_network: calico
+k8s_cluster_svc_ip: 10.96.0.0/12
+k8s_pod_cidr: 10.88.0.0/16
+k8s_svc_node_port_range: 30000-32767
+k8s_cluster_domain: cluster.local
+k8s_vip_address: 10.10.10.250
+
+container_worker_node_name: worker
+virtual_worker_node_name: vm
+
+#
+# NTP
+#
+ntp_server1: '3.kr.pool.ntp.org'
+ntp_server2: '0.asia.pool.ntp.org'
+time_zone: 'Asia/Seoul'
+
+# Kubernetes Metrics
+k8s_metric_server_version: 0.6.1

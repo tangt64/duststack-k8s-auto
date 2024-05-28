@@ -1,0 +1,6 @@
+[Match]
+Name=eth0
+
+[Network]
+Address="{{ k8s_ip4 }}"
+Gateway="{{ k8s_external_gw }}"

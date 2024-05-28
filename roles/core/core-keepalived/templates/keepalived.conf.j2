@@ -1,0 +1,17 @@
+global_defs {
+    router_id LVS_DEVEL
+}
+
+vrrp_instance VI_1 {
+    state "{{ keepalived_node }}"
+    interface "{{ k8s_interface }}"
+    virtual_router_id 51
+    priority "{{ keepalived_node }}"
+    authentication {
+        auth_type PASS
+        auth_pass keepalived
+    }
+    virtual_ipaddress {
+        "{{ k8s_vip_address }}"
+    }
+}

@@ -1,0 +1,19 @@
+- name: install a keepalived
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - keepalived
+
+- name: configure to keepalived 
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+
+- name: start and enable keepalived service
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - keepalived

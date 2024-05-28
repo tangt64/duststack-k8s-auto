@@ -1,0 +1,14 @@
+- hosts: all
+
+  become_user: root
+  become: true
+  remote_user: root
+
+  tasks:
+  - name: Set authorized key in alternate location
+    authorized_key:
+      user: root
+      state: present
+      key: "{{ lookup('file', 'k8s.pub') }}"
+      manage_dir: False
+

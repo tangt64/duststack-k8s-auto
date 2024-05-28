@@ -1,0 +1,6 @@
+[Match]
+Name=eth0
+
+[Network]
+Address="{{ inventory_hostname }}"
+Gateway="{{ k8s_internal_gw }}"
