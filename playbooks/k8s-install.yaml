@@ -34,8 +34,9 @@
   hosts: k8s_master[0]
   tags: k8s-controller
   roles:
-   - { role: kubernetes/k8s-master-single, tags: multi }
-   - { role: core/core-virt, when: enabled_virtual, tags: virt }
+    - { role: kubernetes/k8s-master-single, tags: multi }
+    - { role: core/core-virt, when: enabled_virtual, tags: virt }
+    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
 
 - name: install kubernetes master for the rest of master nodes
   hosts: k8s_master[1:{{ MASTER_HOSTS_COUNT }}]
@@ -50,7 +51,8 @@
   tags: k8s-node
   roles:  
     - { role: kubernetes/k8s-node }
-    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
+#    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
+#    - { role: core/core-virt, when: enabled_virtual, tags: virt }
 
 - name: install kubernetes network service
   hosts: k8s_master[0]

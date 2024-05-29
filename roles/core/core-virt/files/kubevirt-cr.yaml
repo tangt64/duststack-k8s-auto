@@ -3,7 +3,7 @@ apiVersion: kubevirt.io/v1
 kind: KubeVirt
 metadata:
   name: kubevirt
-  namespace: kubevirt
+  namespace: kube-virt
 spec:
   certificateRotateStrategy: {}
   configuration:
@@ -11,6 +11,4 @@ spec:
       featureGates: []
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
-  infra:
-    replicas: 2
   workloadUpdateStrategy: {}

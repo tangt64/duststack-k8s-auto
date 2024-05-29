@@ -4,7 +4,6 @@
     state: latest
 
 - name: get to the kubevirt CR from github
-
   get_url:
     url: https://github.com/kubevirt/kubevirt/releases/download/v0.54.0/kubevirt-operator.yaml
     dest: /tmp/kubevirt-operator.yaml
@@ -19,7 +18,8 @@
   loop:
     - kubevirt-operator.yaml
     - kubevirt-cr.yaml
+  delegate_to: "{{ groups['k8s_master'] | first }}"
 
-- name: wait for the kubevirt service is available status
-  command: kubectl -n kubevirt wait kv kubevirt --for condition=Available
-  register: virt_kv    
+#- name: wait for the kubevirt service is available status
+#  command: kubectl -n kubevirt wait kv kubevirt --for condition=Available
+#  register: virt_kv    

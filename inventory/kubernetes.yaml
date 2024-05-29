@@ -24,16 +24,16 @@ k8s_master:
       k8s_ip4: 10.10.10.10/24
       keepalived_node: master
       keepalived_pri: 100
-#    192.168.10.20:
-#      nodename: master2.example.com
-#      k8s_ip4: 10.10.10.20/24
-#      keepalived_node: backup
-#      keepalived_pri: 99
-#     192.168.10.30:
-#      nodename: master3.example.com
-#      k8s_ip4: 10.10.10.30/24
-#      keepalived_node: backup
-#      keepalived_pri: 99
+    192.168.10.20:
+      nodename: master2.example.com
+      k8s_ip4: 10.10.10.20/24
+      keepalived_node: backup
+      keepalived_pri: 99
+    192.168.10.30:
+      nodename: master3.example.com
+      k8s_ip4: 10.10.10.30/24
+      keepalived_node: backup
+      keepalived_pri: 99
 k8s_node:
   hosts:
     192.168.10.40:

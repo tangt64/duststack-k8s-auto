@@ -4,11 +4,11 @@
 ingress_controller: haproxy
 
 # kubernetes virtualization enabled
-enabled_virtual: no
-enabled_dashboard: no
-enabled_helm: no
-enabled_cicd_tekton: no
-enabled_ingress: no
+enabled_virtual: yes
+enabled_dashboard: yes
+enabled_helm: yes
+enabled_cicd_tekton: yes
+enabled_ingress: yes
 ssh_remote_user: root
 ssh_remote_password: k8s
 ansible_ssh_private_key_file: k8s.pem
