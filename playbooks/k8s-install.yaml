@@ -51,8 +51,8 @@
   tags: k8s-node
   roles:  
     - { role: kubernetes/k8s-node }
-#    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
-#    - { role: core/core-virt, when: enabled_virtual, tags: virt }
+    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
+    - { role: core/core-virt, when: enabled_virtual, tags: virt }
 
 - name: install kubernetes network service
   hosts: k8s_master[0]
@@ -66,16 +66,15 @@
   run_once: yes
 
 - name: label to kubernetes worker nodes
-  hosts: k8s_master
+  hosts: k8s_master,k8s_node
   tags: k8s-post
   roles:  
     - { role: kubernetes/k8s-post-config }
-    - { role: extension/helm, when: enabled_helm, tags: helm }
-    - { role: extension/ingress, when: enabled_ingress, tags: ingress }    
-    - { role: extension/dashboard, when: enabled_dashboard, tags: dashboard }
-    - { role: extension/kubevirt, when: enabled_virtual, tags: virt }
-    - { role: cicd/tekton, when: enabled_cicd_tekton, tags: tekton }
-  run_once: yes
+#    - { role: extension/helm, when: enabled_helm, tags: helm }
+#    - { role: extension/ingress, when: enabled_ingress, tags: ingress }    
+#    - { role: extension/dashboard, when: enabled_dashboard, tags: dashboard }
+#    - { role: extension/kubevirt, when: enabled_virtual, tags: virt }
+#    - { role: cicd/tekton, when: enabled_cicd_tekton, tags: tekton }
 
 # - name: install and configure NFS storage 
 #  hosts: k8s_storage_nfs

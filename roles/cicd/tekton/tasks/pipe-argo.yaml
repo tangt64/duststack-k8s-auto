@@ -1,2 +1,0 @@
-- name: enable argocd-task-sync-and-wait
-  shell: tkn hub install task argocd-task-sync-and-wait

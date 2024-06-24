@@ -64,6 +64,10 @@
       - "6443/tcp"
       - "6443/tcp"
       - "2379-2380/tcp"
+      - "9472/tcp"
+      - "9472/udp"
+      - "9946/tcp"
+      - "9946/udp"
     when: k8s_network =="calico"
 
   - name: add an rich rule for worker node address to firewalld
