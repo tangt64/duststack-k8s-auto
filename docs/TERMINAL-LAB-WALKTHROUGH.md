@@ -128,6 +128,13 @@ bash setup-k8s.sh install -i inventory/local-live/hosts.yaml
 호스트 방화벽과 보안그룹에서 전용 노드 사이의 API·VXLAN·NFS 및 필요한 관리 통신을
 허용하고, SELinux·호스트 키 확인을 유지한 상태로 실제 설치 결과를 점검하세요.
 
+Ceph CSI 표준 이미지는 x86-64-v3가 필요합니다. glibc의
+`/lib64/ld-linux-x86-64.so.2 --help`에서 v2만 `(supported, searched)`로 표시되는
+VM에서는 표준 최신 CSI가 실행되지 않습니다. 이번 랩의 구버전 실험에는 개인 인벤토리에
+`profiles/rook-csi-legacy-lab.yaml`의 변수 2개를 넣습니다. 기존 이미지 교체는 별도
+`rook_allow_csi_image_change: true` 설정이 필요합니다. Kubernetes 1.36과 CSI 3.16.3은
+공식 검증 범위 밖의 전용 실험 조합입니다. 상세 한계는 [CSI 설정](CNI-CSI.md)에 있습니다.
+
 ```bash
 sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf get nodes -o wide
 sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf -n kube-system get ds cilium
@@ -184,6 +191,9 @@ LIVE_CLUSTER_VALIDATION=PASS
 `HEALTH_OK`를 유지합니다. 명시적으로 호환성을 선택한 결과는 경고 목록과 실제 건강
 상태를 보존하며 `PASS_WITH_WARNINGS`로 구분합니다. 시계·디스크·복제 오류를 허용하는
 옵션은 아닙니다. [CephX 호환성](CNI-CSI.md#cephx와-구형-커널-호환성)을 먼저 확인하세요.
+
+구버전 CSI 랩 프로필이면 `--allow-legacy-csi-lab`도 추가합니다. Ceph가 HEALTH_OK여도
+구버전 랩의 전체 결과를 경고 없는 PASS로 표시하지 않습니다.
 
 ### 실제 선행 결과: Cilium·NFS
 

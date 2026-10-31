@@ -9,6 +9,14 @@
   tasks:
     - ansible.builtin.import_tasks: ../tasks/storage-preflight.yaml
 
+- name: Check RBD CSI image CPU support on all eligible nodes
+  hosts: k8s_master:k8s_node
+  any_errors_fatal: true
+  tags: [k8s-storage]
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/rook-csi-cpu.yaml
+      when: "'rook' in k8s_csi_providers"
+
 - name: Validate explicitly selected Ceph devices before preparing hosts
   hosts: k8s_storage_ceph
   any_errors_fatal: true

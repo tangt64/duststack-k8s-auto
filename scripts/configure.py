@@ -44,6 +44,12 @@ def build_inventory(args):
                     k8s_proxy_mode_enable=False, k8s_network=args.cni)
     if args.cni == 'cilium':
         settings.update(yaml.safe_load((ROOT / 'profiles/cilium.yaml').read_text(encoding='utf-8')))
+    if args.storage == 'rook':
+        # Ceph CSI 3.18 is tested through Kubernetes 1.36, including Calico installs.
+        settings.update(k8s_version='1.36.6', crio_version='1.36.7')
+        settings['rook_csi_legacy_lab'] = getattr(args, 'rook_csi_legacy_lab', False)
+        if settings['rook_csi_legacy_lab']:
+            settings['rook_csi_version'] = 'v3.16.3'
     for option, setting in [('pod_cidr', 'k8s_pod_cidr'), ('service_cidr', 'k8s_cluster_svc_ip')]:
         if getattr(args, option, None):
             settings[setting] = str(ipaddress.ip_network(getattr(args, option)))
@@ -82,6 +88,7 @@ def main():
     parser.add_argument('--interface', default='eth1')
     parser.add_argument('--ssh-user', default='root')
     parser.add_argument('--cni', choices=['calico', 'flannel', 'cilium'], default='calico')
+    parser.add_argument('--rook-csi-legacy-lab', action='store_true', help='Experimental x86-64-v2 lab: Ceph CSI 3.16.3 on Kubernetes 1.36, outside upstream tested range')
     parser.add_argument('--pod-cidr', help='신규 클러스터 Pod IPv4 CIDR (예: 172.22.0.0/16)')
     parser.add_argument('--service-cidr', help='신규 클러스터 Service IPv4 CIDR (예: 172.23.0.0/16)')
     parser.add_argument('--storage', choices=['none', 'nfs', 'rook'], default='none')

@@ -1,0 +1,20 @@
+---
+- name: Inspect glibc supported CPU levels before installing Ceph CSI
+  ansible.builtin.command:
+    argv: [/lib64/ld-linux-x86-64.so.2, --help]
+  register: rook_csi_cpu_probe
+  changed_when: false
+  check_mode: false
+  when: ansible_facts['architecture'] == 'x86_64'
+
+- name: Require the CPU level of the explicitly selected official CSI image
+  ansible.builtin.assert:
+    that:
+      - "('x86-64-v2 (supported, searched)' if rook_csi_legacy_lab else 'x86-64-v3 (supported, searched)') in rook_csi_cpu_probe.stdout"
+    fail_msg: >-
+      Standard Ceph CSI 3.18 requires x86-64-v3. On an x86-64-v2 VM explicitly
+      use x86-64-v3 hardware for the standard profile. The explicit legacy lab
+      profile uses Ceph CSI 3.16.3 outside the tested Kubernetes 1.36 range.
+      Do not change an existing image without
+      reviewing the storage upgrade procedure. See docs/CNI-CSI.md.
+  when: ansible_facts['architecture'] == 'x86_64'

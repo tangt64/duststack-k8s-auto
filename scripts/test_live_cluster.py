@@ -165,6 +165,31 @@ def network_tests(cluster, workers, image, record, cluster_domain='cluster.local
     record('cilium-networkpolicy-allow', {})
 
 
+def rook_csi_runtime(cluster, namespace, allow_legacy_lab=False):
+    driver = cluster.read('daemonset', namespace + '.rbd.csi.ceph.com-nodeplugin', namespace=namespace)
+    state = driver.get('status', {})
+    if not state.get('desiredNumberScheduled') or state.get('numberReady') != state['desiredNumberScheduled']:
+        raise RuntimeError('RBD CSI node plugin is not fully Ready')
+    images = [c['image'] for c in driver['spec']['template']['spec']['containers'] if c['name'] == 'csi-rbdplugin']
+    if len(images) != 1:
+        raise RuntimeError('Cannot identify the RBD CSI plugin image')
+    match = re.fullmatch(r'quay\.io/cephcsi/cephcsi:(v3\.(?:16\.3|18\.1))(?:@sha256:[0-9a-f]{64})?', images[0])
+    if not match:
+        raise RuntimeError('RBD CSI image is outside the reviewed release profiles')
+    server = json.loads(cluster.run('version', '--output=json').stdout)['serverVersion']['gitVersion']
+    version = re.match(r'^v1\.([0-9]+)\.', server)
+    if not version or not 32 <= int(version[1]) <= 36:
+        raise RuntimeError('Kubernetes is outside the reviewed CSI lab profiles')
+    warnings = []
+    if match[1] == 'v3.16.3':
+        if not allow_legacy_lab:
+            raise RuntimeError('Legacy CSI requires explicit --allow-legacy-csi-lab; this is not production support validation')
+        warnings.append('Legacy Ceph CSI v3.16.3 lab; upstream tested Kubernetes 1.32-1.34, actual ' + server)
+    elif int(version[1]) < 34:
+        raise RuntimeError('Ceph CSI v3.18.1 upstream tested range starts at Kubernetes 1.34')
+    return {'image': images[0], 'kubernetes': server, 'warnings': warnings}
+
+
 def storage_tests(cluster, workers, image, storage_class, provider, record):
     ns, claim = cluster.namespace, provider + '-io'
     mode = 'ReadWriteMany' if provider == 'nfs' else 'ReadWriteOnce'
@@ -216,6 +241,8 @@ def main():
     parser.add_argument('--providers', nargs='+', choices=['nfs', 'rook'], default=['nfs', 'rook'])
     parser.add_argument('--allow-ceph-legacy-client-key-warnings', action='store_true',
                         help='Acknowledge only documented legacy-client warnings; require AES256K service tickets and report warnings')
+    parser.add_argument('--allow-legacy-csi-lab', action='store_true',
+                        help='Acknowledge Ceph CSI 3.16.3 legacy lab and unsupported Kubernetes combinations; always report warnings')
     parser.add_argument('--confirm-test-workloads', action='store_true')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
@@ -229,6 +256,7 @@ def main():
               'requested_providers': list(dict.fromkeys(args.providers)),
               'completed_providers': [],
               'warnings': {},
+              'compatibility_warnings': [],
               'ceph_legacy_client_key_warnings_allowed': args.allow_ceph_legacy_client_key_warnings,
               'scope': 'full' if set(args.providers) == {'nfs', 'rook'} else 'partial'}
     source = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=Path(__file__).resolve().parents[1],
@@ -263,6 +291,9 @@ def main():
             storage_tests(cluster, workers, args.image, args.nfs_class, 'nfs', record)
             report['completed_providers'].append('nfs')
         if 'rook' in args.providers:
+            report['csi_runtime'] = rook_csi_runtime(cluster, args.rook_namespace, args.allow_legacy_csi_lab)
+            report['compatibility_warnings'] = report['csi_runtime']['warnings']
+            record('rook-csi-runtime', report['csi_runtime'])
             def ceph_healthy():
                 ceph = cluster.read('cephcluster', args.rook_namespace, namespace=args.rook_namespace)
                 return ceph_health_result(ceph, args.allow_ceph_legacy_client_key_warnings)
@@ -279,12 +310,13 @@ def main():
                                                 'compatibility_warnings': sorted(health['warnings'])})
             storage_tests(cluster, workers, args.image, args.rook_class, 'rook', record)
             report['completed_providers'].append('rook')
+        has_warnings = bool(report['warnings'] or report['compatibility_warnings'])
         if report['scope'] == 'full':
-            report['status'] = 'passed_with_warnings' if report['warnings'] else 'passed'
-            print('LIVE_CLUSTER_VALIDATION=' + ('PASS_WITH_WARNINGS' if report['warnings'] else 'PASS'), flush=True)
+            report['status'] = 'passed_with_warnings' if has_warnings else 'passed'
+            print('LIVE_CLUSTER_VALIDATION=' + ('PASS_WITH_WARNINGS' if has_warnings else 'PASS'), flush=True)
         else:
-            report['status'] = 'partial_passed_with_warnings' if report['warnings'] else 'partial_passed'
-            print('LIVE_CLUSTER_VALIDATION=' + ('PARTIAL_PASS_WITH_WARNINGS' if report['warnings'] else 'PARTIAL_PASS'), flush=True)
+            report['status'] = 'partial_passed_with_warnings' if has_warnings else 'partial_passed'
+            print('LIVE_CLUSTER_VALIDATION=' + ('PARTIAL_PASS_WITH_WARNINGS' if has_warnings else 'PARTIAL_PASS'), flush=True)
     except Exception as error:
         report['status'] = 'failed'
         report['error'] = str(error)

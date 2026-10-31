@@ -2,5 +2,8 @@ crds:
   enabled: true
 csi:
   installCsiOperator: true
+  cephcsi:
+    repository: quay.io/cephcsi/cephcsi
+    tag: "{{ rook_csi_version }}@sha256:{{ rook_csi_image_digests[rook_csi_version] }}"
 hostpathRequiresPrivileged: false
 disableDeviceHotplug: true

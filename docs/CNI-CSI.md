@@ -140,6 +140,26 @@ operator v1.1.0의 공식 RBAC에서 RBD 리소스만 사용하며, Driver에 �
 이 드라이버에는 Secret·PV/PVC·VolumeAttachment 등 업스트림 클러스터 권한이 필요합니다.
 [RBAC 원본](https://github.com/ceph/ceph-csi-operator/blob/v1.1.0/deploy/multifile/csi-rbac.yaml)
 
+Ceph CSI v3.18.1의 공식 Kubernetes 검증 범위는 1.34~1.36입니다. Rook을 선택한
+생성 인벤토리도 CNI 종류에 관계없이 Kubernetes 1.36.6/CRI-O 1.36.7을 사용합니다.
+기존 1.37 클러스터를 자동으로 내리지 않습니다. 별도 호환성 검토가 필요합니다.
+
+표준 CSI 이미지는 Rocky Linux 10 기반으로 x86-64-v3 CPU가 필요합니다. 설치 전에
+glibc가 보고하는 CPU 지원 수준을 검사합니다. 문서에 언급된 `-rocky9` 대체 태그는
+2026-11-01 확인 당시 공식 Quay에 배포되지 않아 설치 옵션으로 제공하지 않습니다.
+[공식 CSI 이미지·CPU·Kubernetes 지원 범위](https://github.com/ceph/ceph-csi#ceph-csi-container-images-and-release-compatibility)
+
+x86-64-v2 전용 실습에는 [구버전 랩 프로필](../profiles/rook-csi-legacy-lab.yaml)을
+명시적으로 사용할 수 있습니다. 공식 `v3.16.3` 이미지를 digest로 고정하며,
+`rook_csi_legacy_lab: true`가 필요합니다. 생성기에는 `--rook-csi-legacy-lab`이 있습니다.
+이 릴리스의 공식 Kubernetes 검증 범위는 1.32~1.34이고 지원 릴리스 창도 지났으므로,
+현재 1.36 조합은 **운영 지원 조합이 아닌 실험**입니다. Kubernetes·Ceph를 내리거나
+데이터를 지우지 않습니다. 기존 RBD 이미지와 다르면 기본적으로 중단하며, 전용 랩의
+변경을 검토한 경우만 `rook_allow_csi_image_change: true`로 교체를 허용합니다.
+표준 이미지와 구버전 이미지의 digest는 `inventory/group_vars/kubernetes/addons`에
+고정합니다. 실증 실행기에도 `--allow-legacy-csi-lab`을 명시해야 하며 실제 이미지·
+Kubernetes 버전과 호환성 경고를 남기고 `PASS_WITH_WARNINGS`로만 보고합니다.
+
 ### CephX와 구형 커널 호환성
 
 Ceph 20.2.4의 새 AES256K 키는 커널 RBD/CephFS 클라이언트에서 Linux 7.0+ 또는

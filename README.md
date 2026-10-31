@@ -15,6 +15,7 @@ Ansible과 kubeadm으로 RHEL 계열 호스트에 Kubernetes를 설치합니다.
 | Cilium | 1.20.4, Kubernetes 1.36.6 프로필 |
 | NFS CSI | 4.13.6, 기존 NFS export에 선택 설치 |
 | Rook/Ceph RBD | 1.21.1 / Ceph 20.2.4, 전용 디스크에 선택 설치 |
+| Ceph CSI | 3.18.1 / Kubernetes 1.36.6 / x86-64-v3, v2 전용 랩의 3.16.3 실험 프로필 별도 |
 | ansible-core | 2.21.5 |
 | clusteradm CLI | 1.4.0, 별도 설치 |
 | virtctl CLI | 1.9.1, 별도 설치 |

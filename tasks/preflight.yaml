@@ -38,6 +38,10 @@
 - name: Validate storage inputs before preparing Kubernetes hosts
   ansible.builtin.import_tasks: storage-settings.yaml
 
+- name: Check selected Rook CSI CPU compatibility before preparing hosts
+  ansible.builtin.import_tasks: rook-csi-cpu.yaml
+  when: "'rook' in k8s_csi_providers"
+
 - name: Require a unique name for every cluster node
   ansible.builtin.assert:
     that:

@@ -54,17 +54,22 @@ def main():
     settings = {}
     for name in ['default', 'addons']:
         settings.update(yaml.safe_load((ROOT / 'inventory/group_vars/kubernetes' / name).read_text(encoding='utf-8')))
-    cases = [('cilium', 'cni/cni-cilium', 'kube-system', '1.36.6'),
-             ('nfs', 'storage/csi-nfs', 'kube-system', '1.37.2'),
-             ('rook', 'storage/csi-rook', 'rook-ceph', '1.37.2')]
+    cases = [('cilium', 'cni/cni-cilium', 'kube-system', '1.36.6', 'standard'),
+             ('nfs', 'storage/csi-nfs', 'kube-system', '1.37.2', 'standard'),
+             ('rook', 'storage/csi-rook', 'rook-ceph', '1.36.6', 'standard'),
+             ('rook', 'storage/csi-rook', 'rook-ceph', '1.36.6', 'legacy-lab')]
     report = []
-    for key, role, namespace, kube_version in cases:
+    for key, role, namespace, kube_version, profile in cases:
+        case_id = key if profile == 'standard' else key + '-' + profile
+        case_settings = dict(settings)
+        if profile == 'legacy-lab':
+            case_settings.update(yaml.safe_load((ROOT / 'profiles/rook-csi-legacy-lab.yaml').read_text(encoding='utf-8')))
         chart = settings['addon_chart_catalog'][key]
         path = CACHE / chart['asset']
         fetch(chart['url'], chart['sha256'], path)
         text = (ROOT / 'roles' / role / 'templates/values.yaml.j2').read_text(encoding='utf-8')
-        values = Templar(loader=DataLoader(), variables=settings).template(trust_as_template(text))
-        value_file = CACHE / (key + '-test-values.yaml')
+        values = Templar(loader=DataLoader(), variables=case_settings).template(trust_as_template(text))
+        value_file = CACHE / (case_id + '-test-values.yaml')
         value_file.write_text(values, encoding='utf-8')
         common = [str(path), '--namespace', namespace, '--values', str(value_file), '--kube-version', kube_version]
         lint = subprocess.run([binary, 'lint', *common], capture_output=True, text=True)
@@ -76,11 +81,17 @@ def main():
         resources = [x for x in yaml.safe_load_all(result.stdout) if x]
         if not resources or not any(x.get('kind') in ['DaemonSet', 'Deployment'] for x in resources):
             raise RuntimeError('Expected controller resources missing: ' + key)
-        (CACHE / (key + '-rendered.yaml')).write_text(result.stdout, encoding='utf-8')
-        report.append({'chart': key, 'version': chart['version'], 'sha256': chart['sha256'], 'kubernetes': kube_version, 'resources': len(resources)})
+        if key == 'rook':
+            image_set = next(x for x in resources if x.get('kind') == 'ConfigMap' and x['metadata']['name'] == 'rook-csi-operator-image-set-configmap')
+            version = case_settings['rook_csi_version']
+            expected = 'quay.io/cephcsi/cephcsi:' + version + '@sha256:' + case_settings['rook_csi_image_digests'][version]
+            if image_set['data']['plugin'] != expected:
+                raise RuntimeError('Rendered CSI image does not match the reviewed digest: ' + profile)
+        (CACHE / (case_id + '-rendered.yaml')).write_text(result.stdout, encoding='utf-8')
+        report.append({'chart': key, 'profile': profile, 'version': chart['version'], 'sha256': chart['sha256'], 'kubernetes': kube_version, 'resources': len(resources)})
     (ROOT / '.tools/chart-validation.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     for row in report:
-        print('Chart verified:', row['chart'], row['version'], str(row['resources']) + ' rendered resources')
+        print('Chart verified:', row['chart'], row['profile'], row['version'], str(row['resources']) + ' rendered resources')
 
 
 if __name__ == '__main__':

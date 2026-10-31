@@ -27,11 +27,17 @@ metadata:
   namespace: {{ rook_namespace }}
 spec:
   fsGroupPolicy: File
+  imageSet:
+    name: rook-csi-operator-image-set-configmap
   snapshotPolicy: none
   nodePlugin:
     serviceAccountName: rbd-nodeplugin-sa
+    annotations:
+      duststack.io/ceph-csi-image: "{{ rook_csi_version }}@sha256:{{ rook_csi_image_digests[rook_csi_version] }}"
     enableSeLinuxHostMount: true
     updateStrategy:
       type: RollingUpdate
   controllerPlugin:
     serviceAccountName: rbd-ctrlplugin-sa
+    annotations:
+      duststack.io/ceph-csi-image: "{{ rook_csi_version }}@sha256:{{ rook_csi_image_digests[rook_csi_version] }}"

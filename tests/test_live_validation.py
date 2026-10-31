@@ -49,6 +49,7 @@ class LiveValidationTests(unittest.TestCase):
                             '--allow-ceph-legacy-client-key-warnings', '--output', str(output)]), \
                     mock.patch.object(LIVE, 'Cluster') as cluster_type, \
                     mock.patch.object(LIVE, 'network_tests'), mock.patch.object(LIVE, 'storage_tests'), \
+                    mock.patch.object(LIVE, 'rook_csi_runtime', return_value={'warnings': []}), \
                     contextlib.redirect_stdout(stdout):
                 cluster_type.return_value.read.side_effect = [
                     {'items': nodes}, {'status': {'desiredNumberScheduled': 4, 'numberReady': 4}},
@@ -62,6 +63,42 @@ class LiveValidationTests(unittest.TestCase):
             self.assertIn('AUTH_INSECURE_KEYS_ALLOWED', result['warnings'])
             self.assertIn('LIVE_CLUSTER_VALIDATION=PASS_WITH_WARNINGS', stdout.getvalue().splitlines())
             self.assertNotIn('LIVE_CLUSTER_VALIDATION=PASS', stdout.getvalue().splitlines())
+
+    def test_legacy_csi_runtime_requires_explicit_lab_flag_and_preserves_actual_versions(self):
+        cluster = mock.Mock()
+        cluster.read.return_value = {'status': {'desiredNumberScheduled': 3, 'numberReady': 3},
+            'spec': {'template': {'spec': {'containers': [{'name': 'csi-rbdplugin',
+                'image': 'quay.io/cephcsi/cephcsi:v3.16.3@sha256:' + 'a' * 64}]}}}}
+        cluster.run.return_value.stdout = json.dumps({'serverVersion': {'gitVersion': 'v1.36.6'}})
+        with self.assertRaisesRegex(RuntimeError, 'explicit --allow-legacy-csi-lab'):
+            LIVE.rook_csi_runtime(cluster, 'rook-ceph')
+        result = LIVE.rook_csi_runtime(cluster, 'rook-ceph', True)
+        self.assertEqual(result['kubernetes'], 'v1.36.6')
+        self.assertIn('1.32-1.34', result['warnings'][0])
+        cluster.run.return_value.stdout = json.dumps({'serverVersion': {'gitVersion': 'v1.37.2'}})
+        with self.assertRaises(RuntimeError):
+            LIVE.rook_csi_runtime(cluster, 'rook-ceph', True)
+
+    def test_legacy_csi_alone_cannot_produce_unqualified_full_pass(self):
+        nodes = [{'metadata': {'name': 'worker' + str(i)}, 'spec': {},
+                  'status': {'conditions': [{'type': 'Ready', 'status': 'True'}]}} for i in range(1, 4)]
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder) / 'result.json'
+            with mock.patch('sys.argv', ['test_live_cluster.py', '--confirm-test-workloads',
+                            '--allow-legacy-csi-lab', '--output', str(output)]), \
+                    mock.patch.object(LIVE, 'Cluster') as cluster_type, \
+                    mock.patch.object(LIVE, 'network_tests'), mock.patch.object(LIVE, 'storage_tests'), \
+                    mock.patch.object(LIVE, 'rook_csi_runtime', return_value={'warnings': ['legacy lab']}), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                cluster_type.return_value.read.side_effect = [
+                    {'items': nodes}, {'status': {'desiredNumberScheduled': 4, 'numberReady': 4}},
+                    {'status': {'phase': 'Ready', 'ceph': {'health': 'HEALTH_OK'}}},
+                    {'spec': {'replicated': {'size': 3}}}]
+                LIVE.main()
+            result = json.loads(output.read_text())
+            self.assertEqual(result['status'], 'passed_with_warnings')
+            self.assertEqual(result['warnings'], {})
+            self.assertEqual(result['compatibility_warnings'], ['legacy lab'])
 
     def test_partial_storage_run_is_never_reported_as_full_cluster_success(self):
         nodes = [{'metadata': {'name': 'worker' + str(i)}, 'spec': {},

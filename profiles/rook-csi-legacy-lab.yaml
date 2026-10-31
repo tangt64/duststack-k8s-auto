@@ -1,0 +1,6 @@
+---
+# Dedicated non-production x86-64-v2 lab only. CSI 3.16.3 is tested upstream
+# through Kubernetes 1.34, so the installer 1.36 combination is experimental.
+# Do not downgrade Kubernetes or Ceph, or reuse this as production guidance.
+rook_csi_version: v3.16.3
+rook_csi_legacy_lab: true

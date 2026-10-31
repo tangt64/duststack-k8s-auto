@@ -25,6 +25,22 @@
 - name: Inspect existing Rook cluster without modifying it
   when: "'rook' in k8s_csi_providers"
   block:
+    - name: Read the existing RBD node plugin image
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace, "{{ rook_namespace }}", get, daemonset, "{{ rook_namespace }}.rbd.csi.ceph.com-nodeplugin", --ignore-not-found, --output=json]
+      register: rook_csi_before
+      changed_when: false
+      check_mode: false
+
+    - name: Prevent unacknowledged CSI image replacement
+      ansible.builtin.assert:
+        that:
+          - rook_allow_csi_image_change or rook_desired_csi_image in ((rook_csi_before.stdout | from_json).spec.template.spec.containers | selectattr('name', 'equalto', 'csi-rbdplugin') | map(attribute='image') | list)
+        fail_msg: Existing RBD CSI image differs. Review the upstream storage upgrade procedure and explicitly set rook_allow_csi_image_change=true before replacing it.
+      vars:
+        rook_desired_csi_image: "quay.io/cephcsi/cephcsi:{{ rook_csi_version }}@sha256:{{ rook_csi_image_digests[rook_csi_version] }}"
+      when: rook_csi_before.stdout | length > 0
+
     - name: Check CephCluster API presence
       ansible.builtin.command:
         argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, crd, cephclusters.ceph.rook.io, --ignore-not-found, --output=json]

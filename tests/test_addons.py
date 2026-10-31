@@ -110,6 +110,20 @@ class AddonTests(unittest.TestCase):
                     self.assertNotIn('*', rule['verbs'])
                     self.assertNotIn('*', rule['resources'])
 
+    def test_rook_csi_cpu_guard_and_official_compatibility_image(self):
+        task = read_yaml('tasks/rook-csi-cpu.yaml')[1]
+        expression = task['ansible.builtin.assert']['that'][0]
+        for legacy, flags, accepted in [(False, 'x86-64-v2 (supported, searched)', False),
+                                        (True, 'x86-64-v2 (supported, searched)', True),
+                                        (True, 'x86-64-v2', False),
+                                        (False, 'x86-64-v3 (supported, searched)', True)]:
+            engine = templar(variables(rook_csi_legacy_lab=legacy, rook_csi_cpu_probe={'stdout': flags}))
+            self.assertEqual(engine.evaluate_conditional(trust_as_template(expression)), accepted)
+            version = 'v3.16.3' if legacy else 'v3.18.1'
+            values = variables(rook_csi_legacy_lab=legacy, rook_csi_version=version)
+            rendered = yaml.safe_load(render('roles/storage/csi-rook/templates/values.yaml.j2', values))
+            self.assertEqual(rendered['csi']['cephcsi']['tag'], version + '@sha256:' + values['rook_csi_image_digests'][version])
+
     def test_storage_guards_reject_missing_backends_and_conflicting_defaults(self):
         expressions = read_yaml('tasks/storage-settings.yaml')[0]['ansible.builtin.assert']['that']
         def valid(**options):
@@ -125,6 +139,23 @@ class AddonTests(unittest.TestCase):
         conflict = {'metadata': {'name': 'another-sc', 'annotations': {'storageclass.kubernetes.io/is-default-class': 'true'}}}
         engine = templar(variables(item=conflict, k8s_default_storage_class='nfs-csi'))
         self.assertFalse(all(engine.evaluate_conditional(trust_as_template(x)) for x in task['ansible.builtin.assert']['that']))
+
+    def test_csi_image_guard_requires_explicit_change_acknowledgement(self):
+        block = next(x['block'] for x in read_yaml('tasks/storage-preflight.yaml') if 'block' in x)
+        guard = next(x for x in block if x['name'] == 'Prevent unacknowledged CSI image replacement')
+        current = {'spec': {'template': {'spec': {'containers': [{'name': 'csi-rbdplugin', 'image': 'old:image'}]}}}}
+        for acknowledge, desired, accepted in [(False, 'new:image', False), (True, 'new:image', True), (False, 'old:image', True)]:
+            engine = templar(variables(rook_csi_before={'stdout': json.dumps(current)}, rook_allow_csi_image_change=acknowledge,
+                                       rook_desired_csi_image=desired))
+            self.assertEqual(engine.evaluate_conditional(trust_as_template(guard['ansible.builtin.assert']['that'][0])), accepted)
+
+    def test_rook_rejects_kubernetes_beyond_official_csi_tested_range(self):
+        expressions = read_yaml('tasks/storage-settings.yaml')[0]['ansible.builtin.assert']['that']
+        for version, accepted in [('1.36.6', True), ('1.37.2', False)]:
+            values = self.ceph_variables()
+            values.update(k8s_version=version, k8s_csi_providers=['rook'], rook_confirm_devices=True)
+            engine = templar(values)
+            self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x)) for x in expressions), accepted)
 
     def test_existing_cni_and_cidr_changes_are_rejected(self):
         tasks = read_yaml('tasks/cluster-config-guard.yaml')
@@ -190,6 +221,15 @@ class SetupTests(unittest.TestCase):
                         {'storage': 'nfs'}, {'storage': 'rook'}]:
             with self.subTest(options=options), self.assertRaises(ValueError):
                 configure.build_inventory(self.arguments(**options))
+
+    def test_calico_rook_generator_uses_supported_csi_kubernetes_and_explicit_cpu_option(self):
+        data = configure.build_inventory(self.arguments(storage='rook',
+            worker=[f'worker{i}=192.0.2.{10+i}@10.10.10.{10+i}/24' for i in range(1, 4)],
+            rook_device=[f'worker{i}=sdb' for i in range(1, 4)], rook_csi_legacy_lab=True))
+        self.assertEqual(data['all']['vars']['k8s_network'], 'calico')
+        self.assertEqual(data['all']['vars']['k8s_version'], '1.36.6')
+        self.assertTrue(data['all']['vars']['rook_csi_legacy_lab'])
+        self.assertEqual(data['all']['vars']['rook_csi_version'], 'v3.16.3')
 
     def test_custom_ranges_avoid_a_broad_node_network(self):
         nodes = dict(control='cp1=192.0.2.10@10.250.253.84/8',

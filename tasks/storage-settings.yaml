@@ -16,4 +16,8 @@
       - "'rook' not in k8s_csi_providers or groups.get('k8s_storage_ceph', []) | length >= 3"
       - "'rook' not in k8s_csi_providers or groups.get('k8s_storage_ceph', []) | difference(groups.get('k8s_node', [])) | length == 0"
       - rook_replicas | int == 3
+      - rook_csi_legacy_lab is boolean
+      - rook_allow_csi_image_change is boolean
+      - rook_csi_version == ('v3.16.3' if rook_csi_legacy_lab else 'v3.18.1')
+      - "'rook' not in k8s_csi_providers or k8s_version.split('.')[1] | int <= 36"
     fail_msg: Configure an existing NFS export or at least three Ceph workers with dedicated empty disks. Explicitly acknowledge rook_confirm_devices; choose only one default StorageClass.
