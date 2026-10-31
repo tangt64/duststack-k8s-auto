@@ -44,6 +44,9 @@ def build_inventory(args):
                     k8s_proxy_mode_enable=False, k8s_network=args.cni)
     if args.cni == 'cilium':
         settings.update(yaml.safe_load((ROOT / 'profiles/cilium.yaml').read_text(encoding='utf-8')))
+    for option, setting in [('pod_cidr', 'k8s_pod_cidr'), ('service_cidr', 'k8s_cluster_svc_ip')]:
+        if getattr(args, option, None):
+            settings[setting] = str(ipaddress.ip_network(getattr(args, option)))
     settings['k8s_csi_providers'] = [] if args.storage == 'none' else [args.storage]
     ceph = {}
     if args.storage == 'nfs':
@@ -60,8 +63,10 @@ def build_inventory(args):
             raise ValueError('Rook requires explicit devices on at least three workers')
         settings.update(k8s_default_storage_class='rook-ceph-block', rook_confirm_devices=args.confirm_rook_devices)
     pod_net, service_net = (ipaddress.ip_network(settings[n]) for n in ['k8s_pod_cidr', 'k8s_cluster_svc_ip'])
-    if pod_net.overlaps(service_net) or any(ipaddress.ip_interface(n[1]['k8s_ip4']).ip in net for n in nodes for net in [pod_net, service_net]):
-        raise ValueError('Pod, service and node address ranges must not overlap')
+    if pod_net.version != 4 or service_net.version != 4:
+        raise ValueError('IPv4 pod and service ranges are required')
+    if pod_net.overlaps(service_net) or any(ipaddress.ip_interface(n[1]['k8s_ip4']).network.overlaps(net) for n in nodes for net in [pod_net, service_net]):
+        raise ValueError('Pod, service and internal node network ranges must not overlap; use --pod-cidr/--service-cidr for a new cluster')
     return {'all': {'vars': settings, 'children': {'kubernetes': {'children': {
         'k8s_master': {'hosts': {control[0]: control[1]}},
         'k8s_node': {'hosts': dict(workers)},
@@ -77,6 +82,8 @@ def main():
     parser.add_argument('--interface', default='eth1')
     parser.add_argument('--ssh-user', default='root')
     parser.add_argument('--cni', choices=['calico', 'flannel', 'cilium'], default='calico')
+    parser.add_argument('--pod-cidr', help='신규 클러스터 Pod IPv4 CIDR (예: 172.22.0.0/16)')
+    parser.add_argument('--service-cidr', help='신규 클러스터 Service IPv4 CIDR (예: 172.23.0.0/16)')
     parser.add_argument('--storage', choices=['none', 'nfs', 'rook'], default='none')
     parser.add_argument('--nfs-server')
     parser.add_argument('--nfs-share')

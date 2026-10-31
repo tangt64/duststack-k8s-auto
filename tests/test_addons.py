@@ -152,6 +152,19 @@ class SetupTests(unittest.TestCase):
             with self.subTest(options=options), self.assertRaises(ValueError):
                 configure.build_inventory(self.arguments(**options))
 
+    def test_custom_ranges_avoid_a_broad_node_network(self):
+        nodes = dict(control='cp1=192.0.2.10@10.250.253.84/8',
+                     worker=['worker1=192.0.2.11@10.250.253.226/8'])
+        with self.assertRaises(ValueError):
+            configure.build_inventory(self.arguments(**nodes))
+        data = configure.build_inventory(self.arguments(**nodes, pod_cidr='172.22.0.0/16', service_cidr='172.23.0.0/16'))
+        self.assertEqual(data['all']['vars']['k8s_pod_cidr'], '172.22.0.0/16')
+        self.assertEqual(data['all']['vars']['k8s_cluster_svc_ip'], '172.23.0.0/16')
+        for ranges in [dict(pod_cidr='172.22.0.0/16', service_cidr='172.22.0.0/24'),
+                       dict(pod_cidr='2001:db8::/48'), dict(service_cidr='172.23.0.1/16')]:
+            with self.subTest(ranges=ranges), self.assertRaises(ValueError):
+                configure.build_inventory(self.arguments(**ranges))
+
     def test_cli_creates_inventory_once_and_refuses_overwrite(self):
         with tempfile.TemporaryDirectory(dir=ROOT / '.tools') as folder:
             output = Path(folder) / 'hosts.yaml'
