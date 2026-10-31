@@ -137,6 +137,9 @@ sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf -n rook-ceph get cephcluste
 
 모든 인벤토리 노드 Ready, Cilium agent Ready, Ceph Ready/HEALTH_OK와 복제 3을
 확인해야 합니다. 리소스 이름만 존재하는 상태는 설치 완료로 기록하지 않습니다.
+Node Ready인데 `logs/exec`가 `tls: internal error`로 실패한다면
+`playbooks/k8s-serving-certs.yaml`로 인벤토리에 맞는 kubelet 서버 CSR를 검토합니다.
+서버 인증서 bootstrap을 끄거나 임의의 CSR를 일괄 승인하지 않습니다.
 
 ## 6. 실제 Cilium 통신과 두 CSI 입출력
 

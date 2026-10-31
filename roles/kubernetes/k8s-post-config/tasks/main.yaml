@@ -1,4 +1,7 @@
 ---
+- name: Complete signed kubelet serving certificate bootstrap before CSI operations
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/../tasks/kubelet-serving-certs.yaml"
+
 - name: Label only worker nodes
   ansible.builtin.command:
     argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, label, node, "{{ hostvars[item]['nodename'] }}", node-role.kubernetes.io/worker=worker, --overwrite]

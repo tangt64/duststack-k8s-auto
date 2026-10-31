@@ -1,0 +1,7 @@
+---
+- name: Review pending kubelet serving certificates against the trusted inventory
+  hosts: k8s_master[0]
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/kubelet-serving-certs.yaml

@@ -1,0 +1,46 @@
+---
+- name: Validate and approve inventory-bound kubelet serving certificates
+  when: not ansible_check_mode
+  block:
+    - name: Initialize trusted serving certificate identities
+      ansible.builtin.set_fact:
+        k8s_serving_nodes: {}
+
+    - name: Bind serving identities to explicit inventory names and internal addresses
+      ansible.builtin.set_fact:
+        k8s_serving_nodes: "{{ k8s_serving_nodes | combine({hostvars[item]['nodename']: hostvars[item]['k8s_ip4'].split('/')[0]}) }}"
+      loop: "{{ groups['k8s_master'] + groups.get('k8s_node', []) }}"
+
+    - name: Read current node identities
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, nodes, --output=json]
+      register: k8s_serving_node_objects
+      changed_when: false
+
+    - name: Read current certificate requests
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, certificatesigningrequests, --output=json]
+      register: k8s_serving_csr_objects
+      changed_when: false
+
+    - name: Verify requester, signature, subject, usages and inventory-bound SANs on the controller
+      ansible.builtin.command:
+        argv: ["{{ ansible_playbook_python }}", -c, "{{ lookup('file', playbook_dir + '/../scripts/check_kubelet_serving_csrs.py') }}"]
+        stdin: "{{ {'expected_nodes': k8s_serving_nodes, 'nodes': (k8s_serving_node_objects.stdout | from_json)['items'], 'csrs': (k8s_serving_csr_objects.stdout | from_json)['items']} | to_json }}"
+      delegate_to: localhost
+      become: false
+      register: k8s_serving_review
+      changed_when: false
+
+    - name: Approve only verified requests using their original object version
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, certificate, approve, --filename=-]
+        stdin: "{{ item | to_json }}"
+      loop: "{{ (k8s_serving_review.stdout | from_json)['eligible'] }}"
+      loop_control:
+        label: "{{ item.metadata.name }}"
+      changed_when: true
+
+    - name: Report requests outside the managed inventory without approving them
+      ansible.builtin.debug:
+        msg: "Unmanaged pending serving CSRs left untouched: {{ (k8s_serving_review.stdout | from_json)['ignored'] }}"

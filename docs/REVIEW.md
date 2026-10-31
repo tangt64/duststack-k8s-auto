@@ -231,3 +231,9 @@ success입니다. 이 결과는 실제 Kubernetes 배포·Cilium 통신·PVC I/O
 `--service-cidr`를 추가했습니다. 입력한 내부 노드 네트워크 전체와의 겹침 및 IPv6·
 잘못된 CIDR를 생성 단계에서 거부합니다. 로컬 필수 검증과 회귀 33개가 통과했습니다.
 추가 관리 NIC·VPN·라우팅 범위는 실제 호스트에서 별도로 확인해야 합니다.
+
+실제 신규 클러스터에서는 네 노드 Ready와 Cilium agent 네 개 Ready 뒤에도
+`kubectl logs`가 `tls: internal error`로 실패했습니다. `serverTLSBootstrap: true`의
+Pending serving CSR를 처리하는 단계가 빠져 있었습니다. 후처리에 인벤토리 IP·노드명,
+요청자·그룹, 실제 CSR 서명·주체·SAN·용도 검증을 추가하고 별도 갱신 플레이북도
+제공합니다. 상시 승인 권한을 만들거나 TLS bootstrap을 해제하지 않습니다.

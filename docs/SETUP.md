@@ -73,6 +73,26 @@ Cilium은 공식 지원 대상인 Kubernetes 1.36.6 조합을 자동 선택합�
 옵션을 plan/install/storage/tools에 그대로 전달합니다. `--check`는 전체 신규 설치의
 성공을 보장하지 않습니다. 실제 설치 뒤 노드·통신·스토리지를 확인해야 합니다.
 
+## kubelet 서버 인증서
+
+`serverTLSBootstrap: true`에 따라 요청하는 서버 인증서는 Kubernetes가 기본 자동
+승인하지 않습니다. 설치 후처리는 인벤토리에 있는 노드의 Pending 요청만 검토합니다.
+Node InternalIP, 요청자·그룹, CSR 서명·주체·서버 용도, 정확한 노드 IP와 DNS SAN을
+검증하고 외부 IP·다른 노드 DNS·URI/email·CA 확장 요청은 거부합니다. 다른 signer,
+이미 처리한 요청과 인벤토리 밖 노드의 요청은 승인하지 않습니다.
+
+기존 설치나 인증서 갱신 때에는 같은 인벤토리로 별도 실행할 수 있습니다.
+
+```bash
+ansible-playbook -i inventory/local-lab/hosts.yaml playbooks/k8s-serving-certs.yaml
+```
+
+이 작업은 상시 승인 컨트롤러나 광범위한 승인 RBAC를 설치하지 않습니다.
+갱신 요청도 같은 절차로 검토해야 하며, 인벤토리 밖 요청은 운영자가 별도로 확인합니다.
+승인 누락 시 Node Ready여도 `kubectl logs/exec`에서 TLS 오류가 발생할 수 있습니다.
+[Kubernetes 인증서 안내](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/)
+
+
 ## 추가로 쉽게 만들 수 있는 부분
 
 Terminal Lab의 랩 노드 선택 → CNI/CSI 선택 → 주소·디스크 검증 → plan 출력 →
