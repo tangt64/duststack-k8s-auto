@@ -1,0 +1,69 @@
+---
+- name: Validate selected storage providers and existing resources
+  hosts: k8s_master[0]
+  any_errors_fatal: true
+  tags: [k8s-storage]
+  pre_tasks:
+    - ansible.builtin.meta: end_play
+      when: k8s_csi_providers | length == 0
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/storage-preflight.yaml
+
+- name: Validate explicitly selected Ceph devices before preparing hosts
+  hosts: k8s_storage_ceph
+  any_errors_fatal: true
+  tags: [k8s-storage]
+  pre_tasks:
+    - ansible.builtin.meta: end_play
+      when: "'rook' not in k8s_csi_providers"
+  tasks:
+    - name: Require adequate storage node resources
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['os_family'] == 'RedHat'
+          - ansible_facts['memtotal_mb'] | int >= 7500
+          - ansible_facts['processor_vcpus'] | int >= 4
+          - rook_devices is sequence and rook_devices is not string and rook_devices | length > 0
+          - rook_devices | unique | length == rook_devices | length
+        fail_msg: Each Ceph storage node needs 4 vCPU, 8 GiB RAM and an explicit unique rook_devices list.
+
+    - name: Validate safe device names
+      ansible.builtin.assert:
+        that: item is match('^[A-Za-z0-9_-]+$')
+      loop: "{{ rook_devices }}"
+
+    - name: Check unused devices without writing or erasing signatures
+      ansible.builtin.command:
+        argv: "{{ [ansible_facts['python']['executable'], '-c', lookup('file', playbook_dir + '/../scripts/check_rook_devices.py')] + rook_devices }}"
+      changed_when: false
+      check_mode: false
+      when: not hostvars[groups['k8s_master'][0]].rook_existing_cluster
+
+    - name: Install Ceph host prerequisites
+      ansible.builtin.dnf:
+        name: [lvm2]
+        state: present
+
+- name: Prepare NFS clients on Kubernetes nodes
+  hosts: k8s_master:k8s_node
+  any_errors_fatal: true
+  tags: [k8s-storage]
+  tasks:
+    - name: Install NFS mount utilities
+      ansible.builtin.dnf:
+        name: nfs-utils
+        state: present
+      when: "'nfs' in k8s_csi_providers"
+
+- name: Install selected CSI providers
+  hosts: k8s_master[0]
+  any_errors_fatal: true
+  tags: [k8s-storage]
+  pre_tasks:
+    - ansible.builtin.meta: end_play
+      when: k8s_csi_providers | length == 0
+  roles:
+    - role: storage/csi-nfs
+      when: "'nfs' in k8s_csi_providers"
+    - role: storage/csi-rook
+      when: "'rook' in k8s_csi_providers"

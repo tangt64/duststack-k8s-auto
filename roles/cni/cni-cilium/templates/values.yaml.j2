@@ -1,0 +1,19 @@
+# Keep kube-proxy for the initial supported profile.
+kubeProxyReplacement: false
+routingMode: tunnel
+tunnelProtocol: vxlan
+ipam:
+  mode: kubernetes
+ipv4:
+  enabled: true
+ipv6:
+  enabled: false
+devices: "{{ k8s_interface }}"
+operator:
+  replicas: {{ cilium_operator_replicas }}
+hubble:
+  enabled: {{ cilium_hubble_enabled | lower }}
+  relay:
+    enabled: false
+  ui:
+    enabled: false

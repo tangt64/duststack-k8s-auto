@@ -20,3 +20,14 @@
     - role: extension/kubevirt
     - role: core/core-virt
     - role: extension/helm
+
+- name: Parse CNI and CSI add-on roles
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  roles:
+    - role: common/helm-release
+    - role: cni/cni-cilium
+    - role: storage/csi-nfs
+    - role: storage/csi-rook

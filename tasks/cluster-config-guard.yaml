@@ -1,0 +1,52 @@
+---
+- name: Read existing cluster configuration before changing networking
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace=kube-system, get, configmap, kubeadm-config, --output=json]
+  register: existing_kubeadm_config
+  changed_when: false
+  check_mode: false
+
+- name: Prevent implicit cluster CIDR or API endpoint changes
+  ansible.builtin.assert:
+    that:
+      - existing_configuration.networking.podSubnet == k8s_pod_cidr
+      - existing_configuration.networking.serviceSubnet == k8s_cluster_svc_ip
+      - existing_configuration.controlPlaneEndpoint == k8s_api_endpoint
+    fail_msg: Existing Pod/Service CIDR or API endpoint differs. Plan a migration rather than rerunning the installer with new values.
+  vars:
+    existing_configuration: "{{ (existing_kubeadm_config.stdout | from_json).data.ClusterConfiguration | from_yaml }}"
+
+- name: Discover current CNI DaemonSets
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, daemonsets, --all-namespaces, --output=json]
+  register: existing_daemonsets
+  changed_when: false
+  check_mode: false
+
+- name: Prevent installing a second CNI
+  ansible.builtin.assert:
+    that: item.metadata.name not in known_cni_names or known_cni_names[item.metadata.name] == requested_cni
+    fail_msg: An existing CNI differs from the selected one. Use a dedicated migration procedure or fresh test cluster.
+  vars:
+    known_cni_names:
+      calico-node: calico
+      kube-flannel-ds: flannel
+      cilium: cilium
+    requested_cni: "{{ 'flannel' if k8s_network == 'flanned' else k8s_network }}"
+  loop: "{{ (existing_daemonsets.stdout | from_json)['items'] }}"
+
+- name: Read node readiness when CNI identity is unknown
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, nodes, --output=json]
+  register: existing_nodes
+  changed_when: false
+  check_mode: false
+
+- name: Require an identified CNI on an already Ready cluster
+  ansible.builtin.assert:
+    that:
+      - not ready_nodes or known_cni_count | int > 0
+    fail_msg: Existing Ready cluster has an unknown CNI. Use a reviewed migration procedure.
+  vars:
+    ready_nodes: "{{ (existing_nodes.stdout | from_json)['items'] | map(attribute='status.conditions') | flatten | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list }}"
+    known_cni_count: "{{ (existing_daemonsets.stdout | from_json)['items'] | map(attribute='metadata.name') | intersect(['calico-node', 'kube-flannel-ds', 'cilium']) | length }}"

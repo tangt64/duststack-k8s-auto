@@ -1,0 +1,31 @@
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: {{ rook_namespace }}
+  namespace: {{ rook_namespace }}
+spec:
+  cephVersion:
+    image: {{ rook_ceph_image | to_json }}
+    allowUnsupported: false
+  dataDirHostPath: {{ rook_data_dir | to_json }}
+  mon:
+    count: 3
+    allowMultiplePerNode: false
+  mgr:
+    count: 2
+    allowMultiplePerNode: false
+  dashboard:
+    enabled: false
+  cleanupPolicy:
+    confirmation: ""
+  storage:
+    useAllNodes: false
+    useAllDevices: false
+    nodes:
+{% for host in groups['k8s_storage_ceph'] %}
+      - name: {{ hostvars[host]['nodename'] | to_json }}
+        devices:
+{% for device in hostvars[host]['rook_devices'] %}
+          - name: {{ device | to_json }}
+{% endfor %}
+{% endfor %}

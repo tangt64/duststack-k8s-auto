@@ -1,0 +1,18 @@
+---
+- name: Validate storage configuration before changing hosts
+  ansible.builtin.assert:
+    that:
+      - k8s_csi_providers is sequence and k8s_csi_providers is not string
+      - k8s_csi_providers | difference(['nfs', 'rook']) | length == 0
+      - k8s_csi_providers | unique | length == k8s_csi_providers | length
+      - k8s_default_storage_class in ['', nfs_storage_class, rook_storage_class]
+      - k8s_default_storage_class != nfs_storage_class or 'nfs' in k8s_csi_providers
+      - k8s_default_storage_class != rook_storage_class or 'rook' in k8s_csi_providers
+      - nfs_storage_class != rook_storage_class
+      - "'nfs' not in k8s_csi_providers or nfs_server | length > 0"
+      - "'nfs' not in k8s_csi_providers or nfs_share is match('^/[^\n]*$')"
+      - "'rook' not in k8s_csi_providers or rook_confirm_devices"
+      - "'rook' not in k8s_csi_providers or groups.get('k8s_storage_ceph', []) | length >= 3"
+      - "'rook' not in k8s_csi_providers or groups.get('k8s_storage_ceph', []) | difference(groups.get('k8s_node', [])) | length == 0"
+      - rook_replicas | int == 3
+    fail_msg: Configure an existing NFS export or at least three Ceph workers with dedicated empty disks. Explicitly acknowledge rook_confirm_devices; choose only one default StorageClass.

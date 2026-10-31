@@ -1,0 +1,4 @@
+---
+_addon_chart: "{{ addon_chart_catalog[addon_chart_id] }}"
+_addon_cache: "{{ addon_chart_cache_dir }}/{{ addon_chart_id }}/{{ _addon_chart.asset }}"
+_addon_manual: "{{ (addon_chart_local_dir if addon_chart_source == 'controller' else addon_chart_staging_dir) }}/{{ addon_chart_id }}/{{ _addon_chart.asset }}"

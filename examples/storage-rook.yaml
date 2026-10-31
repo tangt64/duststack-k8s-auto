@@ -1,0 +1,9 @@
+---
+k8s_csi_providers: [rook]
+k8s_default_storage_class: rook-ceph-block
+# Keep false until dedicated empty devices are selected on 3+ workers.
+rook_confirm_devices: false
+# Add each storage worker to k8s_storage_ceph in the inventory:
+# storage1: {nodename: storage1, rook_devices: [sdb]}
+# storage2: {nodename: storage2, rook_devices: [sdb]}
+# storage3: {nodename: storage3, rook_devices: [sdb]}

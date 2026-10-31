@@ -1,0 +1,36 @@
+---
+cilium_allow_untested_kubernetes: false
+cilium_kube_proxy_replacement: false
+cilium_operator_replicas: 1
+cilium_hubble_enabled: true
+k8s_csi_providers: []
+k8s_default_storage_class: ''
+nfs_server: ''
+nfs_share: ''
+nfs_storage_class: nfs-csi
+nfs_mount_options: [nfsvers=4.1, hard]
+rook_namespace: rook-ceph
+rook_storage_class: rook-ceph-block
+rook_ceph_image: quay.io/ceph/ceph:v20.2.4
+rook_confirm_devices: false
+rook_data_dir: /var/lib/rook
+rook_replicas: 3
+addon_chart_catalog:
+  cilium:
+    name: cilium
+    version: "1.20.4"
+    asset: "cilium-1.20.4.tgz"
+    url: "https://helm.cilium.io/cilium-1.20.4.tgz"
+    sha256: "505abff8385811df1a949776fc42e9f10697989a332acc86d6e8933efcb855ed"
+  nfs:
+    name: csi-driver-nfs
+    version: "4.13.6"
+    asset: "csi-driver-nfs-4.13.6.tgz"
+    url: "https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts/v4.13.6/csi-driver-nfs-4.13.6.tgz"
+    sha256: "4b471fb134bfea4fcaa3dc3342a67acd646431b746c673c978327353db5d22da"
+  rook:
+    name: rook-ceph
+    version: "1.21.1"
+    asset: "rook-ceph-1.21.1.tgz"
+    url: "https://charts.rook.io/release/rook-ceph-1.21.1.tgz"
+    sha256: "29ba81c74203b839f354ced89f1c9d79847bafaacd29cd83ac81e8777bddcda2"

@@ -1,0 +1,54 @@
+---
+- name: Validate selected storage settings
+  ansible.builtin.import_tasks: storage-settings.yaml
+
+- name: Read current StorageClasses
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, storageclasses, --output=json]
+  register: storage_classes
+  changed_when: false
+  check_mode: false
+
+- name: Prevent replacing a different default StorageClass
+  ansible.builtin.assert:
+    that:
+      - (item.metadata.annotations | default({})).get('storageclass.kubernetes.io/is-default-class', 'false') != 'true' or item.metadata.name == k8s_default_storage_class
+      - (item.metadata.annotations | default({})).get('storageclass.beta.kubernetes.io/is-default-class', 'false') != 'true' or item.metadata.name == k8s_default_storage_class
+    fail_msg: A different default StorageClass exists. Review it explicitly before selecting a new default.
+  loop: "{{ (storage_classes.stdout | from_json)['items'] }}"
+  when: k8s_default_storage_class | length > 0
+
+- name: Initialize Ceph state for following host checks
+  ansible.builtin.set_fact:
+    rook_existing_cluster: false
+
+- name: Inspect existing Rook cluster without modifying it
+  when: "'rook' in k8s_csi_providers"
+  block:
+    - name: Check CephCluster API presence
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, crd, cephclusters.ceph.rook.io, --ignore-not-found, --output=json]
+      register: rook_crd
+      changed_when: false
+      check_mode: false
+
+    - name: Read existing CephCluster
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace, "{{ rook_namespace }}", get, cephcluster, "{{ rook_namespace }}", --ignore-not-found, --output=json]
+      register: rook_cluster_before
+      changed_when: false
+      check_mode: false
+      when: rook_crd.stdout | length > 0
+
+    - name: Record existing Ceph cluster status
+      ansible.builtin.set_fact:
+        rook_existing_cluster: "{{ rook_cluster_before.stdout | default('') | length > 0 }}"
+
+    - name: Prevent implicit Ceph disk or image reconfiguration
+      ansible.builtin.assert:
+        that:
+          - (rook_cluster_before.stdout | from_json).spec.storage.nodes == (lookup('template', playbook_dir + '/../roles/storage/csi-rook/templates/ceph-cluster.yaml.j2') | from_yaml).spec.storage.nodes
+          - (rook_cluster_before.stdout | from_json).spec.cephVersion.image == rook_ceph_image
+          - (rook_cluster_before.stdout | from_json).spec.dataDirHostPath == rook_data_dir
+        fail_msg: Existing Ceph devices or image differ. Use a separate reviewed Ceph maintenance procedure.
+      when: rook_existing_cluster

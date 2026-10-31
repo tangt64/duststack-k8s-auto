@@ -1,0 +1,19 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ nfs_storage_class }}
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "{{ (k8s_default_storage_class == nfs_storage_class) | lower }}"
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: {{ nfs_server | to_json }}
+  share: {{ nfs_share | to_json }}
+  subDir: "${pvc.metadata.namespace}/${pvc.metadata.name}/${pv.metadata.name}"
+  onDelete: retain
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+mountOptions:
+{% for option in nfs_mount_options %}
+  - {{ option | to_json }}
+{% endfor %}

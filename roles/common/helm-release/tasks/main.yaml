@@ -1,0 +1,92 @@
+---
+- name: Validate Helm release and chart source
+  ansible.builtin.assert:
+    that:
+      - addon_chart_id in addon_chart_catalog
+      - addon_chart_source in ['download', 'controller', 'target']
+      - addon_release_name is match('^[a-z0-9][a-z0-9-]*$')
+      - addon_namespace is match('^[a-z0-9][a-z0-9-]*$')
+      - addon_values_file is match('^/.+')
+      - _addon_chart.url is match('^https://')
+      - _addon_chart.sha256 is match('^[0-9a-f]{64}$')
+      - _addon_chart.asset is match('^[A-Za-z0-9][A-Za-z0-9_.-]*[.]tgz$')
+      - _addon_chart.version is match('^[0-9]+[.][0-9]+[.][0-9]+$')
+
+- name: Supply Helm through the verified CLI installer
+  ansible.builtin.include_role:
+    name: common/cli-tool
+  vars:
+    cli_tool_name: helm
+
+- name: Verify manually supplied chart before copying
+  when: addon_chart_source != 'download'
+  block:
+    - name: Inspect original chart
+      ansible.builtin.stat:
+        path: "{{ _addon_manual }}"
+        checksum_algorithm: sha256
+        follow: false
+      delegate_to: "{{ 'localhost' if addon_chart_source == 'controller' else inventory_hostname }}"
+      become: "{{ addon_chart_source == 'target' }}"
+      register: _addon_source
+
+    - name: Reject missing or modified chart
+      ansible.builtin.assert:
+        that:
+          - _addon_source.stat.isreg | default(false)
+          - _addon_source.stat.size | default(0) > 0
+          - _addon_source.stat.checksum | default('') == _addon_chart.sha256
+        fail_msg: "Place the original chart at {{ _addon_manual }} and verify its SHA-256."
+
+- name: Create chart cache
+  ansible.builtin.file:
+    path: "{{ addon_chart_cache_dir }}/{{ addon_chart_id }}"
+    state: directory
+    mode: '0755'
+
+- name: Download pinned chart with SHA-256 verification
+  ansible.builtin.get_url:
+    url: "{{ _addon_chart.url }}"
+    dest: "{{ _addon_cache }}"
+    checksum: "sha256:{{ _addon_chart.sha256 }}"
+    mode: '0644'
+    timeout: 60
+  when: addon_chart_source == 'download'
+
+- name: Copy manually supplied chart
+  ansible.builtin.copy:
+    src: "{{ _addon_manual }}"
+    dest: "{{ _addon_cache }}"
+    remote_src: "{{ addon_chart_source == 'target' }}"
+    mode: '0644'
+  when: addon_chart_source != 'download'
+
+- name: Validate and install release
+  when: not ansible_check_mode
+  block:
+    - name: Verify chart cache after transfer
+      ansible.builtin.stat:
+        path: "{{ _addon_cache }}"
+        checksum_algorithm: sha256
+      register: _addon_cached
+
+    - name: Require verified chart bytes
+      ansible.builtin.assert:
+        that: _addon_cached.stat.checksum == _addon_chart.sha256
+
+    - name: Read existing release metadata
+      ansible.builtin.command:
+        argv: ["{{ addon_helm_binary }}", list, --kubeconfig, "{{ addon_kubeconfig }}", --namespace, "{{ addon_namespace }}", --filter, "^{{ addon_release_name }}$", --output, json]
+      register: _addon_existing
+      changed_when: false
+
+    - name: Prevent implicit chart version changes
+      ansible.builtin.assert:
+        that:
+          - _addon_existing.stdout | from_json | length == 0 or addon_allow_chart_upgrade or (_addon_existing.stdout | from_json)[0].chart == _addon_chart.name + '-' + _addon_chart.version
+        fail_msg: Existing release uses another chart version. Review its upgrade procedure before setting addon_allow_chart_upgrade=true.
+
+    - name: Install pinned Helm release and wait for readiness
+      ansible.builtin.command:
+        argv: ["{{ addon_helm_binary }}", upgrade, --install, "{{ addon_release_name }}", "{{ _addon_cache }}", --kubeconfig, "{{ addon_kubeconfig }}", --namespace, "{{ addon_namespace }}", --create-namespace, --values, "{{ addon_values_file }}", --wait, --timeout, "{{ addon_timeout }}", --rollback-on-failure]
+      changed_when: true

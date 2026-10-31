@@ -68,3 +68,7 @@ kubernetes:
     lb: {}
     k8s_hub: {}
     k8s_spoke: {}
+    k8s_storage_ceph: {}
+
+k8s_storage_ceph:
+  hosts: {}

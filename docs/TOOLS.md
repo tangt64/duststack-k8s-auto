@@ -176,3 +176,11 @@ CLI_TEST_TEMP_DIR=/tmp RUN_CLI_INTEGRATION=1 bash scripts/validate.sh
 - [Helm v4.3.1](https://github.com/helm/helm/releases/tag/v4.3.1)
 - [Helm 공식 배포](https://get.helm.sh/)
 - [OCM 설치 안내](https://open-cluster-management.io/docs/getting-started/installation/start-the-control-plane/)
+
+
+## CNI·CSI Helm 차트
+
+Cilium·NFS CSI·Rook의 선택 설치는 Helm CLI를 위와 같은 공급 역할로 준비합니다.
+차트도 고정 버전·SHA-256 검증과 다운로드/수동 배치를 지원합니다. CLI 도구 설치
+플레이북 자체는 차트를 배포하지 않습니다. 경로와 선택 설치는 [CNI·CSI 안내](CNI-CSI.md)를
+참고하세요. `artifacts/charts/`의 원본 `.tgz`는 Git에 넣지 않습니다.

@@ -12,6 +12,9 @@ Ansible과 kubeadm으로 RHEL 계열 호스트에 Kubernetes를 설치합니다.
 | containerd | 2.4.2, 선택 가능 / config v3 |
 | Calico | 3.33.0, 기본 CNI / VXLAN |
 | Flannel | 0.28.10, 선택 가능 |
+| Cilium | 1.20.4, Kubernetes 1.36.6 프로필 |
+| NFS CSI | 4.13.6, 기존 NFS export에 선택 설치 |
+| Rook/Ceph RBD | 1.21.1 / Ceph 20.2.4, 전용 디스크에 선택 설치 |
 | ansible-core | 2.21.5 |
 | clusteradm CLI | 1.4.0, 별도 설치 |
 | virtctl CLI | 1.9.1, 별도 설치 |
@@ -37,6 +40,26 @@ OCM·KubeVirt 서버 리소스, Dashboard/Ingress 확장, CentOS 7 기반 VM 프
 CLI 설치로 연결되며, 과거의 init/join 명령이나 구형 매니페스트를 자동 실행하지 않습니다.
 KubeVirt 서버 배포 전용 플레이북은 계속 중단합니다. 세부 보강 과제는
 [검토 문서](docs/REVIEW.md)에 있습니다.
+
+## 간편 시작과 CNI·CSI 선택
+
+```bash
+bash setup-k8s.sh deps
+bash setup-k8s.sh configure --interactive
+bash setup-k8s.sh plan -i inventory/local-lab/hosts.yaml
+bash setup-k8s.sh install -i inventory/local-lab/hosts.yaml
+```
+
+[간편 설정](docs/SETUP.md)은 새 인벤토리를 생성하고 의존성 준비·계획·설치를 하나의
+진입점으로 제공합니다. Cilium 1.20은 공식 검증 범위에 맞춰 Kubernetes 1.36.6과
+CRI-O 1.36.7을 사용합니다. 기존 1.37 클러스터를 다운그레이드하거나 CNI를 교체하는
+프로필이 아닙니다. 기본 Kubernetes 1.37.2/Calico 조합은 유지합니다.
+
+NFS CSI와 Rook/Ceph를 기본 선택지로 제공하되 `k8s_csi_providers: []`로 시작합니다.
+NFS 서버·export 또는 Rook 전용 빈 디스크와 3개 스토리지 worker를 지정해야 설치합니다.
+데이터는 Retain으로 보존하고 기본 StorageClass 충돌과 기존 Ceph 재구성을 차단합니다.
+설정·수동 차트 공급·요구사항은 [CNI·CSI 안내](docs/CNI-CSI.md), 웹 콘솔 검증은
+[터미널랩 안내](docs/TERMINAL-LAB.md)를 참고하세요.
 
 ## 준비
 
@@ -71,7 +94,7 @@ SSH 호스트 키 검증은 활성화되어 있으므로 신뢰하는 호스트 
 Pod CIDR, Service CIDR, 노드 주소는 겹치면 안 됩니다. Calico 기본 IPAM 블록은 /26이며
 Pod CIDR은 /26 또는 더 넓어야 합니다. NAT·라우팅·방화벽에서 API 6443/TCP,
 control plane 간 etcd 2379~2380/TCP, kubelet 10250/TCP, 노드 간 VXLAN
-(Calico 4789/UDP, Flannel 8472/UDP)을 필요한 노드 사이에 허용하세요.
+(Calico 4789/UDP, Flannel·Cilium 8472/UDP)을 필요한 노드 사이에 허용하세요.
 NodePort를 사용할 때만 해당 포트 범위도 허용합니다.
 
 호스트 방화벽을 자동으로 끄거나 전체 노드 대역을 무조건 허용하지 않습니다.
@@ -91,6 +114,7 @@ containerd는 Docker CE의 서명된 RPM 저장소를 사용합니다. 선택한
 ```bash
 bash scripts/validate.sh                         # 소스·문법·회귀 테스트
 RUN_CLI_INTEGRATION=1 bash scripts/validate.sh   # 로컬 HTTPS/수동 배치 통합 검증
+RUN_CHART_VALIDATION=1 bash scripts/validate.sh  # 공식 Cilium·CSI 차트 검증
 ansible-inventory --graph
 bash deploy-k8s.sh --list-hosts
 bash deploy-k8s.sh --check                       # 준비 작업 예상 변경 확인
@@ -106,7 +130,7 @@ bash deploy-k8s.sh --private-key ~/.ssh/k8s_id_rsa
 오류를 확인하고 복구할 수 있습니다. 이미 설치된 노드는 초기화·join을 건너뜁니다.
 join 토큰과 인증서 키는 실행 시 생성하며 로그에 출력하지 않고, join 설정 파일은
 성공·실패 모두 정리합니다. API 감사 로그는 Metadata 수준으로 기본 활성화됩니다.
-설치 마지막에는 인벤토리의 각 노드가 Ready인지 확인합니다.
+기본 설치 후 인벤토리의 각 노드가 Ready인지 확인하고 명시적으로 선택한 CSI를 설치합니다.
 
 kubelet serving 인증서는 `serverTLSBootstrap`을 사용합니다. Metrics Server 등에서
 kubelet HTTPS를 사용하기 전 CSR의 노드 이름과 주소를 검증하고 승인하세요.
@@ -157,14 +181,15 @@ kubeconfig도 제거합니다. 컨테이너 런타임, CNI 인터페이스, ipta
 ## 검증 범위
 
 회귀 테스트는 Ansible 2.21 템플릿 엔진으로 단일/HA, CRI-O/containerd,
-control plane/worker join, CNI CIDR·NIC, 기존 버전 보호 조건을 확인합니다.
+control plane/worker join, CNI CIDR·NIC·호환성, 기존 버전·CNI 변경 차단,
+CSI 데이터 보존·장치 가드와 인벤토리 생성을 확인합니다.
 `KUBEADM_BINARY`에 kubeadm 1.37.2 경로를 지정하면 실제 스키마 검증도 수행합니다.
 소스 검사에서 바이너리 재유입과 마크다운 로컬 링크 오류를 차단합니다.
 CLI 통합 테스트는 로컬 HTTPS 서버와 임시 설치 경로로 다운로드·컨트롤러/대상 수동 배치,
 재실행, 잘못된 파일의 거부를 확인합니다. `openssl`, `tar`, `gzip`이 필요합니다.
 WSL의 Windows 공유 드라이브는 POSIX 권한과 원자적 rename 검증에 맞지 않을 수 있으므로
 `CLI_TEST_TEMP_DIR=/tmp RUN_CLI_INTEGRATION=1 bash scripts/validate.sh`를 사용하세요.
-CI에서도 소스·문법·회귀·CLI 통합 검증을 실행합니다. 실제 다중 노드 설치, 재부팅,
+CI에서도 소스·문법·회귀·CLI 통합 검증과 공식 차트 SHA-256·lint·렌더링을 실행합니다. 실제 다중 노드 설치, 재부팅,
 네트워크 정책, HA failover 검증은 별도 테스트 클러스터에서 수행해야 합니다.
 
 ## 공식 참고

@@ -62,9 +62,14 @@
       when: k8s_network == 'calico'
     - role: cni/cni-flanned
       when: k8s_network in ['flannel', 'flanned']
+    - role: cni/cni-cilium
+      when: k8s_network == 'cilium'
 
 - name: Label workers and verify cluster readiness
   hosts: k8s_master[0]
   tags: [k8s-post]
   roles:
     - role: kubernetes/k8s-post-config
+
+- name: Install explicitly selected storage providers
+  ansible.builtin.import_playbook: k8s-storage.yaml

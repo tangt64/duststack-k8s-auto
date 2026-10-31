@@ -1,0 +1,13 @@
+---
+addon_chart_id: ''
+addon_release_name: ''
+addon_namespace: kube-system
+addon_values_file: ''
+addon_kubeconfig: /etc/kubernetes/admin.conf
+addon_helm_binary: "{{ cli_tool_install_dir | default('/usr/local/bin') }}/helm"
+addon_timeout: 10m
+addon_allow_chart_upgrade: false
+addon_chart_source: download
+addon_chart_local_dir: "{{ playbook_dir }}/../artifacts/charts"
+addon_chart_staging_dir: /var/cache/duststack/incoming/charts
+addon_chart_cache_dir: /var/cache/duststack/charts

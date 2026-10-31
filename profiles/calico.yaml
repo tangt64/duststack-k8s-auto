@@ -1,0 +1,4 @@
+---
+k8s_network: calico
+k8s_version: "1.37.2"
+crio_version: "1.37.2"

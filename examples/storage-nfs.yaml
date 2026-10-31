@@ -1,0 +1,6 @@
+---
+k8s_csi_providers: [nfs]
+# Replace the documentation-only address with your existing NFS server.
+nfs_server: 192.0.2.50
+nfs_share: /exports/kubernetes
+k8s_default_storage_class: nfs-csi

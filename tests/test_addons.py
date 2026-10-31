@@ -1,0 +1,168 @@
+"""CNI/CSI configuration, destructive-operation guards and quick setup tests."""
+import argparse
+import copy
+import importlib.util
+import json
+from pathlib import Path
+import stat
+import subprocess
+import tempfile
+from types import SimpleNamespace
+import unittest
+
+from ansible.template import trust_as_template
+import yaml
+from test_configuration import ROOT, read_yaml, variables, templar, render
+
+
+def load_script(name):
+    spec = importlib.util.spec_from_file_location(name, ROOT / 'scripts' / (name + '.py'))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+configure = load_script('configure')
+devices = load_script('check_rook_devices')
+
+
+class AddonTests(unittest.TestCase):
+    def test_cilium_requires_a_supported_kubernetes_profile(self):
+        expressions = read_yaml('tasks/preflight.yaml')[0]['ansible.builtin.assert']['that']
+        for version, allowed in [('1.36.6', True), ('1.37.2', False)]:
+            engine = templar(variables(k8s_network='cilium', k8s_version=version, crio_version=version))
+            self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x)) for x in expressions), allowed)
+        value = yaml.safe_load(render('roles/cni/cni-cilium/templates/values.yaml.j2', variables()))
+        self.assertFalse(value['kubeProxyReplacement'])
+        self.assertEqual(value['ipam']['mode'], 'kubernetes')
+        self.assertEqual(value['routingMode'], 'tunnel')
+        self.assertFalse(value['hubble']['ui']['enabled'])
+
+    def test_nfs_retains_data_and_only_marks_selected_default(self):
+        for selected in ('', 'nfs-csi'):
+            value = yaml.safe_load(render('roles/storage/csi-nfs/templates/storageclass.yaml.j2', variables(
+                nfs_server='192.0.2.50', nfs_share='/exports/k8s', k8s_default_storage_class=selected)))
+            self.assertEqual(value['provisioner'], 'nfs.csi.k8s.io')
+            self.assertEqual(value['reclaimPolicy'], 'Retain')
+            self.assertEqual(value['parameters']['onDelete'], 'retain')
+            self.assertEqual(value['metadata']['annotations']['storageclass.kubernetes.io/is-default-class'], str(bool(selected)).lower())
+            self.assertIn('${pv.metadata.name}', value['parameters']['subDir'])
+
+    def ceph_variables(self):
+        values = variables()
+        values['groups']['k8s_storage_ceph'] = ['worker1', 'worker2', 'worker3']
+        values['groups']['k8s_node'] = ['worker1', 'worker2', 'worker3']
+        for i, name in enumerate(values['groups']['k8s_node']):
+            values['hostvars'][name] = {'nodename': name, 'rook_devices': ['sdb']}
+        return values
+
+    def test_ceph_uses_only_explicit_devices_and_safe_replication(self):
+        values = self.ceph_variables()
+        cluster = yaml.safe_load(render('roles/storage/csi-rook/templates/ceph-cluster.yaml.j2', values))
+        self.assertFalse(cluster['spec']['storage']['useAllNodes'])
+        self.assertFalse(cluster['spec']['storage']['useAllDevices'])
+        self.assertEqual(len(cluster['spec']['storage']['nodes']), 3)
+        self.assertEqual(cluster['spec']['storage']['nodes'][1]['devices'], [{'name': 'sdb'}])
+        self.assertEqual(cluster['spec']['cleanupPolicy']['confirmation'], '')
+        pool = yaml.safe_load(render('roles/storage/csi-rook/templates/block-pool.yaml.j2', values))
+        self.assertEqual(pool['spec']['replicated']['size'], 3)
+        self.assertTrue(pool['spec']['replicated']['requireSafeReplicaSize'])
+        storage = yaml.safe_load(render('roles/storage/csi-rook/templates/storageclass.yaml.j2', values))
+        self.assertEqual(storage['reclaimPolicy'], 'Retain')
+        self.assertEqual(storage['volumeBindingMode'], 'WaitForFirstConsumer')
+
+    def test_storage_guards_reject_missing_backends_and_conflicting_defaults(self):
+        expressions = read_yaml('tasks/storage-settings.yaml')[0]['ansible.builtin.assert']['that']
+        def valid(**options):
+            engine = templar(variables(**options))
+            return all(engine.evaluate_conditional(trust_as_template(x)) for x in expressions)
+        self.assertTrue(valid())
+        self.assertFalse(valid(k8s_csi_providers=['nfs']))
+        self.assertFalse(valid(k8s_csi_providers=['rook']))
+        self.assertFalse(valid(k8s_default_storage_class='nfs-csi'))
+        self.assertFalse(valid(k8s_csi_providers=['nfs', 'nfs']))
+        self.assertTrue(valid(k8s_csi_providers=['nfs'], nfs_server='192.0.2.50', nfs_share='/export', k8s_default_storage_class='nfs-csi'))
+        task = next(x for x in read_yaml('tasks/storage-preflight.yaml') if x.get('name') == 'Prevent replacing a different default StorageClass')
+        conflict = {'metadata': {'name': 'another-sc', 'annotations': {'storageclass.kubernetes.io/is-default-class': 'true'}}}
+        engine = templar(variables(item=conflict, k8s_default_storage_class='nfs-csi'))
+        self.assertFalse(all(engine.evaluate_conditional(trust_as_template(x)) for x in task['ansible.builtin.assert']['that']))
+
+    def test_existing_cni_and_cidr_changes_are_rejected(self):
+        tasks = read_yaml('tasks/cluster-config-guard.yaml')
+        task = next(x for x in tasks if x.get('name') == 'Prevent installing a second CNI')
+        settings = dict(task['vars'])
+        settings.update(item={'metadata': {'name': 'calico-node'}}, k8s_network='cilium')
+        engine = templar(variables(**settings))
+        self.assertFalse(engine.evaluate_conditional(trust_as_template(task['ansible.builtin.assert']['that'])))
+        expressions = tasks[1]['ansible.builtin.assert']['that']
+        engine = templar(variables(existing_configuration={'networking': {'podSubnet': '172.16.0.0/16', 'serviceSubnet': '10.96.0.0/12'}, 'controlPlaneEndpoint': 'api.example.com:6443'}))
+        self.assertFalse(all(engine.evaluate_conditional(trust_as_template(x)) for x in expressions))
+
+
+class DiskGuardTests(unittest.TestCase):
+    def validate(self, **changes):
+        disk = {'type': 'disk', 'fstype': None, 'mountpoints': [None], 'size': 50 * 1024 ** 3}
+        disk.update(changes.pop('disk', {}))
+        signatures = changes.pop('signatures', [])
+        calls = []
+        def run(argv, **kwargs):
+            calls.append(argv)
+            result = {'blockdevices': [disk]} if argv[0] == 'lsblk' else {'signatures': signatures}
+            return SimpleNamespace(stdout=json.dumps(result))
+        result = devices.validate_device('sdb', run=run, inspect=lambda _: SimpleNamespace(st_mode=stat.S_IFBLK, st_rdev=42))
+        self.assertIn('--no-act', calls[1])
+        return result
+
+    def test_empty_disk_is_accepted_without_writes(self):
+        self.assertEqual(self.validate()['device'], 'sdb')
+
+    def test_used_partitioned_small_or_signed_disks_are_rejected(self):
+        for change in [{'disk': {'type': 'part'}}, {'disk': {'children': [{}]}},
+                       {'disk': {'fstype': 'xfs'}}, {'disk': {'mountpoints': ['/']}},
+                       {'disk': {'size': 1024}}, {'signatures': [{'type': 'ceph_bluestore'}]}]:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                self.validate(**change)
+
+    def test_path_injection_and_regular_files_are_rejected(self):
+        with self.assertRaises(ValueError):
+            devices.validate_device('../sda')
+        with self.assertRaises(ValueError):
+            devices.validate_device('sdb', inspect=lambda _: SimpleNamespace(st_mode=stat.S_IFREG))
+
+
+class SetupTests(unittest.TestCase):
+    def arguments(self, **changes):
+        values = dict(control='cp1=192.0.2.10@10.10.10.10/24', worker=['worker1=192.0.2.11@10.10.10.11/24'],
+                      interface='eth1', ssh_user='rocky', cni='calico', storage='none', nfs_server=None,
+                      nfs_share=None, rook_device=[], confirm_rook_devices=False)
+        values.update(changes)
+        return argparse.Namespace(**values)
+
+    def test_generated_cilium_inventory_pins_compatible_versions(self):
+        data = configure.build_inventory(self.arguments(cni='cilium'))
+        self.assertEqual(data['all']['vars']['k8s_version'], '1.36.6')
+        self.assertEqual(data['all']['vars']['crio_version'], '1.36.7')
+        self.assertFalse(data['all']['vars']['k8s_proxy_mode_enable'])
+        self.assertIn('worker1', data['all']['children']['kubernetes']['children']['k8s_node']['hosts'])
+
+    def test_invalid_or_missing_backend_configuration_is_rejected(self):
+        for options in [{'worker': []}, {'worker': ['cp1=192.0.2.11@10.10.10.11/24']},
+                        {'worker': ['worker1=192.0.2.11@10.88.0.1/16']},
+                        {'storage': 'nfs'}, {'storage': 'rook'}]:
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                configure.build_inventory(self.arguments(**options))
+
+    def test_cli_creates_inventory_once_and_refuses_overwrite(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / '.tools') as folder:
+            output = Path(folder) / 'hosts.yaml'
+            args = ['python', str(ROOT / 'scripts/configure.py'), '--control', self.arguments().control,
+                    '--worker', self.arguments().worker[0], '--output', str(output)]
+            first = subprocess.run(args, capture_output=True)
+            self.assertEqual(first.returncode, 0, first.stderr)
+            second = subprocess.run(args, capture_output=True)
+            self.assertNotEqual(second.returncode, 0)
+            self.assertEqual(yaml.safe_load(output.read_text(encoding='utf-8'))['all']['vars']['k8s_network'], 'calico')
+
+
+if __name__ == '__main__':
+    unittest.main()

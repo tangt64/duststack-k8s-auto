@@ -6,12 +6,14 @@
       - ansible_facts['os_family'] == 'RedHat'
       - ansible_facts['distribution_major_version'] | int >= 9
       - ansible_facts['kernel'] is version('5.10', '>=')
-      - k8s_version is match('^1[.]37[.][0-9]+$')
+      - k8s_version is match('^1[.](36|37)[.][0-9]+$')
       - k8s_repo_version == (k8s_version.split('.')[:2] | join('.'))
       - k8s_runtime_environment in ['crio', 'containerd']
       - containerd_version is version('2.0', '>=')
       - k8s_instmethod == 'config'
-      - k8s_network in ['calico', 'flannel', 'flanned']
+      - k8s_network in ['calico', 'flannel', 'flanned', 'cilium']
+      - k8s_network != 'cilium' or k8s_version.split('.')[1] | int <= 36 or cilium_allow_untested_kubernetes
+      - k8s_network != 'cilium' or not cilium_kube_proxy_replacement
       - k8s_selinux_state in ['enforcing', 'permissive']
       - k8s_proxy_mode in ['haproxy', 'keepalived']
       - groups.get('k8s_master', []) | length > 0
@@ -32,6 +34,9 @@
       inventory addresses, kubeadm config mode, CRI-O/containerd and an API
       load balancer for HA. Legacy host network rewrites and add-ons are not
       supported by this installer. See README.md and docs/REVIEW.md.
+
+- name: Validate storage inputs before preparing Kubernetes hosts
+  ansible.builtin.import_tasks: storage-settings.yaml
 
 - name: Require a unique name for every cluster node
   ansible.builtin.assert:
@@ -117,3 +122,7 @@
       - (k8s_existing_apiserver.content | b64decode | from_yaml)['spec']['containers'][0]['image'].split(':')[-1] == 'v' + k8s_version
     fail_msg: Existing API server differs from the requested version. Use the kubeadm upgrade procedure.
   when: k8s_existing_node.stat.exists and inventory_hostname in groups['k8s_master']
+
+- name: Validate existing cluster networking before host preparation
+  ansible.builtin.include_tasks: cluster-config-guard.yaml
+  when: k8s_existing_node.stat.exists and inventory_hostname == groups['k8s_master'][0]

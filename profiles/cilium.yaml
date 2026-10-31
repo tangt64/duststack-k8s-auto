@@ -1,0 +1,7 @@
+---
+# Cilium 1.20 upstream compatibility matrix ends at Kubernetes 1.36.
+k8s_network: cilium
+k8s_version: "1.36.6"
+crio_version: "1.36.7"
+cilium_allow_untested_kubernetes: false
+cilium_kube_proxy_replacement: false

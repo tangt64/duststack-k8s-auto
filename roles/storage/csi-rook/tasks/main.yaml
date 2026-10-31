@@ -1,0 +1,56 @@
+---
+- name: Create add-on configuration directory
+  ansible.builtin.file:
+    path: /etc/kubernetes/addons
+    state: directory
+    mode: '0755'
+
+- name: Render Rook operator values
+  ansible.builtin.template:
+    src: values.yaml.j2
+    dest: /etc/kubernetes/addons/rook-values.yaml
+    mode: '0644'
+
+- name: Install Rook operator and bundled Ceph CSI operator
+  ansible.builtin.include_role:
+    name: common/helm-release
+  vars:
+    addon_chart_id: rook
+    addon_release_name: rook-ceph
+    addon_namespace: "{{ rook_namespace }}"
+    addon_values_file: /etc/kubernetes/addons/rook-values.yaml
+
+- name: Wait for CephCluster and CephBlockPool APIs
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, wait, --for=condition=Established, "crd/{{ item }}", --timeout=120s]
+  loop: [cephclusters.ceph.rook.io, cephblockpools.ceph.rook.io]
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Render explicit Ceph cluster and retained block storage
+  ansible.builtin.template:
+    src: "{{ item }}.yaml.j2"
+    dest: "/etc/kubernetes/addons/rook-{{ item }}.yaml"
+    mode: '0644'
+  loop: [ceph-cluster, block-pool, storageclass]
+
+- name: Apply CephCluster without destructive cleanup settings
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, /etc/kubernetes/addons/rook-ceph-cluster.yaml]
+  register: rook_cluster_apply
+  changed_when: "'unchanged' not in rook_cluster_apply.stdout"
+  when: not ansible_check_mode
+
+- name: Wait for Ceph cluster readiness
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace, "{{ rook_namespace }}", wait, "--for=jsonpath={.status.phase}=Ready", "cephcluster/{{ rook_namespace }}", --timeout=900s]
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Apply replicated block pool and StorageClass
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, "/etc/kubernetes/addons/rook-{{ item }}.yaml"]
+  loop: [block-pool, storageclass]
+  register: rook_storage_apply
+  changed_when: "'unchanged' not in rook_storage_apply.stdout"
+  when: not ansible_check_mode

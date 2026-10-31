@@ -1,0 +1,34 @@
+---
+- name: Create add-on configuration directory
+  ansible.builtin.file:
+    path: /etc/kubernetes/addons
+    state: directory
+    mode: '0755'
+
+- name: Render NFS CSI values
+  ansible.builtin.template:
+    src: values.yaml.j2
+    dest: /etc/kubernetes/addons/nfs-values.yaml
+    mode: '0644'
+
+- name: Install NFS CSI driver
+  ansible.builtin.include_role:
+    name: common/helm-release
+  vars:
+    addon_chart_id: nfs
+    addon_release_name: csi-driver-nfs
+    addon_namespace: kube-system
+    addon_values_file: /etc/kubernetes/addons/nfs-values.yaml
+
+- name: Render retained NFS StorageClass
+  ansible.builtin.template:
+    src: storageclass.yaml.j2
+    dest: /etc/kubernetes/addons/nfs-storageclass.yaml
+    mode: '0644'
+
+- name: Apply NFS StorageClass
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, /etc/kubernetes/addons/nfs-storageclass.yaml]
+  register: nfs_class_apply
+  changed_when: "'unchanged' not in nfs_class_apply.stdout"
+  when: not ansible_check_mode

@@ -20,6 +20,7 @@ def read_yaml(path):
 
 def variables(**overrides):
     values = read_yaml('inventory/group_vars/kubernetes/default')
+    values.update(read_yaml('inventory/group_vars/kubernetes/addons'))
     values.update({
         'nodename': 'master1.example.com', 'k8s_ip4': '10.10.10.10/24',
         'ansible_version': {'full': '2.21.5'},

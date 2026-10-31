@@ -1,0 +1,35 @@
+---
+- name: Validate Cilium version compatibility and topology
+  ansible.builtin.assert:
+    that:
+      - k8s_network == 'cilium'
+      - k8s_version.split('.')[1] | int <= 36 or cilium_allow_untested_kubernetes
+      - not cilium_kube_proxy_replacement
+    fail_msg: Cilium 1.20 is officially tested through Kubernetes 1.36. Use the Cilium profile; kube-proxy replacement is a separate future profile.
+
+- name: Create add-on configuration directory
+  ansible.builtin.file:
+    path: /etc/kubernetes/addons
+    state: directory
+    mode: '0755'
+
+- name: Render Cilium values
+  ansible.builtin.template:
+    src: values.yaml.j2
+    dest: /etc/kubernetes/addons/cilium-values.yaml
+    mode: '0644'
+
+- name: Install Cilium from a verified pinned Helm chart
+  ansible.builtin.include_role:
+    name: common/helm-release
+  vars:
+    addon_chart_id: cilium
+    addon_release_name: cilium
+    addon_namespace: kube-system
+    addon_values_file: /etc/kubernetes/addons/cilium-values.yaml
+
+- name: Wait for Cilium agents
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace=kube-system, rollout, status, daemonset/cilium, --timeout=300s]
+  changed_when: false
+  when: not ansible_check_mode
