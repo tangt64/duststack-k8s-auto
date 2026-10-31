@@ -4,3 +4,4 @@
 # Do not downgrade Kubernetes or Ceph, or reuse this as production guidance.
 rook_csi_version: v3.16.3
 rook_csi_legacy_lab: true
+rook_csi_cephx_key_type: aes

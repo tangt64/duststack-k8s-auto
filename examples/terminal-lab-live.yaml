@@ -5,6 +5,8 @@
 k8s_csi_providers: [nfs, rook]
 k8s_version: '1.36.6'
 crio_version: '1.36.7'
+# Rocky 9 kernel mounts need AES CSI client keys; core Ceph keeps AES256K.
+rook_csi_cephx_key_type: aes
 # x86-64-v2 labs need profiles/rook-csi-legacy-lab.yaml; this is experimental.
 k8s_default_storage_class: nfs-csi
 nfs_server: ''

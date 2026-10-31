@@ -10,6 +10,12 @@
   check_mode: false
   when: ansible_facts['architecture'] == 'x86_64'
 
+- name: Require kernel support before selecting AES256K CSI client keys
+  ansible.builtin.assert:
+    that:
+      - rook_csi_cephx_key_type != 'aes256k' or ansible_facts['kernel'] is version('7.0', '>=') or rook_csi_kernel_aes256k_verified
+    fail_msg: AES256K kernel mounts need Linux 7.0+ or an explicitly verified backport. Use the documented CSI AES compatibility policy for older kernels; retain AES256K for core Ceph daemons and tickets.
+
 - name: Require the CPU level of the explicitly selected official CSI image
   ansible.builtin.assert:
     that:

@@ -17,6 +17,15 @@ SPEC.loader.exec_module(LIVE)
 
 
 class LiveValidationTests(unittest.TestCase):
+    def test_ceph_key_reporting_contains_metadata_only(self):
+        ceph = {'status': {'phase': 'Ready', 'ceph': {'health': 'HEALTH_OK'}, 'cephx': {
+            'csi': {'keyType': 'aes', 'keyGeneration': 2, 'priorKeyCount': 1, 'key': 'SYNTHETIC-DO-NOT-EXPORT'},
+            'mgr': {'keyType': 'aes256k'}, 'osd': {'keyType': 'aes256k'}}}}
+        result = LIVE.ceph_health_result(ceph)
+        self.assertEqual(result['csi_key_metadata'], {'keyType': 'aes', 'keyGeneration': 2, 'priorKeyCount': 1})
+        self.assertNotIn('SYNTHETIC', json.dumps(result))
+        self.assertEqual(result['daemon_key_types'], {'mgr': 'aes256k', 'osd': 'aes256k'})
+
     def test_compatibility_mode_does_not_accept_clock_storage_or_security_errors(self):
         import copy
         value = {'status': {'phase': 'Ready', 'ceph': {'health': 'HEALTH_WARN', 'details': {

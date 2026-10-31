@@ -293,3 +293,10 @@ RBD 컨테이너 시작 후 `Fatal glibc error: CPU does not support x86-64-v3`�
 누락한 애드온 기본값만 채우는 단계를 추가했습니다. 기존 인벤토리의 버전·CPU 실험·
 이미지 변경 확인·NFS 주소는 덮어쓰지 않습니다. 이 우선순위는 실제 localhost Ansible
 플레이북으로도 검증합니다.
+
+RBD PVC Bound 이후 Rocky 9 커널에서 `failed to add secret ... to kernel`과
+오류 524를 확인했습니다. CSI의 자동 키 타입을 그대로 둔 설정으로는 구형 커널
+마운트가 실패했습니다. 새 클러스터에 CSI 키 타입을 명시하고, 기존 정책 변경에는
+증가한 세대·명시적 회전 확인을 요구하도록 보완했습니다. 핵심 daemon·서비스 티켓과
+허용 cipher 설정은 건드리지 않고 이전 CSI 키를 최대 2세대 유지합니다.
+호환성 패치는 실제 API server dry-run을 통과했으며, 전용 랩 적용은 별도 확인 대상입니다.

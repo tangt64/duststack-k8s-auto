@@ -85,6 +85,16 @@
   changed_when: false
   when: not ansible_check_mode
 
+- name: Wait for the explicitly selected CSI key policy generation
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace, "{{ rook_namespace }}", get, cephcluster, "{{ rook_namespace }}", "--output=jsonpath={.status.cephx.csi.keyType}:{.status.cephx.csi.keyGeneration}"]
+  register: rook_csi_key_ready
+  until: rook_csi_key_ready.stdout == rook_csi_cephx_key_type + ':' + (rook_csi_cephx_key_generation | string)
+  retries: 60
+  delay: 5
+  changed_when: false
+  when: not ansible_check_mode and rook_csi_cephx_key_type | length > 0
+
 - name: Wait for the CSI controller and node plugin workloads
   ansible.builtin.command:
     argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace, "{{ rook_namespace }}", rollout, status, "{{ item }}", --timeout=300s]

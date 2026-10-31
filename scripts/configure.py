@@ -47,8 +47,11 @@ def build_inventory(args):
     if args.storage == 'rook':
         # Ceph CSI 3.18 is tested through Kubernetes 1.36, including Calico installs.
         settings.update(k8s_version='1.36.6', crio_version='1.36.7')
+        settings['rook_csi_cephx_key_type'] = getattr(args, 'rook_csi_key_type', 'aes')
         settings['rook_csi_legacy_lab'] = getattr(args, 'rook_csi_legacy_lab', False)
         if settings['rook_csi_legacy_lab']:
+            if settings['rook_csi_cephx_key_type'] != 'aes':
+                raise ValueError('Legacy CSI lab requires aes client keys; aes256k needs a newer CSI and supported kernel')
             settings['rook_csi_version'] = 'v3.16.3'
     for option, setting in [('pod_cidr', 'k8s_pod_cidr'), ('service_cidr', 'k8s_cluster_svc_ip')]:
         if getattr(args, option, None):
@@ -89,6 +92,7 @@ def main():
     parser.add_argument('--ssh-user', default='root')
     parser.add_argument('--cni', choices=['calico', 'flannel', 'cilium'], default='calico')
     parser.add_argument('--rook-csi-legacy-lab', action='store_true', help='Experimental x86-64-v2 lab: Ceph CSI 3.16.3 on Kubernetes 1.36, outside upstream tested range')
+    parser.add_argument('--rook-csi-key-type', choices=['aes', 'aes256k'], default='aes', help='New cluster CSI key type; aes256k needs Linux 7.0+ or a verified backport')
     parser.add_argument('--pod-cidr', help='신규 클러스터 Pod IPv4 CIDR (예: 172.22.0.0/16)')
     parser.add_argument('--service-cidr', help='신규 클러스터 Service IPv4 CIDR (예: 172.23.0.0/16)')
     parser.add_argument('--storage', choices=['none', 'nfs', 'rook'], default='none')

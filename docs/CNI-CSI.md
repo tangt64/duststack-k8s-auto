@@ -177,6 +177,18 @@ AES256K 키 메타데이터와 MON의 AES256K 서비스 티켓을 검증하며, 
 기록하고 전체 성공 표시도 `PASS_WITH_WARNINGS`/`passed_with_warnings`로 구분합니다.
 Ceph의 경고 자체를 mute하지 않습니다.
 
+새 Ceph 클러스터는 `rook_csi_cephx_key_type`을 명시합니다. 생성기는 기존 커널용
+`aes`를 선택하며 `--rook-csi-key-type aes256k`는 Linux 7.0+ 또는 검증한 backport가
+있을 때만 사용합니다. backport는 `rook_csi_kernel_aes256k_verified: true`로 별도
+확인합니다. 구버전 CSI 실험은 `aes`만 사용합니다. 핵심 daemon과 서비스 티켓의
+AES256K는 CSI 호환성 정책과 별개로 유지합니다.
+
+기존 클러스터는 키 타입 변수를 비워 두면 현재 CSI 정책을 보존합니다. 키 타입 변경은
+공식 유지보수 절차를 검토하고 `rook_allow_csi_key_rotation: true`와 증가한
+`rook_csi_cephx_key_generation`을 명시해야 합니다. 이전 키는 최대 2세대를 보존하며
+세대를 설치 재실행마다 자동 증가시키지 않습니다. 플레이북은 실제 CSI 키 타입·세대
+반영을 기다립니다. 값 자체를 출력하지 않고 키 메타데이터만 검사·기록합니다.
+
 ## 기본 StorageClass와 데이터 정책
 
 NFS와 Rook을 함께 선택할 수 있지만 `k8s_default_storage_class`에는 하나만 지정합니다.

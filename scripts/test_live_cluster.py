@@ -100,14 +100,17 @@ def ceph_health_result(ceph, allow_legacy_client_warnings=False):
         return None
     health = status.get('ceph', {}).get('health')
     details = status.get('ceph', {}).get('details', {})
+    csi_keys = status.get('cephx', {}).get('csi', {})
+    metadata = {key: csi_keys[key] for key in ['keyType', 'keyGeneration', 'priorKeyCount'] if key in csi_keys}
+    daemon_types = {name: status.get('cephx', {}).get(name, {}).get('keyType', 'unknown') for name in ['mgr', 'osd']}
     if health == 'HEALTH_OK' and not details:
-        return {'health': health, 'warnings': {}}
+        return {'health': health, 'warnings': {}, 'csi_key_metadata': metadata, 'daemon_key_types': daemon_types}
     if (allow_legacy_client_warnings and health == 'HEALTH_WARN' and details
             and set(details) <= LEGACY_CLIENT_KEY_WARNINGS
             and all(value.get('severity') == 'HEALTH_WARN' for value in details.values())
             and all(status.get('cephx', {}).get(daemon, {}).get('keyType') == 'aes256k'
                     for daemon in ['mgr', 'osd'])):
-        return {'health': health, 'warnings': details}
+        return {'health': health, 'warnings': details, 'csi_key_metadata': metadata, 'daemon_key_types': daemon_types}
     return None
 
 
@@ -298,6 +301,11 @@ def main():
                 ceph = cluster.read('cephcluster', args.rook_namespace, namespace=args.rook_namespace)
                 return ceph_health_result(ceph, args.allow_ceph_legacy_client_key_warnings)
             health = eventually(ceph_healthy, 'CephCluster Ready and acceptable explicitly selected health policy', seconds=300)
+            report['ceph_csi_key_metadata'] = health['csi_key_metadata']
+            report['ceph_daemon_key_types'] = health['daemon_key_types']
+            if (report['csi_runtime'].get('image', '').startswith('quay.io/cephcsi/cephcsi:v3.16.3')
+                    and health['csi_key_metadata'].get('keyType') != 'aes'):
+                raise RuntimeError('Legacy CSI lab requires explicit AES CSI client key metadata; review the key policy before testing kernel mounts')
             if health['warnings']:
                 mon = cluster.run('exec', 'deployment/rook-ceph-mon-a', '--', 'ceph', '--admin-daemon',
                                   '/run/ceph/ceph-mon.a.asok', 'mon_status', namespace=args.rook_namespace)

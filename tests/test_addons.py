@@ -111,7 +111,7 @@ class AddonTests(unittest.TestCase):
                     self.assertNotIn('*', rule['resources'])
 
     def test_rook_csi_cpu_guard_and_official_compatibility_image(self):
-        task = next(x for x in read_yaml('tasks/rook-csi-cpu.yaml') if 'ansible.builtin.assert' in x)
+        task = next(x for x in read_yaml('tasks/rook-csi-cpu.yaml') if x['name'] == 'Require the CPU level of the explicitly selected official CSI image')
         expression = task['ansible.builtin.assert']['that'][0]
         for legacy, flags, accepted in [(False, 'x86-64-v2 (supported, searched)', False),
                                         (True, 'x86-64-v2 (supported, searched)', True),
@@ -156,6 +156,29 @@ class AddonTests(unittest.TestCase):
             values.update(k8s_version=version, k8s_csi_providers=['rook'], rook_confirm_devices=True)
             engine = templar(values)
             self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x)) for x in expressions), accepted)
+
+    def test_csi_key_policy_only_changes_explicit_client_keys_and_retains_prior_generations(self):
+        values = self.ceph_variables()
+        values['rook_csi_effective_key_policy'] = {'keyType': 'aes', 'keyGeneration': 2,
+            'keyRotationPolicy': 'KeyGeneration', 'keepPriorKeyCountMax': 2}
+        cluster = yaml.safe_load(render('roles/storage/csi-rook/templates/ceph-cluster.yaml.j2', values))
+        self.assertEqual(cluster['spec']['security']['cephx'], {'csi': values['rook_csi_effective_key_policy']})
+        task = next(x for x in read_yaml('tasks/storage-preflight.yaml') if x['name'] == 'Prevent implicit CSI key rotation or generation rollback')
+        previous = dict(values['rook_csi_effective_key_policy'], keyType='aes256k', keyGeneration=1)
+        for allow, generation, accepted in [(False, 2, False), (True, 2, True), (True, 1, False), (True, 0, False)]:
+            options = variables(rook_csi_previous_key_policy=previous, rook_csi_current_key_type='aes256k',
+                rook_csi_current_key_generation=1, rook_csi_cephx_key_type='aes', rook_csi_cephx_key_generation=generation,
+                rook_csi_effective_key_policy=dict(values['rook_csi_effective_key_policy'], keyGeneration=generation),
+                rook_allow_csi_key_rotation=allow, rook_csi_current_core_key_types={'mgr': 'aes256k', 'osd': 'aes256k'})
+            engine = templar(options)
+            self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x)) for x in task['ansible.builtin.assert']['that']), accepted)
+
+    def test_aes256k_mounts_require_kernel_support_or_verified_backport(self):
+        task = next(x for x in read_yaml('tasks/rook-csi-cpu.yaml') if x['name'] == 'Require kernel support before selecting AES256K CSI client keys')
+        for kernel, verified, accepted in [('5.14.0', False, False), ('5.14.0', True, True), ('7.0.0', False, True)]:
+            values = variables(rook_csi_cephx_key_type='aes256k', rook_csi_kernel_aes256k_verified=verified)
+            values['ansible_facts']['kernel'] = kernel
+            self.assertEqual(templar(values).evaluate_conditional(trust_as_template(task['ansible.builtin.assert']['that'][0])), accepted)
 
     def test_existing_cni_and_cidr_changes_are_rejected(self):
         tasks = read_yaml('tasks/cluster-config-guard.yaml')
@@ -230,6 +253,7 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(data['all']['vars']['k8s_version'], '1.36.6')
         self.assertTrue(data['all']['vars']['rook_csi_legacy_lab'])
         self.assertEqual(data['all']['vars']['rook_csi_version'], 'v3.16.3')
+        self.assertEqual(data['all']['vars']['rook_csi_cephx_key_type'], 'aes')
 
     def test_custom_ranges_avoid_a_broad_node_network(self):
         nodes = dict(control='cp1=192.0.2.10@10.250.253.84/8',

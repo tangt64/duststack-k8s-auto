@@ -21,6 +21,10 @@
 - name: Initialize Ceph state for following host checks
   ansible.builtin.set_fact:
     rook_existing_cluster: false
+    rook_csi_previous_key_policy: {}
+    rook_csi_current_key_generation: 0
+    rook_csi_current_key_type: ''
+    rook_csi_current_core_key_types: {}
 
 - name: Inspect existing Rook cluster without modifying it
   when: "'rook' in k8s_csi_providers"
@@ -68,3 +72,37 @@
           - (rook_cluster_before.stdout | from_json).spec.dataDirHostPath == rook_data_dir
         fail_msg: Existing Ceph devices or image differ. Use a separate reviewed Ceph maintenance procedure.
       when: rook_existing_cluster
+
+    - name: Record CSI key policy metadata without reading key values
+      ansible.builtin.set_fact:
+        rook_csi_previous_key_policy: "{{ rook_csi_spec_policy }}"
+        rook_csi_current_key_generation: "{{ [rook_csi_spec_policy.get('keyGeneration', 0) | int, rook_csi_status_policy.get('keyGeneration', 0) | int] | max }}"
+        rook_csi_current_key_type: "{{ rook_csi_status_policy.get('keyType', '') or rook_csi_spec_policy.get('keyType', '') }}"
+        rook_csi_current_core_key_types:
+          mgr: "{{ (rook_cluster_before.stdout | from_json).get('status', {}).get('cephx', {}).get('mgr', {}).get('keyType', '') }}"
+          osd: "{{ (rook_cluster_before.stdout | from_json).get('status', {}).get('cephx', {}).get('osd', {}).get('keyType', '') }}"
+      vars:
+        rook_csi_spec_policy: "{{ (rook_cluster_before.stdout | from_json).spec.get('security', {}).get('cephx', {}).get('csi', {}) }}"
+        rook_csi_status_policy: "{{ (rook_cluster_before.stdout | from_json).get('status', {}).get('cephx', {}).get('csi', {}) }}"
+      when: rook_existing_cluster
+
+- name: Require an explicit CSI key type for a new Ceph cluster
+  ansible.builtin.assert:
+    that: rook_existing_cluster or rook_csi_cephx_key_type | length > 0
+    fail_msg: Choose CSI key type aes for older kernels, or aes256k for verified Linux 7.0+ support. Existing cluster key policies are preserved unless an explicit reviewed rotation is requested.
+  when: "'rook' in k8s_csi_providers"
+
+- name: Preserve existing CSI key policy or prepare the explicit requested policy
+  ansible.builtin.set_fact:
+    rook_csi_effective_key_policy: "{{ {'keyRotationPolicy': 'KeyGeneration', 'keyGeneration': rook_csi_cephx_key_generation | int, 'keepPriorKeyCountMax': 2, 'keyType': rook_csi_cephx_key_type} if rook_csi_cephx_key_type | length > 0 else rook_csi_previous_key_policy }}"
+  when: "'rook' in k8s_csi_providers"
+
+- name: Prevent implicit CSI key rotation or generation rollback
+  ansible.builtin.assert:
+    that:
+      - rook_csi_effective_key_policy == rook_csi_previous_key_policy or rook_allow_csi_key_rotation
+      - rook_csi_cephx_key_generation | int >= rook_csi_current_key_generation | int
+      - rook_csi_cephx_key_type == rook_csi_current_key_type or rook_csi_cephx_key_generation | int > rook_csi_current_key_generation | int
+      - rook_csi_cephx_key_type != 'aes' or (rook_csi_current_core_key_types.get('mgr') == 'aes256k' and rook_csi_current_core_key_types.get('osd') == 'aes256k')
+    fail_msg: Existing CSI key policy differs. Review the client and kernel compatibility, retain prior keys, select a higher explicit generation for key type changes, and acknowledge rook_allow_csi_key_rotation before applying.
+  when: "'rook' in k8s_csi_providers and rook_existing_cluster and rook_csi_cephx_key_type | length > 0"
