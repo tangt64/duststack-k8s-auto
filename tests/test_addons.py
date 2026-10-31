@@ -85,6 +85,31 @@ class AddonTests(unittest.TestCase):
             self.assertEqual(driver['spec']['snapshotPolicy'], 'none')
             self.assertTrue(driver['spec']['nodePlugin']['enableSeLinuxHostMount'])
 
+    def test_rbd_accounts_and_bindings_match_with_namespace_isolated_cluster_roles(self):
+        for namespace in ['rook-ceph', 'storage-lab']:
+            values = self.ceph_variables()
+            values['rook_namespace'] = namespace
+            resources = list(yaml.safe_load_all(render('roles/storage/csi-rook/templates/csi-rbac.yaml.j2', values)))
+            self.assertEqual(len(resources), 10)
+            accounts = {r['metadata']['name'] for r in resources if r['kind'] == 'ServiceAccount'}
+            self.assertEqual(accounts, {'rbd-ctrlplugin-sa', 'rbd-nodeplugin-sa'})
+            driver = list(yaml.safe_load_all(render('roles/storage/csi-rook/templates/csi-driver.yaml.j2', values)))[1]
+            for plugin in ['nodePlugin', 'controllerPlugin']:
+                self.assertIn(driver['spec'][plugin]['serviceAccountName'], accounts)
+            roles = {(r['kind'], r['metadata']['name']) for r in resources if r['kind'] in ['Role', 'ClusterRole']}
+            for resource in resources:
+                if resource['kind'].startswith('Cluster'):
+                    self.assertTrue(resource['metadata']['name'].startswith(namespace + '-rbd-'))
+                else:
+                    self.assertEqual(resource['metadata']['namespace'], namespace)
+                if resource['kind'].endswith('Binding'):
+                    self.assertIn((resource['roleRef']['kind'], resource['roleRef']['name']), roles)
+                    self.assertEqual(resource['subjects'][0]['namespace'], namespace)
+                    self.assertIn(resource['subjects'][0]['name'], accounts)
+                for rule in resource.get('rules', []):
+                    self.assertNotIn('*', rule['verbs'])
+                    self.assertNotIn('*', rule['resources'])
+
     def test_storage_guards_reject_missing_backends_and_conflicting_defaults(self):
         expressions = read_yaml('tasks/storage-settings.yaml')[0]['ansible.builtin.assert']['that']
         def valid(**options):

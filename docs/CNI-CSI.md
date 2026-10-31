@@ -134,6 +134,12 @@ SELinux 설정은 node plugin에 읽기 전용으로 연결하고 snapshot 기�
 operator·CephCluster Ready만으로 RBD CSI 준비가 완료됐다고 판정하지 않습니다.
 [공식 Rook 1.21.1 구성](https://github.com/rook/rook/blob/v1.21.1/deploy/examples/operator.yaml)
 
+RBD controller·node plugin 계정과 권한도 설치 역할이 먼저 준비합니다. 번들 CSI
+operator v1.1.0의 공식 RBAC에서 RBD 리소스만 사용하며, Driver에 계정 이름을 명시합니다.
+클러스터 범위 Role/Binding에는 Rook namespace를 붙여 다른 설치와 충돌을 방지합니다.
+이 드라이버에는 Secret·PV/PVC·VolumeAttachment 등 업스트림 클러스터 권한이 필요합니다.
+[RBAC 원본](https://github.com/ceph/ceph-csi-operator/blob/v1.1.0/deploy/multifile/csi-rbac.yaml)
+
 ### CephX와 구형 커널 호환성
 
 Ceph 20.2.4의 새 AES256K 키는 커널 RBD/CephFS 클라이언트에서 Linux 7.0+ 또는

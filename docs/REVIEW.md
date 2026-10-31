@@ -261,10 +261,18 @@ Ceph Ready 이후 시간 동기화 누락과 구형 커널용 키 호환성 경�
 이 변경은 로컬 필수 검사와 회귀 41개를 통과했습니다. 구형 클라이언트 경고를
 명시적으로 허용해도 무조건적인 전체 PASS로 표시하지 않는 회귀를 포함합니다.
 
-전체 I/O 실증에서 RBD PVC가 Pending인 원인은 CSI operator만 있고 `OperatorConfig`와
+전체 I/O 실증에서 RBD PVC가 Pending인 첫 원인은 CSI operator만 있고 `OperatorConfig`와
 RBD `Driver`가 없는 구성이었습니다. Rook 1.21.1의 별도 CSI CR 생성 단계를 추가하고,
 실제 API schema dry-run·controller/node plugin rollout·worker별 driver 등록까지
 검사하도록 보완했습니다. CephConnection/ClientProfile은 Rook이 만들고 실제 driver
 정의는 설치 역할이 관리합니다. Ceph 클러스터 Ready와 CSI 준비를 분리해서 검사합니다.
 이 수정은 로컬 회귀 42개·공식 차트 렌더링을 통과했고, 전용 랩의 실제 CSI CRD에 대한
 server dry-run과 두 리소스 생성도 통과했습니다. PVC I/O 통과와는 별도 단계입니다.
+
+이어서 실제 이벤트에서 `rbd-ctrlplugin-sa`·`rbd-nodeplugin-sa` 부재로 Pod 생성이
+거부됨을 확인했습니다. 번들 CSI operator와 같은 v1.1.0의
+[공식 RBAC](https://github.com/ceph/ceph-csi-operator/blob/v1.1.0/deploy/multifile/csi-rbac.yaml)에서
+RBD 리소스 10개만 포함하고, namespace와 클러스터 범위 이름을 분리했습니다.
+Driver에 두 계정을 명시하고 RBAC를 먼저 서버 검증·적용합니다. 업스트림 RBD 권한을
+유지하므로 PVC/PV·Secret·VolumeAttachment 등에 대한 클러스터 권한이 필요합니다.
+CephFS/NFS/NVMe 드라이버의 별도 계정·권한과 cluster-admin 바인딩은 추가하지 않습니다.

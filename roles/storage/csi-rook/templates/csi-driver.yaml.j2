@@ -29,7 +29,9 @@ spec:
   fsGroupPolicy: File
   snapshotPolicy: none
   nodePlugin:
+    serviceAccountName: rbd-nodeplugin-sa
     enableSeLinuxHostMount: true
     updateStrategy:
       type: RollingUpdate
-  controllerPlugin: {}
+  controllerPlugin:
+    serviceAccountName: rbd-ctrlplugin-sa

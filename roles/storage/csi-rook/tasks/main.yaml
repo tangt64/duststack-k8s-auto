@@ -27,6 +27,25 @@
   changed_when: false
   when: not ansible_check_mode
 
+- name: Render upstream RBD driver ServiceAccounts and RBAC
+  ansible.builtin.template:
+    src: csi-rbac.yaml.j2
+    dest: /etc/kubernetes/addons/rook-csi-rbac.yaml
+    mode: '0644'
+
+- name: Validate RBD permissions against the installed APIs
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, --dry-run=server, -f, /etc/kubernetes/addons/rook-csi-rbac.yaml]
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Apply RBD driver accounts before creating its workloads
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, /etc/kubernetes/addons/rook-csi-rbac.yaml]
+  register: rook_csi_rbac_apply
+  changed_when: "'unchanged' not in rook_csi_rbac_apply.stdout"
+  when: not ansible_check_mode
+
 - name: Render explicit CSI operator configuration and RBD driver
   ansible.builtin.template:
     src: csi-driver.yaml.j2
