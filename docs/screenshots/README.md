@@ -11,6 +11,7 @@
 | 03-source-validation.jpg | 2026-11-01 | b558839의 전용 controller 소스 검증. 회귀 31개 통과·스키마 1개 생략, CLI 공급·공식 차트 통과. Kubernetes/PVC I/O는 미수행 |
 | 04-cilium-connectivity.jpg | 2026-11-01 | bdc2c83의 실제 Cilium agent·교차 노드 HTTP·ClusterIP/DNS·정책 차단/허용 통과. Cilium/NFS 부분 실증 |
 | 05-nfs-pvc-io.jpg | 2026-11-01 | bdc2c83의 실제 NFS RWX·4 MiB 체크섬·교차 노드 재연결 입출력 통과. Rook은 이 부분 실행에 미포함 |
+| 06-rook-pvc-io.jpg | 2026-11-01 | d06b61d의 전체 실행 실패. RBD PVC Bound 이후 커널의 CSI 키 거부로 I/O 미통과. 키 호환 변경은 미적용 상태 |
 
 미수행 단계의 성공 화면을 합성하지 않습니다. 예상 출력은
 [사용 안내](../TERMINAL-LAB-WALKTHROUGH.md)의 예시 코드 블록으로 표시합니다.

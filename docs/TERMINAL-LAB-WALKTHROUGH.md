@@ -206,6 +206,15 @@ LIVE_CLUSTER_VALIDATION=PASS
 
 ![실제 NFS PVC 공유 쓰기·체크섬·재연결 검사 통과](screenshots/05-nfs-pvc-io.jpg)
 
+### 실제 Rook 시도: PVC 생성 성공, 커널 마운트 실패
+
+`d06b61d`의 전체 실행은 10개 검사를 통과했지만 RBD 커널 마운트에서 실패했습니다.
+PVC Bound와 CSI Pod Ready만으로 RBD I/O 통과를 선언할 수 없음을 보여주는 사례입니다.
+원문 결과와 무결성 정보는 [실행 기록](validation/README.md)에 있습니다.
+구형 커널용 CSI 키 호환 패치는 서버 dry-run만 수행했으며 적용 확인이 필요합니다.
+
+![실제 RBD PVC Bound 이후 커널 마운트 실패 — I/O 미통과](screenshots/06-rook-pvc-io.jpg)
+
 ## 7. 결과 기록과 종료
 
 `.tools/duststack-e2e-*.json`에서 소스 커밋, 검사 범위, 완료 provider, PVC/PV, 노드와
