@@ -1,0 +1,35 @@
+apiVersion: csi.ceph.io/v1
+kind: OperatorConfig
+metadata:
+  name: ceph-csi-operator-config
+  namespace: {{ rook_namespace }}
+spec:
+  driverSpecDefaults:
+    imageSet:
+      name: rook-csi-operator-image-set-configmap
+    enableMetadata: true
+    generateOMapInfo: false
+    fsGroupPolicy: File
+    deployCsiAddons: false
+    nodePlugin:
+      priorityClassName: system-node-critical
+      kubeletDirPath: /var/lib/kubelet
+      enableSeLinuxHostMount: true
+    controllerPlugin:
+      priorityClassName: system-cluster-critical
+      deploymentStrategy:
+        type: Recreate
+---
+apiVersion: csi.ceph.io/v1
+kind: Driver
+metadata:
+  name: {{ rook_namespace }}.rbd.csi.ceph.com
+  namespace: {{ rook_namespace }}
+spec:
+  fsGroupPolicy: File
+  snapshotPolicy: none
+  nodePlugin:
+    enableSeLinuxHostMount: true
+    updateStrategy:
+      type: RollingUpdate
+  controllerPlugin: {}

@@ -126,6 +126,14 @@ ansible-playbook -i inventory/local-live/hosts.yaml playbooks/k8s-storage-hosts.
 Rook operator 차트에 포함된 Ceph CSI operator도 설치합니다. CephFS/RWX, RGW,
 외부 Ceph, snapshot, 암호화·KMS는 후속 확장 항목입니다.
 
+Rook 1.21은 CSI operator 외에 관리자가 만드는 `OperatorConfig`와 RBD `Driver`도
+필요합니다. 설치 역할은 두 리소스를 명시적으로 생성하고, driver 이름이 StorageClass
+provisioner와 같도록 유지합니다. 실제 CRD의 server dry-run, controller·node plugin
+rollout, 모든 worker의 CSINode 등록을 확인한 뒤 StorageClass를 제공합니다.
+SELinux 설정은 node plugin에 읽기 전용으로 연결하고 snapshot 기능은 켜지 않습니다.
+operator·CephCluster Ready만으로 RBD CSI 준비가 완료됐다고 판정하지 않습니다.
+[공식 Rook 1.21.1 구성](https://github.com/rook/rook/blob/v1.21.1/deploy/examples/operator.yaml)
+
 ### CephX와 구형 커널 호환성
 
 Ceph 20.2.4의 새 AES256K 키는 커널 RBD/CephFS 클라이언트에서 Linux 7.0+ 또는

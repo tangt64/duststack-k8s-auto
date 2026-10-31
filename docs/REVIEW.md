@@ -260,3 +260,11 @@ Ceph Ready 이후 시간 동기화 누락과 구형 커널용 키 호환성 경�
 이 호환성 모드에서도 실패합니다. 경고를 숨겨 건강 상태를 바꾸지 않습니다.
 이 변경은 로컬 필수 검사와 회귀 41개를 통과했습니다. 구형 클라이언트 경고를
 명시적으로 허용해도 무조건적인 전체 PASS로 표시하지 않는 회귀를 포함합니다.
+
+전체 I/O 실증에서 RBD PVC가 Pending인 원인은 CSI operator만 있고 `OperatorConfig`와
+RBD `Driver`가 없는 구성이었습니다. Rook 1.21.1의 별도 CSI CR 생성 단계를 추가하고,
+실제 API schema dry-run·controller/node plugin rollout·worker별 driver 등록까지
+검사하도록 보완했습니다. CephConnection/ClientProfile은 Rook이 만들고 실제 driver
+정의는 설치 역할이 관리합니다. Ceph 클러스터 Ready와 CSI 준비를 분리해서 검사합니다.
+이 수정은 로컬 회귀 42개·공식 차트 렌더링을 통과했고, 전용 랩의 실제 CSI CRD에 대한
+server dry-run과 두 리소스 생성도 통과했습니다. PVC I/O 통과와는 별도 단계입니다.

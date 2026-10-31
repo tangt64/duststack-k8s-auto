@@ -71,6 +71,20 @@ class AddonTests(unittest.TestCase):
         self.assertEqual(storage['reclaimPolicy'], 'Retain')
         self.assertEqual(storage['volumeBindingMode'], 'WaitForFirstConsumer')
 
+    def test_rook_rbd_driver_identity_matches_storageclass_and_keeps_selinux_mount_support(self):
+        values = self.ceph_variables()
+        for namespace in ['rook-ceph', 'storage-lab']:
+            values['rook_namespace'] = namespace
+            resources = list(yaml.safe_load_all(render('roles/storage/csi-rook/templates/csi-driver.yaml.j2', values)))
+            self.assertEqual([r['kind'] for r in resources], ['OperatorConfig', 'Driver'])
+            driver = resources[1]
+            storage = yaml.safe_load(render('roles/storage/csi-rook/templates/storageclass.yaml.j2', values))
+            self.assertEqual(driver['metadata']['name'], storage['provisioner'])
+            self.assertEqual(driver['metadata']['namespace'], namespace)
+            self.assertEqual(driver['spec']['fsGroupPolicy'], 'File')
+            self.assertEqual(driver['spec']['snapshotPolicy'], 'none')
+            self.assertTrue(driver['spec']['nodePlugin']['enableSeLinuxHostMount'])
+
     def test_storage_guards_reject_missing_backends_and_conflicting_defaults(self):
         expressions = read_yaml('tasks/storage-settings.yaml')[0]['ansible.builtin.assert']['that']
         def valid(**options):

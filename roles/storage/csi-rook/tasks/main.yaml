@@ -23,8 +23,27 @@
 - name: Wait for CephCluster and CephBlockPool APIs
   ansible.builtin.command:
     argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, wait, --for=condition=Established, "crd/{{ item }}", --timeout=120s]
-  loop: [cephclusters.ceph.rook.io, cephblockpools.ceph.rook.io]
+  loop: [cephclusters.ceph.rook.io, cephblockpools.ceph.rook.io, drivers.csi.ceph.io, operatorconfigs.csi.ceph.io]
   changed_when: false
+  when: not ansible_check_mode
+
+- name: Render explicit CSI operator configuration and RBD driver
+  ansible.builtin.template:
+    src: csi-driver.yaml.j2
+    dest: /etc/kubernetes/addons/rook-csi-driver.yaml
+    mode: '0644'
+
+- name: Validate CSI custom resources against the installed upstream APIs
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, --dry-run=server, -f, /etc/kubernetes/addons/rook-csi-driver.yaml]
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Apply the RBD driver without enabling unused CSI drivers
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, /etc/kubernetes/addons/rook-csi-driver.yaml]
+  register: rook_csi_apply
+  changed_when: "'unchanged' not in rook_csi_apply.stdout"
   when: not ansible_check_mode
 
 - name: Render explicit Ceph cluster and retained block storage
@@ -44,6 +63,30 @@
 - name: Wait for Ceph cluster readiness
   ansible.builtin.command:
     argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace, "{{ rook_namespace }}", wait, "--for=jsonpath={.status.phase}=Ready", "cephcluster/{{ rook_namespace }}", --timeout=900s]
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Wait for the CSI controller and node plugin workloads
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace, "{{ rook_namespace }}", rollout, status, "{{ item }}", --timeout=300s]
+  loop:
+    - "deployment/{{ rook_namespace }}.rbd.csi.ceph.com-ctrlplugin"
+    - "daemonset/{{ rook_namespace }}.rbd.csi.ceph.com-nodeplugin"
+  register: rook_csi_rollout
+  until: rook_csi_rollout.rc == 0
+  retries: 3
+  delay: 5
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Require RBD driver registration on every worker before exposing the StorageClass
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, csinode, "{{ hostvars[item]['nodename'] }}", "--output=jsonpath={.spec.drivers[*].name}"]
+  loop: "{{ groups.get('k8s_node', []) }}"
+  register: rook_csi_registration
+  until: (rook_namespace + '.rbd.csi.ceph.com') in rook_csi_registration.stdout.split()
+  retries: 30
+  delay: 5
   changed_when: false
   when: not ansible_check_mode
 
