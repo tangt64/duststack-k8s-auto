@@ -220,3 +220,9 @@ control plane 준비 검사 화면을 추가했습니다. 계정 잔액과 인�
 제외합니다. 문서용 지정 JPEG만 크기·프레임 제한으로 허용하며 실행 바이너리와 차트
 아카이브는 계속 외부 공급합니다. 이 예외에 대한 회귀를 포함해 로컬 테스트 32개가
 통과했습니다. 실제 통과하지 않은 Cilium·CSI 단계는 예상 출력 예시로만 표시합니다.
+
+새 8 GiB 전용 control plane에서 `b558839`의 소스 검증을 다시 수행했습니다.
+회귀 31개 통과·kubeadm 스키마 1개 생략, CLI 공급 통합 검사와 Cilium 25/NFS 9/
+Rook 88개 리소스 차트 검증이 통과했고 종료 코드는 0입니다.
+같은 커밋의 [GitHub Actions](https://github.com/tangt64/duststack-k8s-auto/actions/runs/41218524721)도
+success입니다. 이 결과는 실제 Kubernetes 배포·Cilium 통신·PVC I/O를 포함하지 않습니다.

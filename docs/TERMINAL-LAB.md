@@ -139,3 +139,7 @@ NFS 또는 Rook만 선택한 실행은 `LIVE_CLUSTER_VALIDATION=PARTIAL_PASS`와
 Cilium/NFS/Rook 공식 차트 검증이 통과했고 종료 코드는 0입니다.
 약 4 GiB의 기존 교육용 노드를 사용했으며 단계 2·3의 실제 배포와 PVC I/O는 수행하지
 않았습니다. 환경·CI 링크·제약은 [검토 기록](REVIEW.md)에 있습니다.
+
+새 8 GiB 전용 control plane에서도 `b558839`의 단계 1을 수행했습니다.
+회귀 31개 통과·스키마 1개 생략, CLI 공급·공식 차트 검증이 통과했고 종료 코드는
+0입니다. 이 재검증 역시 실제 클러스터 설치와 PVC I/O를 포함하지 않습니다.

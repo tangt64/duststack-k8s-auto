@@ -93,7 +93,14 @@ bash scripts/terminal-lab-check.sh
 공식 Helm 차트 lint/render를 검사합니다. Kubernetes나 CSI 리소스를 설치하지 않습니다.
 실제 kubeadm 바이너리가 없으면 추가 스키마 검사만 생략될 수 있습니다.
 
-**예상 출력 예시 — 실제 실행 결과가 아닙니다.**
+**실제 촬영: 새 전용 controller에서 `b558839` 검증을 통과했습니다.** 회귀 31개가
+통과하고 kubeadm 바이너리가 없는 추가 스키마 검사 1개는 생략됐습니다. CLI 공급 통합
+검사와 공식 차트 렌더링도 통과했습니다. 아래 화면과 JSON은 소스 검증만 기록하며
+Kubernetes 배포와 PVC I/O는 아직 수행하지 않았다고 명시합니다.
+
+![실제 소스·CLI 공급·공식 차트 검증 결과](screenshots/03-source-validation.jpg)
+
+같은 단계에서 확인할 출력 항목은 다음과 같습니다.
 
 ```text
 OK (skipped=1)
