@@ -173,6 +173,17 @@ LIVE_CLUSTER_VALIDATION=PASS
 `--providers nfs`처럼 일부 CSI만 실행하면 `PARTIAL_PASS`/`partial_passed`로 기록합니다.
 전체 완료 판정은 NFS와 Rook을 모두 검증한 실행의 JSON과 실제 결과로 확인하세요.
 
+### 실제 선행 결과: Cilium·NFS
+
+2026-11-01 새 전용 랩에서 소스 `bdc2c83`의 Cilium 5개 검사와 NFS 3개 검사가
+통과했습니다. NFS는 4 MiB 쓰기·체크섬, 서로 다른 worker의 RWX 공유 쓰기,
+세 번째 worker로 Pod 재생성 후 데이터 보존·입출력까지 확인했습니다.
+이 실행은 `--providers nfs`의 `partial_passed`이며 Rook I/O는 포함하지 않습니다.
+
+![실제 Cilium 교차 노드 통신·DNS·정책 검사 통과](screenshots/04-cilium-connectivity.jpg)
+
+![실제 NFS PVC 공유 쓰기·체크섬·재연결 검사 통과](screenshots/05-nfs-pvc-io.jpg)
+
 ## 7. 결과 기록과 종료
 
 `.tools/duststack-e2e-*.json`에서 소스 커밋, 검사 범위, 완료 provider, PVC/PV, 노드와

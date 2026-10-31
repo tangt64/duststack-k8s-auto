@@ -9,6 +9,8 @@
 | 01-lab-vms.jpg | 2026-11-01 | 포털에 새 전용 VM 4대가 실행 중으로 표시됨. Node Ready·CNI·PVC 통과와 구분 |
 | 02-controller-ready.jpg | 2026-11-01 | 새 control plane SSH에서 Python 3.12.14·Ansible 2.21.5·4 vCPU·7936 MiB·sudo 확인. 소스 c8ab1b7, Kubernetes 설치 전 |
 | 03-source-validation.jpg | 2026-11-01 | b558839의 전용 controller 소스 검증. 회귀 31개 통과·스키마 1개 생략, CLI 공급·공식 차트 통과. Kubernetes/PVC I/O는 미수행 |
+| 04-cilium-connectivity.jpg | 2026-11-01 | bdc2c83의 실제 Cilium agent·교차 노드 HTTP·ClusterIP/DNS·정책 차단/허용 통과. Cilium/NFS 부분 실증 |
+| 05-nfs-pvc-io.jpg | 2026-11-01 | bdc2c83의 실제 NFS RWX·4 MiB 체크섬·교차 노드 재연결 입출력 통과. Rook은 이 부분 실행에 미포함 |
 
 미수행 단계의 성공 화면을 합성하지 않습니다. 예상 출력은
 [사용 안내](../TERMINAL-LAB-WALKTHROUGH.md)의 예시 코드 블록으로 표시합니다.

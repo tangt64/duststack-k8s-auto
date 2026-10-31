@@ -245,3 +245,9 @@ Rook 실증에서는 `chown-container-data-dir` 초기화가 `container_var_lib_
 디스크 hotplug 자동 orchestration도 명시적으로 해제합니다.
 이 변경은 로컬 필수 검사·회귀 39개와 Cilium/NFS/Rook 공식 차트의 실제 렌더링을
 통과했습니다. 호스트 적용 후의 Ceph Ready·PVC I/O 결과는 별도로 확인합니다.
+
+`bdc2c83`에서 Cilium과 NFS의 실제 부분 실증을 수행했습니다. Cilium agent 4개,
+교차 노드 HTTP·서비스/DNS·NetworkPolicy 차단/허용, NFS PVC 4 MiB 체크섬·RWX 공유
+쓰기·세 번째 worker 재연결 I/O가 통과했습니다. `partial_passed`, 완료 provider는
+`[nfs]`이며 Rook 실증을 포함하지 않습니다. 실제 화면은
+[사용 안내](TERMINAL-LAB-WALKTHROUGH.md)에 있습니다.
