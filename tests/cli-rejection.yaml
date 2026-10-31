@@ -1,0 +1,16 @@
+---
+- name: Reject invalid controller input and preserve installed tool
+  block:
+    - name: Try invalid controller artifact
+      ansible.builtin.include_role:
+        name: common/cli-tool
+      vars:
+        cli_tool_name: clusteradm
+        cli_tool_source: controller
+        cli_tool_local_dir: "{{ cli_fixture_root }}/{{ cli_fixture_case }}"
+    - ansible.builtin.fail:
+        msg: Invalid artifact was incorrectly accepted.
+  rescue:
+    - name: Verify validation was the reason for rejection
+      ansible.builtin.assert:
+        that: ansible_failed_task.name == 'Validate controller artifact before transferring it'

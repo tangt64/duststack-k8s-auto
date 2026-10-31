@@ -1,0 +1,42 @@
+---
+cli_tool_name: ''
+cli_tool_source: download
+cli_tool_local_dir: "{{ playbook_dir }}/../artifacts"
+cli_tool_staging_dir: /var/cache/duststack/incoming
+cli_tool_cache_dir: /var/cache/duststack/tools
+cli_tool_install_dir: /usr/local/bin
+cli_tool_owner: root
+cli_tool_group: root
+cli_tool_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+  amd64: amd64
+  arm64: arm64
+cli_tool_arch: "{{ cli_tool_arch_map.get(ansible_facts['architecture'], '') }}"
+# Versions, exact asset names and SHA-256 values form one release lock.
+# Override the entire entry when changing a version or using an internal mirror.
+cli_tool_catalog:
+  clusteradm:
+    version: v1.4.0
+    asset: "clusteradm_linux_{{ cli_tool_arch }}.tar.gz"
+    url: "https://github.com/open-cluster-management-io/clusteradm/releases/download/v1.4.0/clusteradm_linux_{{ cli_tool_arch }}.tar.gz"
+    archive_member: clusteradm
+    sha256:
+      amd64: aa94241caf353a515a0778e0ce608b4c68ced9b3e7f6fb5fe23f48393926153b
+      arm64: 37fa11ea802f526ed3226af892b4066f9e8224ac9d620849f6cdc1ecd074560b
+  virtctl:
+    version: v1.9.1
+    asset: "virtctl-v1.9.1-linux-{{ cli_tool_arch }}"
+    url: "https://github.com/kubevirt/kubevirt/releases/download/v1.9.1/virtctl-v1.9.1-linux-{{ cli_tool_arch }}"
+    archive_member: ''
+    sha256:
+      amd64: c289393c8186a258653594605f5199b4c171a3131e6e409ed204a96b491b782a
+      arm64: 12a26aa4f1088594eeafb76b209e1c9752fa6a10d968b6c98364f96f6c1ecbc5
+  helm:
+    version: v4.3.1
+    asset: "helm-v4.3.1-linux-{{ cli_tool_arch }}.tar.gz"
+    url: "https://get.helm.sh/helm-v4.3.1-linux-{{ cli_tool_arch }}.tar.gz"
+    archive_member: "linux-{{ cli_tool_arch }}/helm"
+    sha256:
+      amd64: 0403a88ae20913d11b10a2467b50087721fea7581736da6b9d3992f5357fe54b
+      arm64: 8cf8f66ecbc252ac8f7f06cca68aba88508ddfde3a6a34feb1678ad1694b4f88

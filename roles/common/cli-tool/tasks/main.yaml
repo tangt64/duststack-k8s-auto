@@ -1,0 +1,142 @@
+---
+- name: Validate selected tool and installation platform
+  ansible.builtin.assert:
+    that:
+      - cli_tool_name in ['clusteradm', 'virtctl', 'helm']
+      - cli_tool_name in cli_tool_catalog
+      - cli_tool_source in ['download', 'controller', 'target']
+      - ansible_facts['system'] == 'Linux'
+      - cli_tool_arch in ['amd64', 'arm64']
+      - cli_tool_install_dir is match('^/.+')
+      - cli_tool_cache_dir is match('^/.+')
+    fail_msg: Requires a supported tool, Linux amd64/arm64, absolute install/cache paths and a valid source mode.
+
+- name: Validate locked artifact metadata before changing the target
+  ansible.builtin.assert:
+    that:
+      - _cli_spec.version is match('^v[0-9]+[.][0-9]+[.][0-9]+$')
+      - _cli_spec.asset is match('^[A-Za-z0-9][A-Za-z0-9_.-]*$')
+      - _cli_spec.url is match('^https://')
+      - _cli_checksum is match('^[0-9a-f]{64}$')
+      - _cli_spec.archive_member == '' or _cli_spec.archive_member is match('^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*$')
+    fail_msg: Set an exact version, safe asset/member name, HTTPS URL and SHA-256 for the selected architecture.
+
+- name: Inspect manually staged artifact on the controller
+  ansible.builtin.stat:
+    path: "{{ _cli_manual_path }}"
+    checksum_algorithm: sha256
+    get_checksum: true
+    follow: false
+  delegate_to: localhost
+  become: false
+  register: _cli_controller_artifact
+  when: cli_tool_source == 'controller'
+
+- name: Inspect manually staged artifact on the target
+  ansible.builtin.stat:
+    path: "{{ _cli_manual_path }}"
+    checksum_algorithm: sha256
+    get_checksum: true
+    follow: false
+  register: _cli_target_artifact
+  when: cli_tool_source == 'target'
+
+- name: Validate controller artifact before transferring it
+  ansible.builtin.assert:
+    that:
+      - _cli_controller_artifact.stat.exists
+      - _cli_controller_artifact.stat.isreg | default(false)
+      - _cli_controller_artifact.stat.size | default(0) > 0
+      - _cli_controller_artifact.stat.checksum | default('') == _cli_checksum
+    fail_msg: "Missing, empty or invalid artifact. Place the original release asset at {{ _cli_manual_path }} and check its SHA-256."
+  when: cli_tool_source == 'controller'
+
+- name: Validate target artifact before installing it
+  ansible.builtin.assert:
+    that:
+      - _cli_target_artifact.stat.exists
+      - _cli_target_artifact.stat.isreg | default(false)
+      - _cli_target_artifact.stat.size | default(0) > 0
+      - _cli_target_artifact.stat.checksum | default('') == _cli_checksum
+    fail_msg: "Missing, empty or invalid artifact. Place the original release asset at {{ _cli_manual_path }} and check its SHA-256."
+  when: cli_tool_source == 'target'
+
+- name: Create per-tool cache directory
+  ansible.builtin.file:
+    path: "{{ cli_tool_cache_dir }}/{{ _cli_relative_dir }}"
+    state: directory
+    owner: "{{ cli_tool_owner }}"
+    group: "{{ cli_tool_group }}"
+    mode: '0700'
+
+- name: Download locked release asset with SHA-256 verification
+  ansible.builtin.get_url:
+    url: "{{ _cli_spec.url }}"
+    dest: "{{ _cli_cache_path }}"
+    checksum: "sha256:{{ _cli_checksum }}"
+    owner: "{{ cli_tool_owner }}"
+    group: "{{ cli_tool_group }}"
+    mode: '0600'
+    timeout: 60
+    validate_certs: true
+  when: cli_tool_source == 'download'
+
+- name: Copy verified release asset from controller
+  ansible.builtin.copy:
+    src: "{{ _cli_manual_path }}"
+    dest: "{{ _cli_cache_path }}"
+    owner: "{{ cli_tool_owner }}"
+    group: "{{ cli_tool_group }}"
+    mode: '0600'
+  when: cli_tool_source == 'controller'
+
+- name: Copy verified release asset from target staging directory
+  ansible.builtin.copy:
+    src: "{{ _cli_manual_path }}"
+    dest: "{{ _cli_cache_path }}"
+    remote_src: true
+    owner: "{{ cli_tool_owner }}"
+    group: "{{ cli_tool_group }}"
+    mode: '0600'
+  when: cli_tool_source == 'target'
+
+- name: Install only after validating the cached artifact
+  when: not ansible_check_mode
+  block:
+    - name: Verify cached bytes after download or copy
+      ansible.builtin.stat:
+        path: "{{ _cli_cache_path }}"
+        checksum_algorithm: sha256
+        get_checksum: true
+        follow: false
+      register: _cli_cached
+
+    - name: Reject an incomplete or modified cached file
+      ansible.builtin.assert:
+        that:
+          - _cli_cached.stat.isreg | default(false)
+          - _cli_cached.stat.size | default(0) > 0
+          - _cli_cached.stat.checksum | default('') == _cli_checksum
+
+    - name: Create install directory
+      ansible.builtin.file:
+        path: "{{ cli_tool_install_dir }}"
+        state: directory
+        owner: "{{ cli_tool_owner }}"
+        group: "{{ cli_tool_group }}"
+        mode: '0755'
+
+    - name: Extract and install an archive
+      ansible.builtin.include_tasks: archive.yaml
+      when: _cli_spec.archive_member != ''
+
+    - name: Atomically install a raw executable
+      ansible.builtin.copy:
+        src: "{{ _cli_cache_path }}"
+        dest: "{{ cli_tool_install_dir }}/{{ cli_tool_name }}"
+        remote_src: true
+        owner: "{{ cli_tool_owner }}"
+        group: "{{ cli_tool_group }}"
+        mode: '0755'
+      register: cli_tool_install_result
+      when: _cli_spec.archive_member == ''

@@ -1,1 +1,3 @@
-dependencies: ['core-crio']
+---
+# CLI installation does not require changing the node container runtime.
+dependencies: []

@@ -1,0 +1,22 @@
+---
+- name: Install cluster administration CLI tools without changing cluster resources
+  hosts: "{{ cli_tools_hosts | default('k8s_master:k8s_hub:k8s_spoke:console') }}"
+  any_errors_fatal: true
+  vars:
+    cli_tools: [clusteradm, virtctl]
+  pre_tasks:
+    - name: Validate requested tool list
+      ansible.builtin.assert:
+        that:
+          - cli_tools is sequence
+          - cli_tools is not string
+          - cli_tools | length > 0
+          - cli_tools | difference(['clusteradm', 'virtctl', 'helm']) | length == 0
+          - cli_tools | unique | length == cli_tools | length
+  tasks:
+    - name: Install selected tools
+      ansible.builtin.include_role:
+        name: common/cli-tool
+      loop: "{{ cli_tools }}"
+      loop_control:
+        loop_var: cli_tool_name

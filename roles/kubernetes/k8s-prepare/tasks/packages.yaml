@@ -1,38 +1,18 @@
-- name: update to system packages
-  package:
+---
+- name: Update unrelated OS packages only when requested
+  ansible.builtin.dnf:
     name: '*'
     state: latest
-    exclude:
-      - kernel*
-      - kubelet*
-  when: update_all_packages == "yes"
+    exclude: ['kernel*', 'kube*', 'cri-o*', 'containerd*']
+  when: update_all_packages
 
-- name: install tc package for kubernetes
-  package:
-    name: "{{ item }}"
+- name: Install host prerequisites
+  ansible.builtin.dnf:
+    name: [iproute-tc, conntrack-tools, socat, container-selinux, policycoreutils-python-utils]
     state: present
-  loop:
-    - iproute
 
-- name: remove the kubeadm/let/ctl packages before installing
-  yum:
-    name: "{{ item }}"
-    state: absent
-    disable_excludes: kubernetes
-  loop:
-    - "{{ k8s_core_packages }}"
-
-- name: install the kubeadm package for install
-  yum:
-    name: "{{ item }}"
+- name: Install pinned Kubernetes packages without removing existing packages
+  ansible.builtin.dnf:
+    name: "{{ k8s_core_packages }}"
     state: present
     disable_excludes: kubernetes
-  loop:
-    - "{{ k8s_core_packages }}"
-
-- name: install the CNI package for install
-  yum:
-    name: "kubernetes-cni"
-    state: present
-  loop:
-    - kubernetes-cni

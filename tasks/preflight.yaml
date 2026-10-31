@@ -1,0 +1,119 @@
+---
+- name: Validate supported installation settings before changing hosts
+  ansible.builtin.assert:
+    that:
+      - ansible_version.full is version('2.21', '>=')
+      - ansible_facts['os_family'] == 'RedHat'
+      - ansible_facts['distribution_major_version'] | int >= 9
+      - ansible_facts['kernel'] is version('5.10', '>=')
+      - k8s_version is match('^1[.]37[.][0-9]+$')
+      - k8s_repo_version == (k8s_version.split('.')[:2] | join('.'))
+      - k8s_runtime_environment in ['crio', 'containerd']
+      - containerd_version is version('2.0', '>=')
+      - k8s_instmethod == 'config'
+      - k8s_network in ['calico', 'flannel', 'flanned']
+      - k8s_selinux_state in ['enforcing', 'permissive']
+      - k8s_proxy_mode in ['haproxy', 'keepalived']
+      - groups.get('k8s_master', []) | length > 0
+      - groups.get('k8s_master', []) | intersect(groups.get('k8s_node', [])) | length == 0
+      - groups['k8s_master'] | length == 1 or k8s_proxy_mode_enable
+      - not k8s_proxy_mode_enable or k8s_proxy_mode != 'haproxy' or groups.get('lb', []) | length > 0
+      - not k8s_proxy_mode_enable or k8s_proxy_mode != 'haproxy' or groups.get('lb', []) | intersect(groups['k8s_master']) | length == 0
+      - k8s_interface in ansible_facts
+      - ansible_facts[k8s_interface]['ipv4']['address'] == k8s_ip4.split('/')[0]
+      - not enabled_virtual
+      - not ocm_hub
+      - not ocm_spoke
+      - not manage_os_network
+      - not use_firewalld
+      - k8s_runtime_environment != 'crio' or crio_version.split('.')[:2] == k8s_version.split('.')[:2]
+    fail_msg: >-
+      Requires Ansible 2.21+, RHEL-compatible 9+ with kernel 5.10+, matching
+      inventory addresses, kubeadm config mode, CRI-O/containerd and an API
+      load balancer for HA. Legacy host network rewrites and add-ons are not
+      supported by this installer. See README.md and docs/REVIEW.md.
+
+- name: Require a unique name for every cluster node
+  ansible.builtin.assert:
+    that:
+      - k8s_node_names | unique | length == k8s_node_names | length
+    fail_msg: Each control plane and worker needs a unique nodename.
+  vars:
+    k8s_node_names: "{{ (groups['k8s_master'] + groups.get('k8s_node', [])) | map('extract', hostvars, 'nodename') | list }}"
+
+- name: Require cgroup v2 for current Kubernetes
+  ansible.builtin.stat:
+    path: /sys/fs/cgroup/cgroup.controllers
+  register: k8s_cgroup_v2
+
+- name: Validate cgroup v2
+  ansible.builtin.assert:
+    that: k8s_cgroup_v2.stat.exists
+    fail_msg: Enable cgroup v2 and reboot before installing Kubernetes.
+
+- name: Inspect existing kubeadm installation
+  ansible.builtin.stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: k8s_existing_node
+
+- name: Read installed kubelet version on existing nodes
+  ansible.builtin.command: kubelet --version
+  register: k8s_existing_version
+  changed_when: false
+  check_mode: false
+  when: k8s_existing_node.stat.exists
+
+- name: Prevent implicit upgrades of existing clusters
+  ansible.builtin.assert:
+    that: k8s_existing_version.stdout.split()[-1] == 'v' + k8s_version
+    fail_msg: >-
+      Existing cluster version differs. This installer does not perform upgrades.
+      Back up etcd and follow the sequential kubeadm upgrade procedure first.
+  when: k8s_existing_node.stat.exists
+
+- name: Gather installed runtime packages
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Prevent implicit runtime upgrades on existing nodes
+  ansible.builtin.assert:
+    that:
+      - k8s_runtime_package in ansible_facts['packages']
+      - ansible_facts['packages'][k8s_runtime_package][0]['version'] == k8s_runtime_version
+    fail_msg: Existing node runtime differs. Upgrade the runtime through a separate drain and maintenance procedure.
+  vars:
+    k8s_runtime_package: "{{ 'cri-o' if k8s_runtime_environment == 'crio' else 'containerd.io' }}"
+    k8s_runtime_version: "{{ crio_version if k8s_runtime_environment == 'crio' else containerd_version }}"
+  when: k8s_existing_node.stat.exists
+
+- name: Check pod and service ranges against each other and node addresses
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts['python']['executable'] }}"
+      - -c
+      - |
+        import ipaddress, sys
+        pods, services = (ipaddress.ip_network(x) for x in sys.argv[1:3])
+        nodes = [ipaddress.ip_interface(x).ip for x in sys.argv[3:]]
+        assert pods.version == services.version == 4, 'IPv4 ranges required'
+        assert pods.prefixlen <= 26, 'Pod CIDR must contain at least one Calico /26 block'
+        assert not pods.overlaps(services), 'Pod and service CIDRs overlap'
+        assert all(n not in pods and n not in services for n in nodes), 'Node address overlaps cluster ranges'
+      - "{{ k8s_pod_cidr }}"
+      - "{{ k8s_cluster_svc_ip }}"
+      - "{{ k8s_ip4 }}"
+  changed_when: false
+  check_mode: false
+
+- name: Read existing API server static pod manifest
+  ansible.builtin.slurp:
+    src: /etc/kubernetes/manifests/kube-apiserver.yaml
+  register: k8s_existing_apiserver
+  when: k8s_existing_node.stat.exists and inventory_hostname in groups['k8s_master']
+
+- name: Prevent implicit control plane version changes
+  ansible.builtin.assert:
+    that:
+      - (k8s_existing_apiserver.content | b64decode | from_yaml)['spec']['containers'][0]['image'].split(':')[-1] == 'v' + k8s_version
+    fail_msg: Existing API server differs from the requested version. Use the kubeadm upgrade procedure.
+  when: k8s_existing_node.stat.exists and inventory_hostname in groups['k8s_master']

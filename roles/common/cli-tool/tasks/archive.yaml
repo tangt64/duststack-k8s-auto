@@ -1,0 +1,44 @@
+---
+- name: Create isolated extraction directory
+  ansible.builtin.tempfile:
+    state: directory
+    path: "{{ cli_tool_cache_dir }}/{{ _cli_relative_dir }}"
+    prefix: extract-
+  register: _cli_extract
+
+- name: Install executable from a verified archive
+  block:
+    - name: Extract release archive
+      ansible.builtin.unarchive:
+        src: "{{ _cli_cache_path }}"
+        dest: "{{ _cli_extract.path }}"
+        remote_src: true
+        extra_opts: [--no-same-owner]
+
+    - name: Check archive member before replacing installed tool
+      ansible.builtin.stat:
+        path: "{{ _cli_extract.path }}/{{ _cli_spec.archive_member }}"
+        follow: false
+      register: _cli_member
+
+    - name: Require a regular non-empty executable in the archive
+      ansible.builtin.assert:
+        that:
+          - _cli_member.stat.isreg | default(false)
+          - _cli_member.stat.size | default(0) > 0
+        fail_msg: The archive does not contain the expected executable. The installed tool was not replaced.
+
+    - name: Atomically install extracted executable
+      ansible.builtin.copy:
+        src: "{{ _cli_extract.path }}/{{ _cli_spec.archive_member }}"
+        dest: "{{ cli_tool_install_dir }}/{{ cli_tool_name }}"
+        remote_src: true
+        owner: "{{ cli_tool_owner }}"
+        group: "{{ cli_tool_group }}"
+        mode: '0755'
+      register: cli_tool_install_result
+  always:
+    - name: Remove temporary extraction directory
+      ansible.builtin.file:
+        path: "{{ _cli_extract.path }}"
+        state: absent

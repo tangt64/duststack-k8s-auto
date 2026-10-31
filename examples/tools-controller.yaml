@@ -1,0 +1,5 @@
+---
+cli_tools: [clusteradm, virtctl]
+cli_tool_source: controller
+# The default is <project>/artifacts; an absolute external path also works.
+# cli_tool_local_dir: /srv/duststack/artifacts

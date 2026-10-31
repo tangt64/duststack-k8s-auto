@@ -1,12 +1,19 @@
-- name: copy to kube-flannel.yml 
-  template:
-   src: flanned-config.yaml
-   dest: /tmp/kube-flannel.yaml
+---
+- name: Create add-on manifest directory
+  ansible.builtin.file:
+    path: /etc/kubernetes/addons
+    state: directory
+    mode: '0755'
 
-- name: apply to kube-flannel on kubernetes cluster
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/kube-flannel.yaml
+- name: Render versioned Flannel manifest
+  ansible.builtin.template:
+    src: flanned-config.yaml
+    dest: /etc/kubernetes/addons/flannel.yaml
+    mode: '0644'
 
-- name: delete to the flanned.yml file
-  file:
-    path: /tmp/kube-flannel.yaml
-    state: absent
+- name: Apply Flannel
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, /etc/kubernetes/addons/flannel.yaml]
+  register: flannel_apply
+  changed_when: "'unchanged' not in flannel_apply.stdout"
+  when: not ansible_check_mode

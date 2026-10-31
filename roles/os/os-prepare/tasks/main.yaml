@@ -1,29 +1,13 @@
-- include_tasks: ssh.yaml
-- include_tasks: deploy_hosts_j2.yaml
-- name: install systemd-networkd package for network
-  package: 
-    name: "{{ item }}"
-    state: present
-  loop:
-  - epel-release
-  - systemd-networkd
+---
+- name: Set inventory hostname
+  ansible.builtin.hostname:
+    name: "{{ nodename }}"
 
-- name: started to the systemd-networkd service
-  systemd:
-    name: systemd-networkd
-    state: started
-    enabled: true
-
-- name: install python package for IP Address templating
-  yum:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - python3-types-ipaddress
-    - python3-netaddr
-  ignore_errors: true
-
-- name: configure to sudoers for none password requirement
-  copy:
-    src: nopasswd
-    dest: /etc/sudoers.d/nopasswd
+- name: Add cluster host records without replacing existing entries
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: '# {mark} ANSIBLE KUBERNETES HOSTS'
+    block: |
+      {% for host in groups['k8s_master'] | union(groups.get('k8s_node', [])) %}
+      {{ hostvars[host]['k8s_ip4'].split('/')[0] }} {{ hostvars[host]['nodename'] }}
+      {% endfor %}

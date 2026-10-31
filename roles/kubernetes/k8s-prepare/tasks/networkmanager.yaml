@@ -1,0 +1,20 @@
+---
+- name: Keep NetworkManager from managing Calico interfaces
+  ansible.builtin.copy:
+    dest: /etc/NetworkManager/conf.d/90-calico-unmanaged.conf
+    mode: '0644'
+    content: |
+      [keyfile]
+      unmanaged-devices=interface-name:cali*;interface-name:tunl*;interface-name:vxlan.calico;interface-name:vxlan-v6.calico;interface-name:wireguard.cali;interface-name:wg-v6.cali
+  when:
+    - k8s_network == 'calico'
+    - "'NetworkManager.service' in ansible_facts['services']"
+  register: k8s_networkmanager_config
+
+- name: Reload NetworkManager configuration without restarting host networking
+  ansible.builtin.systemd_service:
+    name: NetworkManager
+    state: reloaded
+  when:
+    - k8s_networkmanager_config.changed
+    - ansible_facts['services'].get('NetworkManager.service', {}).get('state', 'stopped') == 'running'

@@ -1,15 +1,42 @@
-- name: copy the calico.yaml to /tmp/
-  copy: 
-    src: tigera-operator.yaml
-    dest: /tmp/calico.yaml
+---
+- name: Create add-on manifest directory
+  ansible.builtin.file:
+    path: /etc/kubernetes/addons
+    state: directory
+    mode: '0755'
 
-- name: apply to kube-calico-operator on kubernetes cluster
-  shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl create -f /tmp/calico.yaml
+- name: Fetch pinned Calico CRDs and operator with checksum verification
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/{{ item.file }}"
+    dest: "/etc/kubernetes/addons/{{ item.file }}"
+    checksum: "sha256:{{ item.sha256 }}"
+    mode: '0644'
+  loop: "{{ calico_manifests }}"
 
-- name: template to kube-calico-crd resource
-  template:
+- name: Apply Calico CRDs and operator using server-side apply
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, --server-side, --field-manager=duststack, -f, "/etc/kubernetes/addons/{{ item.file }}"]
+  loop: "{{ calico_manifests }}"
+  register: calico_apply
+  changed_when: "'unchanged' not in calico_apply.stdout"
+  when: not ansible_check_mode
+
+- name: Wait for Installation and APIServer APIs
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, wait, --for=condition=Established, "crd/{{ item }}", --timeout=120s]
+  loop: [installations.operator.tigera.io, apiservers.operator.tigera.io]
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Render Calico networking using inventory pod CIDR and interface
+  ansible.builtin.template:
     src: custom-resources.yaml
-    dest: /tmp/custom-resources.yaml
-- shell: KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/custom-resources.yaml
+    dest: /etc/kubernetes/addons/calico-custom-resources.yaml
+    mode: '0644'
 
-    
+- name: Apply Calico installation
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, --server-side, --field-manager=duststack, -f, /etc/kubernetes/addons/calico-custom-resources.yaml]
+  register: calico_resources
+  changed_when: "'unchanged' not in calico_resources.stdout"
+  when: not ansible_check_mode

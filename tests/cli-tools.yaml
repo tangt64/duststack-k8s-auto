@@ -1,0 +1,104 @@
+---
+- name: Exercise CLI acquisition locally with isolated fixtures
+  hosts: localhost
+  connection: local
+  become: false
+  gather_facts: false
+  environment:
+    SSL_CERT_FILE: "{{ cli_fixture_root }}/ca.crt"
+  vars:
+    ansible_facts:
+      system: Linux
+      architecture: x86_64
+    cli_tool_catalog: "{{ cli_fixture_catalog }}"
+    cli_tool_owner: "{{ lookup('pipe', 'id -un') }}"
+    cli_tool_group: "{{ lookup('pipe', 'id -gn') }}"
+    cli_tool_local_dir: "{{ cli_fixture_root }}/controller"
+    cli_tool_staging_dir: "{{ cli_fixture_root }}/target"
+    cli_tool_cache_dir: "{{ cli_fixture_root }}/cache"
+    cli_tool_install_dir: "{{ cli_fixture_root }}/bin/{{ cli_tool_source }}"
+  tasks:
+    - name: Exercise archive acquisition in each source mode
+      ansible.builtin.include_role:
+        name: common/cli-tool
+      loop: [download, controller, target]
+      loop_control:
+        loop_var: cli_fixture_source
+      vars:
+        cli_tool_name: clusteradm
+        cli_tool_source: "{{ cli_fixture_source }}"
+
+    - name: Install a raw tool from controller staging
+      ansible.builtin.include_role:
+        name: common/cli-tool
+      vars:
+        cli_tool_name: virtctl
+        cli_tool_source: controller
+
+    - name: Reinstall the same raw tool
+      ansible.builtin.include_role:
+        name: common/cli-tool
+      vars:
+        cli_tool_name: virtctl
+        cli_tool_source: controller
+
+    - name: Require unchanged destination when bytes already match
+      ansible.builtin.assert:
+        that: not cli_tool_install_result.changed
+
+    - name: Check each invalid manually staged artifact
+      ansible.builtin.include_tasks: cli-rejection.yaml
+      loop: [missing, empty, tampered]
+      loop_control:
+        loop_var: cli_fixture_case
+
+    - name: Reject an unsupported architecture
+      block:
+        - name: Try unsupported architecture
+          ansible.builtin.include_role:
+            name: common/cli-tool
+          vars:
+            cli_tool_name: clusteradm
+            cli_tool_source: controller
+            cli_tool_arch: ppc64le
+        - ansible.builtin.fail:
+            msg: Unsupported architecture was incorrectly accepted.
+      rescue:
+        - ansible.builtin.assert:
+            that: ansible_failed_task.name == 'Validate selected tool and installation platform'
+
+    - name: Reject missing architecture checksum
+      block:
+        - name: Try missing checksum
+          ansible.builtin.include_role:
+            name: common/cli-tool
+          vars:
+            cli_tool_name: clusteradm
+            cli_tool_source: controller
+            cli_tool_catalog:
+              clusteradm:
+                version: v1.2.3
+                asset: fixture.tar.gz
+                url: https://invalid.example/fixture.tar.gz
+                archive_member: clusteradm
+                sha256: {}
+        - ansible.builtin.fail:
+            msg: Missing checksum was incorrectly accepted.
+      rescue:
+        - ansible.builtin.assert:
+            that: ansible_failed_task.name == 'Validate locked artifact metadata before changing the target'
+
+    - name: Reject an archive missing its executable and preserve installed tool
+      block:
+        - name: Try incomplete archive
+          ansible.builtin.include_role:
+            name: common/cli-tool
+          vars:
+            cli_tool_name: clusteradm
+            cli_tool_source: controller
+            cli_tool_catalog: "{{ cli_fixture_bad_catalog }}"
+        - ansible.builtin.fail:
+            msg: Incomplete archive was incorrectly accepted.
+      rescue:
+        - ansible.builtin.assert:
+            that: ansible_failed_task.name == 'Require a regular non-empty executable in the archive'

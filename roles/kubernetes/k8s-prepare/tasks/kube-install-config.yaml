@@ -1,4 +1,6 @@
-- name: make a template file for kubernetes installation(kubeadm-config)
-  template:
+---
+- name: Render private kubeadm initialization configuration
+  ansible.builtin.template:
     src: kubeadm-config.yaml
-    dest: /tmp/kubeadm-config.yaml
+    dest: /etc/kubernetes/kubeadm-init.yaml
+    mode: '0600'

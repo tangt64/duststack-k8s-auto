@@ -1,27 +1,21 @@
-# This section includes base Calico installation configuration.
-# For more information, see: https://projectcalico.docs.tigera.io/master/reference/installation/api#operator.tigera.io/v1.Installation
 apiVersion: operator.tigera.io/v1
 kind: Installation
 metadata:
   name: default
 spec:
-  # Configures Calico networking.
   calicoNetwork:
-    # Note: The ipPools section cannot be modified post-install.
+    bgp: Disabled
+    nodeAddressAutodetectionV4:
+      interface: "{{ k8s_interface }}"
     ipPools:
-    - blockSize: 24
-      cidr: "{{ k8s_pod_cidr }}"
-      encapsulation: VXLANCrossSubnet
-      natOutgoing: Enabled
-      nodeSelector: all()
-  registry: quay.io
-
+      - blockSize: 26
+        cidr: "{{ k8s_pod_cidr }}"
+        encapsulation: VXLAN
+        natOutgoing: Enabled
+        nodeSelector: all()
 ---
-
-# This section configures the Calico API server.
-# For more information, see: https://projectcalico.docs.tigera.io/master/reference/installation/api#operator.tigera.io/v1.APIServer
 apiVersion: operator.tigera.io/v1
-kind: APIServer 
-metadata: 
-  name: default 
+kind: APIServer
+metadata:
+  name: default
 spec: {}

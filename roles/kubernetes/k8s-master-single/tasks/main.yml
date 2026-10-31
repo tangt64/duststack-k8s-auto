@@ -1,11 +1,33 @@
-# tasks file for k8s-master
-#- import_tasks: containerd.yaml
-#  when: k8s_runtime_environment == "containerd"
+---
+- name: Inspect existing control plane
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: k8s_control_plane
 
-#- import_tasks: docker.yaml
-#  when: k8s_runtime_environment == "docker"
+- name: Bootstrap a new control plane without automatic reset on failure
+  when: not k8s_control_plane.stat.exists
+  block:
+    - name: Render current kubeadm configuration
+      ansible.builtin.template:
+        src: "{{ role_path }}/../k8s-prepare/templates/kubeadm-config.yaml"
+        dest: /etc/kubernetes/kubeadm-init.yaml
+        owner: root
+        group: root
+        mode: '0600'
 
-- import_tasks: crio.yaml
+    - name: Validate kubeadm configuration before initialization
+      ansible.builtin.command:
+        argv: [kubeadm, config, validate, --config, /etc/kubernetes/kubeadm-init.yaml]
+      changed_when: false
+      when: not ansible_check_mode
 
-- import_tasks: kubeconfig.yaml
-- import_tasks: kubelet.yaml
+    - name: Initialize control plane
+      ansible.builtin.command:
+        argv: [kubeadm, init, --config, /etc/kubernetes/kubeadm-init.yaml]
+        creates: /etc/kubernetes/admin.conf
+      no_log: true
+      when: not ansible_check_mode
+
+- name: Configure root kubeconfig
+  ansible.builtin.import_tasks: kubeconfig.yaml
+  when: not ansible_check_mode or k8s_control_plane.stat.exists

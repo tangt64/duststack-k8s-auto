@@ -1,4 +1,7 @@
-apiVersion: audit.k8s.io/v1beta1
+apiVersion: audit.k8s.io/v1
 kind: Policy
+omitStages: [RequestReceived]
 rules:
-- level: Metadata
+  - level: None
+    nonResourceURLs: [/healthz*, /readyz*, /livez*]
+  - level: Metadata

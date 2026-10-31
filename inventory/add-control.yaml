@@ -1,7 +1,6 @@
 all:
   vars:
     ansible_user: "{{ ssh_remote_user }}"
-    ansible_password: "{{ ssh_remote_password }}"
 
 lb:
   hosts:
@@ -54,3 +53,10 @@ k8s_spoke:
   hosts:
     # 192.168.90.92:
     # 192.168.90.102:
+kubernetes:
+  children:
+    k8s_master: {}
+    k8s_node: {}
+    lb: {}
+    k8s_hub: {}
+    k8s_spoke: {}

@@ -5,3 +5,24 @@ rsa.yaml
 *.sublime-project
 *.sublime-workspace
 kubernetes-ansible.log
+
+.tools/
+.venv/
+__pycache__/
+*.pem
+*.key
+inventory/local*
+inventory/group_vars/*/vault*
+
+# User-provided release artifacts belong outside the source tree.
+/artifacts/
+/roles/kubernetes/k8s-ocm/*/files/clusteradm
+/roles/extension/kubevirt/files/virtctl*
+*.exe
+*.dll
+*.so
+*.tar.gz
+*.tgz
+*.zip
+*.rpm
+*.deb

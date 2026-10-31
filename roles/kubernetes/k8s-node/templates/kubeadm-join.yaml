@@ -1,12 +1,21 @@
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: JoinConfiguration
 nodeRegistration:
+  name: "{{ nodename }}"
+  criSocket: "{{ k8s_cri_socket }}"
   kubeletExtraArgs:
-    enable-controller-attach-detach: "false"
-    node-labels: "{{ nodename }}"
+    - name: node-ip
+      value: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
 discovery:
   bootstrapToken:
-    apiServerEndpoint: {{ k8s_vip_address }}:6443
-    token: {{ k8s_token.stdout }}
+    apiServerEndpoint: "{{ k8s_join_command.stdout.split()[2] }}"
+    token: "{{ k8s_join_command.stdout.split()[4] }}"
     caCertHashes:
-    - {{ k8s_ca_cert_hash.stdout }}
+      - "{{ k8s_join_command.stdout.split()[6] }}"
+{% if k8s_join_control_plane %}
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
+    bindPort: {{ k8s_endpoint_port }}
+  certificateKey: "{{ k8s_upload_certs.stdout_lines | select('match', '^[0-9a-f]{64}$') | first }}"
+{% endif %}

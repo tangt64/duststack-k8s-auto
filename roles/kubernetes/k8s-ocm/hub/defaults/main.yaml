@@ -1,1 +1,3 @@
-ocm_join_file: /tmp/ocm_manage.txt
+---
+# Cluster resource deployment remains separate from CLI installation.
+ocm_hub: false

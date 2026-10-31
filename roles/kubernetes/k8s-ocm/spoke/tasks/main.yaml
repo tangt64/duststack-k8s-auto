@@ -1,8 +1,11 @@
-- name: copy the OCM clusteradm file
-  copy:
-    src: clusteradm
-    dest: /usr/local/bin/clusteradm
+---
+- name: Keep legacy OCM registration disabled
+  ansible.builtin.assert:
+    that: not (ocm_spoke | default(false) | bool)
+    fail_msg: This role now installs clusteradm only. Register the cluster with a reviewed short-lived join command; see docs/TOOLS.md.
 
-- name: read to the command file for join to hub-cluster
-  command: "{{ lookup('file', '/tmp/ocm_manage.txt') }}"
-  delegate_to: "{{ groups['k8s_hub'] | first }}"
+- name: Install clusteradm from a verified external artifact
+  ansible.builtin.include_role:
+    name: common/cli-tool
+  vars:
+    cli_tool_name: clusteradm

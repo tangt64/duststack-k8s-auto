@@ -1,10 +1,6 @@
-- name: prepare helm YAML files to the first master node
-  copy:
-    src: "{{ item }}"
-    dest: /tmp/
-  with_items:
-    - helm.sh
-    - rbac-config.yaml
-
-- name: prepare helm package manager
-  shell: bash /tmp/helm.sh
+---
+- name: Install Helm CLI without applying charts or Tiller RBAC
+  ansible.builtin.include_role:
+    name: common/cli-tool
+  vars:
+    cli_tool_name: helm

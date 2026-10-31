@@ -1,1 +1,3 @@
-kubernetes/
+---
+# Defaults shared by every inventory group.
+ssh_remote_user: root

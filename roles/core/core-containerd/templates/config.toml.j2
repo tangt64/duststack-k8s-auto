@@ -1,0 +1,9 @@
+version = 3
+[plugins.'io.containerd.cri.v1.runtime']
+  enable_selinux = {{ (k8s_selinux_state == 'enforcing') | lower }}
+  [plugins.'io.containerd.cri.v1.runtime'.containerd]
+    default_runtime_name = "runc"
+    [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc]
+      runtime_type = "io.containerd.runc.v2"
+      [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options]
+        SystemdCgroup = true

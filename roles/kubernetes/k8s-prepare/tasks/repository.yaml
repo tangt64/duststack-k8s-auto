@@ -1,26 +1,26 @@
 ---
-- name: repository kubernetes for YUM
-  template:
+- name: Configure signed Kubernetes minor release repository
+  ansible.builtin.template:
     src: kubernetes.repo.j2
     dest: /etc/yum.repos.d/kubernetes.repo
+    mode: '0644'
 
-- name: copy a containerd repository file
-  copy:
-    src: containerd.repo
-    dest: /etc/yum.repos.d/containerd.repo
-  when: k8s_runtime_environment == "containerd"
+- name: Configure signed CRI-O minor release repository
+  ansible.builtin.yum_repository:
+    name: cri-o
+    description: CRI-O stable v{{ k8s_repo_version }}
+    baseurl: https://download.opensuse.org/repositories/isv:/cri-o:/stable:/v{{ k8s_repo_version }}/rpm/
+    gpgkey: https://download.opensuse.org/repositories/isv:/cri-o:/stable:/v{{ k8s_repo_version }}/rpm/repodata/repomd.xml.key
+    gpgcheck: true
+    enabled: true
+  when: k8s_runtime_environment == 'crio'
 
-- name: enable repository for cri-o
-  copy:
-    src: cri-o.repo
-    dest: /etc/yum.repos.d/
-  when: k8s_runtime_environment == "crio"
-
-- name: register docker repository in yum.repos.d
-  yum_repository:
-    name: docker-ce
-    description: docker CE repository
-    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
-    gpgcheck: no
-    enabled: yes
-  when: k8s_runtime_environment == "containerd"    
+- name: Configure signed containerd package repository
+  ansible.builtin.yum_repository:
+    name: docker-ce-stable
+    description: Docker CE stable packages for containerd
+    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+    gpgkey: https://download.docker.com/linux/centos/gpg
+    gpgcheck: true
+    enabled: true
+  when: k8s_runtime_environment == 'containerd'

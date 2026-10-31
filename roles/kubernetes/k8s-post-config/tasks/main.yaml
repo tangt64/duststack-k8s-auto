@@ -1,10 +1,15 @@
-- name: label to kubernetes worker node role to master and compute node
-  shell: kubectl label node {{ nodename }} node-role.kubernetes.io/worker=worker --overwrite
-  delegate_to: "{{ groups['k8s_master'][0] }}"
-  ignore_errors: yes
+---
+- name: Label only worker nodes
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, label, node, "{{ hostvars[item]['nodename'] }}", node-role.kubernetes.io/worker=worker, --overwrite]
+  loop: "{{ groups.get('k8s_node', []) }}"
+  register: k8s_labels
+  changed_when: "'not labeled' not in k8s_labels.stdout"
+  when: not ansible_check_mode
 
-#- name: enabled to kubernetes metric service 
-#  copy:
-#    src: metrics.yaml
-#    dest: /tmp/metrics.yaml
-#- command: kubectl create -f /tmp/metrics.yaml  
+- name: Wait for every inventory node to be Ready
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, wait, --for=condition=Ready, "node/{{ hostvars[item]['nodename'] }}", --timeout=300s]
+  loop: "{{ groups['k8s_master'] + groups.get('k8s_node', []) }}"
+  changed_when: false
+  when: not ansible_check_mode

@@ -1,15 +1,25 @@
-- hosts: k8s_master:k8s_node
+---
+- name: Explicitly reset Kubernetes nodes
+  hosts: k8s_master:k8s_node
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Require explicit acknowledgement of data loss
+      ansible.builtin.assert:
+        that: k8s_confirm_reset | default(false) | bool
+        fail_msg: Reset deletes local cluster state. Supply -e k8s_confirm_reset=true only after backup and drain.
   tasks:
-  - name: uninstall kubernetes all nodes
-    command: kubeadm reset --force
-    ignore_errors: yes
+    - name: Reset kubeadm using the configured runtime
+      ansible.builtin.command:
+        argv: [kubeadm, reset, --force, --cri-socket, "{{ k8s_cri_socket }}"]
+      changed_when: true
 
-  - name: delete to old configuration and certification files
-    file:
-      state: absent
-      path: "{{ item }}"
-    loop:
-      - /etc/kubernetes/
-      - ~/.kube
-  - name: delete the cni.d configureation files
-    shell: rm -f /etc/cni/net.d/*
+    - name: Remove local Kubernetes credentials and CNI configuration
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/kubernetes
+        - /root/.kube/config
+        - /etc/cni/net.d
+    # kubeadm does not flush iptables/IPVS rules or remove runtime workloads.
+    # See README before reusing a host or changing its CNI.

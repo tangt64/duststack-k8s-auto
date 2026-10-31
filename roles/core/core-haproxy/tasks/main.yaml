@@ -1,20 +1,29 @@
-- name: install haproxy and keepalived
-  package:
-    name: "{{ item }}"
-    state: latest
-  loop:
-    - haproxy
+---
+- name: Install HAProxy
+  ansible.builtin.dnf:
+    name: haproxy
+    state: present
 
-- name: configuration to haproxy as loadbalance
-  template:
+- name: Validate and configure TCP API load balancing
+  ansible.builtin.template:
     src: haproxy.conf.j2
     dest: /etc/haproxy/haproxy.cfg
+    mode: '0644'
+    validate: /usr/sbin/haproxy -c -f %s
+  notify: Reload HAProxy
 
-- name: start and enable haproxy and keepalived service
-  service:
-    name: "{{ item }}"
+- name: Allow HAProxy connections under SELinux
+  ansible.posix.seboolean:
+    name: haproxy_connect_any
+    state: true
+    persistent: true
+  when: ansible_facts['selinux']['status'] == 'enabled'
+
+- name: Enable and start HAProxy
+  ansible.builtin.systemd_service:
+    name: haproxy
+    enabled: true
     state: started
-    enabled: yes
-  loop:
-    - haproxy
-- import_tasks: selinux.yaml
+
+- name: Apply API load balancer configuration before bootstrap
+  ansible.builtin.meta: flush_handlers

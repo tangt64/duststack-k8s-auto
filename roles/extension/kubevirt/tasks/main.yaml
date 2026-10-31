@@ -1,35 +1,11 @@
-- name: check to the compute node for virtualization
-  command: virt-host-validate qemu
-  register: result_vhv
-  ignore_errors: true
+---
+- name: Keep legacy KubeVirt resource deployment disabled
+  ansible.builtin.assert:
+    that: not (enabled_virtual | default(false) | bool)
+    fail_msg: This role now installs virtctl only. Validate the KubeVirt server version separately; see docs/TOOLS.md.
 
-- name: install to the kube-virt operator 
-  block:
-  - copy:
-      src: "{{ item }}"
-      dest: /tmp/{{ item }}
-    loop:
-      - kube-virt-operator.yaml
-      - kube-virt-cr.yaml
-
-  - k8s:
-      state: present
-      src: "{{ item }}"
-    loop:
-      - /tmp/kube-virt-operator.yaml
-  - ansible.builtin.pause:
-      minutes: 5
-
-  - k8s:
-      state: present
-      src: "{{ item }}"
-    loop:
-      - /tmp/kube-virt-cr.yaml
-  - ansible.builtin.pause:
-      minutes: 5
-
-- name: install to the virtctl command for VM
-  copy:
-    src: virtctl-v0.54.0
-    dest: /usr/local/virtctl
-    mode: 0700
+- name: Install virtctl from a verified external artifact
+  ansible.builtin.include_role:
+    name: common/cli-tool
+  vars:
+    cli_tool_name: virtctl

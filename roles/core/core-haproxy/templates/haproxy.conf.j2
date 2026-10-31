@@ -1,51 +1,23 @@
-# /etc/haproxy/haproxy.cfg
-#---------------------------------------------------------------------
-# Global settings
-#---------------------------------------------------------------------
 global
     log /dev/log local0
-    log /dev/log local1 notice
     daemon
+    maxconn 4096
 
-#---------------------------------------------------------------------
-# common defaults that all the 'listen' and 'backend' sections will
-# use if not designated in their block
-#---------------------------------------------------------------------
 defaults
-    mode                    http
-    log                     global
-    option                  httplog
-    option                  dontlognull
-    option http-server-close
-    option forwardfor       except 127.0.0.0/8
-    option                  redispatch
-    retries                 1
-    timeout http-request    10s
-    timeout queue           20s
-    timeout connect         5s
-    timeout client          20s
-    timeout server          20s
-    timeout http-keep-alive 10s
-    timeout check           10s
-
-#---------------------------------------------------------------------
-# apiserver frontend which proxys to the masters
-#---------------------------------------------------------------------
-frontend kubernetes
-    bind *:'{{ k8s_endpoint_port }}'
     mode tcp
+    log global
     option tcplog
-    default_backend kubernetes-master-nodes
+    timeout connect 5s
+    timeout client 1h
+    timeout server 1h
 
-#---------------------------------------------------------------------
-# round robin balancing for apiserver
-#---------------------------------------------------------------------
-backend kubernetes-master-nodes
-    option httpchk GET /healthz
-    http-check expect status 200
-    mode tcp
-    option ssl-hello-chk
-    balance     roundrobin
-    {% for host in groups['k8s_master'] %}
-       server {{ hostvars[host]['nodename']|default(host) }} {{ hostvars[host]['ansible_host']|default(host) }}:{{ k8s_endpoint_port }} check fall 3 rise 2
-    {% endfor %}
+frontend kubernetes
+    bind *:{{ k8s_endpoint_port }}
+    default_backend kubernetes-control-planes
+
+backend kubernetes-control-planes
+    balance roundrobin
+    option tcp-check
+{% for host in groups['k8s_master'] %}
+    server control{{ loop.index }} {{ hostvars[host]['k8s_ip4'].split('/')[0] }}:{{ k8s_endpoint_port }} check inter 3s fall 3 rise 2
+{% endfor %}

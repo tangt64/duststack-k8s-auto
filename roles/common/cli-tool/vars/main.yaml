@@ -1,0 +1,6 @@
+---
+_cli_spec: "{{ cli_tool_catalog[cli_tool_name] }}"
+_cli_checksum: "{{ _cli_spec.get('sha256', {}).get(cli_tool_arch, '') }}"
+_cli_relative_dir: "{{ cli_tool_name }}/{{ _cli_spec.version }}/linux-{{ cli_tool_arch }}"
+_cli_cache_path: "{{ cli_tool_cache_dir }}/{{ _cli_relative_dir }}/{{ _cli_spec.asset }}"
+_cli_manual_path: "{{ (cli_tool_local_dir if cli_tool_source == 'controller' else cli_tool_staging_dir) }}/{{ _cli_relative_dir }}/{{ _cli_spec.asset }}"

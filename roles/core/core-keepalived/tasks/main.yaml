@@ -1,19 +1,35 @@
-- name: install a keepalived
-  package:
-    name: "{{ item }}"
-    state: latest
-  loop:
-    - keepalived
+---
+- name: Install keepalived and health check utility
+  ansible.builtin.dnf:
+    name: [keepalived, curl]
+    state: present
 
-- name: configure to keepalived 
-  template:
+- name: Configure root-owned API health check
+  ansible.builtin.copy:
+    dest: /etc/keepalived/check-kube-apiserver.sh
+    owner: root
+    group: root
+    mode: '0700'
+    content: |
+      #!/bin/sh
+      exec /usr/bin/curl --fail --silent --max-time 2 --cacert /etc/kubernetes/pki/ca.crt https://{{ k8s_ip4.split('/')[0] }}:{{ k8s_endpoint_port }}/livez
+  notify: Reload keepalived
+
+- name: Configure virtual API address
+  ansible.builtin.template:
     src: keepalived.conf.j2
     dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: '0600'
+    validate: /usr/sbin/keepalived --config-test --use-file=%s
+  notify: Reload keepalived
 
-- name: start and enable keepalived service
-  service:
-    name: "{{ item }}"
+- name: Enable and start keepalived
+  ansible.builtin.systemd_service:
+    name: keepalived
+    enabled: true
     state: started
-    enabled: yes
-  loop:
-    - keepalived
+
+- name: Apply virtual IP configuration before bootstrap
+  ansible.builtin.meta: flush_handlers

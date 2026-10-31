@@ -1,17 +1,11 @@
-- name: copy the OCM clusteradm file
-  copy:
-    src: clusteradm
-    dest: /usr/local/bin/clusteradm
-- copy:
-    content: ""
-    dest: "{{ ocm_join_file }}"
-    force: yes
+---
+- name: Keep legacy OCM resource deployment disabled
+  ansible.builtin.assert:
+    that: not (ocm_hub | default(false) | bool)
+    fail_msg: This role now installs clusteradm only. Validate the OCM bundle and run clusteradm init separately; see docs/TOOLS.md.
 
-- name: deployment OCM hub node on {{ inventory_hostname }}
-  shell: clusteradm init --wait --image-registry={{ ocm_registry }} --bundle-version={{ ocm_version }} --output-join-command-file={{ ocm_join_file }}
-
-- name: replace to name of hub cluster
-  replace:
-    path: "{{ ocm_join_file }}"
-    regexp: '$1'
-    replace:  "{{ ocm_cluster_name }}"
+- name: Install clusteradm from a verified external artifact
+  ansible.builtin.include_role:
+    name: common/cli-tool
+  vars:
+    cli_tool_name: clusteradm

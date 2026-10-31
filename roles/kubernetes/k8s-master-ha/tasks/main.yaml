@@ -1,31 +1,10 @@
-- name: reset master nodes joins into the first master
-  block:
-    - name: get token
-      command: kubeadm token create --print-join-command
-      register: k8stoken
-      delegate_to: "{{ groups['k8s_master'] | first }}"
-      run_once: yes
+---
+- name: Join additional control plane
+  ansible.builtin.include_role:
+    name: kubernetes/k8s-join
+  vars:
+    k8s_join_control_plane: true
 
-    - name: upload TLS certifications
-      shell: kubeadm init phase upload-certs --upload-certs | tail -1
-      register: k8sTls
-      delegate_to: "{{ groups['k8s_master'] | first }}"
-      run_once: yes      
-
-    - name: join the rest of master nodes into first master node cluster
-      shell: "{{ k8stoken.stdout }} --control-plane --certificate-key {{ k8sTls.stdout }}"
-      register: master_reg_result
-
-    - pause:
-        seconds: 10
-        prompt: The master nodes successfully installed      
- 
-  rescue:
-    - name: reset master
-      command: kubeadm reset --force
-      
-    - debug:
-        msg: The master nodes has been reseted
-      failed_when: ( master_result.rc in [ 1,2 ] )
-
-# - import_tasks: kubelet.yaml
+- name: Configure control plane kubeconfig
+  ansible.builtin.include_tasks: "{{ role_path }}/../k8s-master-single/tasks/kubeconfig.yaml"
+  when: not ansible_check_mode

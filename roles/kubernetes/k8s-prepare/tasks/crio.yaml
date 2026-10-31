@@ -1,8 +1,4 @@
-- name: cri-o bridge network file
-  block:
-  - file:
-      path: /etc/cni/net.d/
-      state: directory
-  - template:
-      src: 100-crio-bridge.conf.j2
-      dest: /etc/cni/net.d/100-crio-bridge.conf
+---
+- name: Configure current CRI-O runtime
+  ansible.builtin.include_role:
+    name: core/core-crio

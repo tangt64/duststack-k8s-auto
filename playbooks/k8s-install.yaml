@@ -1,92 +1,70 @@
-- name: install and enable to cri-o,docker enviroment
-  hosts: 
-    - k8s_master
-    - k8s_node
-  tags: k8s-prepare
-  roles: 
-    - { role: os/os-prepare, tags: k8s-os }
-    - { role: os/os-network, tags: k8s-network } 
-    - { role: kubernetes/k8s-prepare }    
-    - { role: core/core-crio, when: k8s_runtime_environment == "crio" }
-    - { role: core/core-containerd, when: k8s_runtime_environment == "containerd" }
+---
+- name: Validate and prepare Kubernetes hosts
+  hosts: k8s_master:k8s_node
+  any_errors_fatal: true
+  tags: [k8s-prepare]
+  pre_tasks:
+    - name: Validate supported platform and installation settings
+      ansible.builtin.import_tasks: ../tasks/preflight.yaml
+      tags: [always]
+  roles:
+    - role: os/os-prepare
+    - role: kubernetes/k8s-prepare
+    - role: core/core-crio
+      when: k8s_runtime_environment == 'crio'
+    - role: core/core-containerd
+      when: k8s_runtime_environment == 'containerd'
 
-- name: haproxy install and setup
+- name: Configure API load balancer
   hosts: lb
-  tags: k8s-haproxy
-  roles:  
+  any_errors_fatal: true
+  tags: [k8s-haproxy]
+  roles:
     - role: core/core-haproxy
-      when: 
-        - k8s_proxy_mode_enable
-        - k8s_proxy_mode == "haproxy"
-      tags: multi }
+      when: k8s_proxy_mode_enable and k8s_proxy_mode == 'haproxy'
 
-- name: haproxy install and setup
+- name: Configure API virtual IP
   hosts: k8s_master
-  tags: k8s-keepalived
-  roles:  
+  any_errors_fatal: true
+  tags: [k8s-keepalived]
+  roles:
     - role: core/core-keepalived
-      when: 
-        - k8s_proxy_mode_enable
-        - k8s_proxy_mode == "keepalived"
-      tags: multi
+      when: k8s_proxy_mode_enable and k8s_proxy_mode == 'keepalived'
 
-- name: install kubernetes for the first master node
+- name: Bootstrap first control plane
   hosts: k8s_master[0]
-  tags: k8s-controller
+  any_errors_fatal: true
+  tags: [k8s-controller]
   roles:
-    - { role: kubernetes/k8s-master-single, tags: multi }
-    - { role: core/core-virt, when: enabled_virtual, tags: virt }
-    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
+    - role: kubernetes/k8s-master-single
 
-- name: install kubernetes master for the rest of master nodes
-  hosts: k8s_master[1:{{ MASTER_HOSTS_COUNT }}]
-  tags: k8s-controller-multi
+- name: Join remaining control planes one at a time
+  hosts: k8s_master:!k8s_master[0]
+  serial: 1
+  any_errors_fatal: true
+  tags: [k8s-controller-multi]
   roles:
-    - { role: kubernetes/k8s-master-ha, when: k8s_proxy_mode_enable, tags: multi }
-  vars:
-    MASTER_HOSTS_COUNT: "{{ groups['k8s_master'] | length }}"
+    - role: kubernetes/k8s-master-ha
 
-- name: install kubernetes nodes
+- name: Join worker nodes
   hosts: k8s_node
-  tags: k8s-node
-  roles:  
-    - { role: kubernetes/k8s-node }
-    - { role: core/core-virt-config, when: enabled_virtual, tags: virt  }
-    - { role: core/core-virt, when: enabled_virtual, tags: virt }
+  any_errors_fatal: true
+  tags: [k8s-node]
+  roles:
+    - role: kubernetes/k8s-node
 
-- name: install kubernetes network service
+- name: Install cluster network
   hosts: k8s_master[0]
-  tags: k8s-network
-  roles:  
-    - { role: cni/cni-calico, when: k8s_network == "calico" }
-    - { role: cni/cni-flanned, when: k8s_network == "flanned" }
-    # - { role: cni-multus, when: k8s_network == "multus" }
-    # - { role: cni-kubeovn, when: k8s_network == "kubeovn" }
-    # - { role: cni-kubeovn, when: k8s_network == "multius" }
-  run_once: yes
-
-- name: label to kubernetes worker nodes
-  hosts: k8s_master,k8s_node
-  tags: k8s-post
-  roles:  
-    - { role: kubernetes/k8s-post-config }
-#    - { role: extension/helm, when: enabled_helm, tags: helm }
-#    - { role: extension/ingress, when: enabled_ingress, tags: ingress }    
-#    - { role: extension/dashboard, when: enabled_dashboard, tags: dashboard }
-#    - { role: extension/kubevirt, when: enabled_virtual, tags: virt }
-#    - { role: cicd/tekton, when: enabled_cicd_tekton, tags: tekton }
-
-# - name: install and configure NFS storage 
-#  hosts: k8s_storage_nfs
-
-- name: install the OCM HUB
-  hosts: k8s_hub
-  tags: ocm-hub
+  any_errors_fatal: true
+  tags: [k8s-network]
   roles:
-    - { role: kubernetes/k8s-ocm/hub, when: ocm_hub }
+    - role: cni/cni-calico
+      when: k8s_network == 'calico'
+    - role: cni/cni-flanned
+      when: k8s_network in ['flannel', 'flanned']
 
-- name: install the OCM HUB
-  hosts: k8s_spoke
-  tags: ocm-spoke
+- name: Label workers and verify cluster readiness
+  hosts: k8s_master[0]
+  tags: [k8s-post]
   roles:
-    - { role: kubernetes/k8s-ocm/spoke, when: ocm_hub }  
+    - role: kubernetes/k8s-post-config

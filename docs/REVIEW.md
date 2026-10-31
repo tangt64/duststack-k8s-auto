@@ -1,0 +1,127 @@
+# 최신화 및 개선 검토
+
+검토 기준일: 2026-10-31. 범위는 설치 플레이북에서 실행되는 코드와 저장소의
+레거시 확장·외부 실행 파일 공급에 대한 정적 검토입니다. 운영 환경 침투 테스트나 전체 보안 감사 결과는 아닙니다.
+
+## 반영한 수정
+
+| 문제 | 변경 |
+| --- | --- |
+| Kubernetes 1.28, kubeadm v1beta3, 폐기된 감사 정책 API | 1.37.2 / v1beta4 / audit.k8s.io/v1 적용 |
+| group_vars/all이 경로 문자열이고 kubernetes 부모 그룹 부재 | 유효한 YAML과 부모 그룹 상속으로 수정 |
+| 기본 비밀번호·고정 bootstrap 토큰·인증서 키 | 기본 비밀번호 제거, 실행 시 join 정보 생성·no_log·0600·항상 정리 |
+| CRI-O가 매 실행마다 삭제되고 Kubernetes 패키지도 삭제 후 재설치 | 지정 버전 설치, 기존 클러스터/런타임 버전 변경 차단 |
+| containerd에서 command에 리다이렉션을 전달하고 실제 master는 CRI-O로 고정 | containerd 2.x config v3, systemd cgroup, 명시적 CRI socket |
+| 초기화 실패가 자동 reset으로 이어짐 | 자동 reset 제거, 재실행 시 기존 노드 확인, 별도 reset에 명시적 플래그 요구 |
+| API endpoint가 노드별 주소/VIP로 불일치 | 단일/HA 공통 endpoint, 내부 주소로 HAProxy 백엔드 구성 |
+| keepalived priority에 상태 문자열 사용, 서비스 상태 미확인 | 숫자 priority, 인증서를 검증하는 API 상태 검사 |
+| manifests 디렉터리가 0644여서 탐색 불가 | 디렉터리 0755, 비밀 파일 0600 |
+| firewall 전체 중단, 노드 대역 전체 허용, 자동 NOPASSWD sudo 설치 | 자동 정책 변경 제거, Calico 충돌은 사전 차단 |
+| 노드 전체에 worker 라벨, 실패 무시 | 실제 worker만 라벨, 노드별 Ready 대기, 실패 전파 |
+| NetworkManager가 Calico 인터페이스를 관리할 가능성 | Calico 가상 인터페이스만 unmanaged로 지정하고 설정 reload |
+| 오래된 Calico operator와 CRD 준비 경쟁 | 3.33.0 SHA-256 검증, CRD 먼저 적용·Established 대기 |
+| Flannel CIDR·NIC·이미지와 인벤토리 불일치 | 0.28.10 공식 매니페스트 기반 템플릿 |
+| 래퍼가 인자를 버리고 호출 디렉터리에 의존 | 엄격 모드, 경로 고정, 옵션 전달, LF 개행 |
+| 최신 Ansible의 사실 변수·조건식 변경 | facts 명시 접근, 실제 bool 조건, 2.21.5 검사와 회귀 테스트·CI 추가 |
+
+## 실행 파일 공급 정비
+
+소스에 포함되었던 `clusteradm` 2개와 `virtctl` 1개를 제거했습니다. 손상된 바이너리를
+되살리지 않고 버전·아키텍처·SHA-256이 고정된 공통 설치 역할로 교체했습니다.
+자동 HTTPS 다운로드, 컨트롤러 수동 배치, 대상 서버 수동 배치를 같은 검증 절차로
+처리합니다. 누락·빈 파일·체크섬 오류는 기존 실행 파일 교체 전에 거부합니다.
+
+OCM의 공유 `/tmp` join 파일 조회·실행과 중복 init 구현을 제거했습니다. OCM·KubeVirt
+기존 역할은 CLI만 공급하고 서버 리소스 배포는 차단합니다. Helm 역할도 원격 설치
+셸 스크립트와 Tiller RBAC 대신 같은 역할로 CLI만 설치합니다. 사용하지 않는 Helm
+다운로더를 제거하고 KubeVirt CLI 역할의 런타임 설치 의존성도 제거했습니다. 구체적 경로·절차는
+[TOOLS.md](TOOLS.md)에 있습니다. CLI 기본 버전은 clusteradm 1.4.0, virtctl 1.9.1,
+Helm 4.3.1이며, 서버 리소스 지원 버전과는 별도로 검증해야 합니다.
+
+소스 트리의 바이너리와 마크다운 로컬 링크 오류를 검사하는 스크립트와 CI 검사를
+추가했습니다. 로컬 CLI 통합 검증은 HTTPS·수동 배치·재실행·잘못된 파일 거부를
+임시 디렉터리에서 실행하며 운영 클러스터를 사용하지 않습니다. WSL 공유 드라이브의
+권한·rename 제약은 `CLI_TEST_TEMP_DIR=/tmp`로 Linux 파일시스템에서 검증합니다.
+
+## 우선 보강할 항목
+
+### 높음: 운영 업그레이드·복구와 통합 검증
+
+현재 변경은 신규 설치 경로를 최신화합니다. Kubernetes 1.28에서 1.37로 직접 이동하는
+업그레이드 자동화는 제공하지 않습니다. etcd 스냅샷과 복원 리허설, control plane부터
+하나씩 minor 업그레이드, drain/uncordon, PDB, 런타임·CNI 호환성 검증이 필요합니다.
+별도 Rocky 9/10 VM에서 단일/3-control-plane × CRI-O/containerd × Calico/Flannel
+설치, 같은 버전 재실행, 재부팅, DNS/Pod 통신, API VIP/LB failover를 검증하세요.
+현재 로컬 회귀 테스트 통과가 이 통합 검증을 대신하지는 않습니다.
+또한 기존 클러스터의 CNI 버전·Pod/Service CIDR·API endpoint 변경까지 자동으로
+마이그레이션하지 않습니다. 생성 시 구성 정보를 기록하고 재실행 시 불일치를 차단하는
+별도 검증을 추가할 필요가 있습니다.
+
+### 높음: API 로드밸런서의 단일 장애점
+
+현재 HAProxy 샘플은 LB 한 대입니다. control plane이 3대여도 LB 장애로 API 접속이
+끊길 수 있습니다. 이중 LB와 VIP 또는 외부 HA 로드밸런서를 구성하고 장애 전환,
+API 장시간 연결, DNS 변경을 검증해야 합니다. 현재 코드에 LB 이중화가 자동 포함된
+것으로 간주해서는 안 됩니다.
+
+### 높음: 레거시 자격 증명과 관리자 권한
+
+`roles/virtualizations/ovirt-builder/tasks/main.yaml`의 평문 초기 비밀번호,
+`roles/virtualizations/virt-k8s/files/*.ks`와 `roles/baremetal/virt-vms/files/*.ks`의
+기존 계정 설정, 배포용 공개 키를 실환경에서 재사용하지 마세요. Vault와 일회용 초기
+계정을 사용하고 기존에 배포된 자격 증명은 교체하세요.
+`roles/extension/dashboard/files/dashboard-rbac.yaml`과 Helm의 `rbac-config.yaml`은
+cluster-admin 권한을 포함합니다. 서비스 계정별 최소 권한과 짧은 수명의 토큰으로
+재설계하기 전에는 수동 적용하지 마세요. 이 파일들은 현재 설치 경로에서 제외됩니다.
+
+### 높음: 레거시 TLS·Metrics Server
+
+`roles/kubernetes/k8s-tls/tasks/kubeconfig.yaml`은 TLS 서버 검증을 끄고,
+`roles/extension/autoscale/templates/install-metric-server.yaml`과
+`roles/kubernetes/k8s-post-config/files/metrics.yaml`은 kubelet 인증서 검증을 생략합니다.
+레거시 수동 인증서 역할 대신 kubeadm PKI를 사용하고, kubelet serving CSR의 SAN과
+노드 신원을 검증한 뒤 승인하는 절차를 마련하세요. Metrics Server의 최신 버전과
+RBAC를 확인하고 신뢰 CA 기반 연결로 재구성해야 합니다. 현재 설치에는 포함되지 않습니다.
+
+### 높음: 워크로드·호스트 네트워크 정책
+
+기본 설치만으로 워크로드 격리가 완성되지는 않습니다. namespace별 default-deny와
+DNS·필수 서비스 허용 정책, API/etcd 관리 대역 제한을 적용하세요. Calico의
+HostEndpoint/GlobalNetworkPolicy는 SSH 잠금 사고를 막도록 테스트 후 적용해야 합니다.
+Flannel 단독으로는 Kubernetes NetworkPolicy를 강제하지 않으므로 해당 요구가 있으면
+Calico 등 정책 엔진을 사용하세요. 호스트 방화벽 정책은 자동 생성하지 않습니다.
+
+### 중간: 애드온 및 VM 프로비저닝 재구축
+
+남아 있는 KubeVirt 0.54 계열 매니페스트와 Helm v2/Tiller 참고 자료,
+구형 Dashboard/Ingress API, Rook/Ceph 매니페스트는 각각 버전·지원 매트릭스를
+확인하고 별도 역할로 교체해야 합니다. 최신 버전 번호만 치환해서 적용하면 안 됩니다.
+`inventory/group_vars/classroom/kubernetes`와 kickstart는 CentOS 7 기반이므로
+지원 중인 OS 이미지, HTTPS 저장소, cloud-init 등으로 바꾸고 VM 파괴 없이 검증하세요.
+프로비저닝·snapshot 스크립트는 최신 설치 경로와 별개인 레거시입니다.
+
+### 중간: 감사·비밀·공급망·운영 관측
+
+감사 로그는 현재 노드 로컬 Metadata 수준입니다. 중앙 전송, 보존 기간, 용량 경보를
+설계하세요. etcd Secrets 저장 암호화와 외부 KMS, 백업 암호화, 키 교체 절차도
+추가해야 합니다. Kubernetes 패키지와 런타임은 버전을 고정하고 저장소 GPG 검증을
+사용합니다. Calico 매니페스트와 CLI 릴리스 파일은 SHA-256을 고정합니다. 컨테이너 이미지 digest,
+공식 서명/출처 검증, 사내 미러 정책까지 추가하면 재현성과 공급망 통제가 강화됩니다.
+인벤토리의 Calico 버전과 체크섬, CLI catalog의 버전·파일명·URL·체크섬은 함께
+갱신해야 합니다. 해시는 내용 일치를 확인하며 게시자 신원 검증까지 제공하지는
+않습니다. 공식 서명·출처 검증과 검토된 사내 미러 승격 절차를 추가하세요.
+CLI 캐시 보존 기간·용량 제한과 이전 버전 롤백 절차도 운영 정책으로 마련해야 합니다.
+CI 액션도 추가로 commit SHA에 고정하고 Dependabot/Renovate와 릴리스별
+테스트 클러스터 검증을 연결하세요. API/etcd/노드 상태, 인증서 만료, 시간 동기화,
+백업 성공에 대한 관측과 경보가 필요합니다.
+
+## 검증 근거와 한계
+
+Ansible 2.21.5에서 설치/reset/도구 설치/KubeVirt 가드, 동적 join과 CLI 역할의
+문법을 검사합니다. 소스 바이너리 재유입과 마크다운 링크도 검사합니다.
+회귀 테스트는 실제 Ansible 템플릿 엔진으로 초기화·join 설정을 렌더링하고
+단일/HA·런타임·감사 옵션, CNI CIDR/NIC, 버전 보호 조건을 확인합니다.
+실제 kubeadm 1.37.2 바이너리가 있으면 config validate도 실행합니다.
+CLI 통합 테스트는 로컬 HTTPS 다운로드, 컨트롤러·대상 수동 배치, tar/raw 설치,
+최종 파일 재실행 시 불필요한 변경 방지, 누락·빈 파일·변조 입력 거부를 확인합니다.
+실제 원격 설치·서비스 재시작·네트워크 전환·기존 클러스터 업그레이드는 수행하지 않았습니다.

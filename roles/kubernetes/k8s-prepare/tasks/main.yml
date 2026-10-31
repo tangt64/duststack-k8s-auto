@@ -1,17 +1,9 @@
 ---
-- import_tasks: repository.yaml
-- import_tasks: hostname.yaml
-- import_tasks: firewalld.yaml
-- import_tasks: swapoff.yaml
-- import_tasks: kernel-mods.yaml
-- import_tasks: selinux.yaml
-- import_tasks: packages.yaml
-- import_tasks: kubelet.yaml 
-- import_tasks: kube-install-config.yaml
-
-- import_tasks: crio.yaml
-  when: k8s_runtime_environment == "crio"
-- import_tasks: containerd.yaml
-  when: k8s_runtime_environment == "containerd"
-- import_tasks: docker.yaml
-  when: k8s_runtime_environment == "docker"
+- ansible.builtin.import_tasks: repository.yaml
+- ansible.builtin.import_tasks: firewalld.yaml
+- ansible.builtin.import_tasks: networkmanager.yaml
+- ansible.builtin.import_tasks: swapoff.yaml
+- ansible.builtin.import_tasks: kernel-mods.yaml
+- ansible.builtin.import_tasks: selinux.yaml
+- ansible.builtin.import_tasks: packages.yaml
+- ansible.builtin.import_tasks: kubelet.yaml

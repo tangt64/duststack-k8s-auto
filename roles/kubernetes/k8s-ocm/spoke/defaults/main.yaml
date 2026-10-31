@@ -1,1 +1,3 @@
-ocm_join_command: "{{ lookup('file', '/tmp/ocm_manage.txt') }}"
+---
+# Never read or execute a shared /tmp file containing a join token.
+ocm_spoke: false

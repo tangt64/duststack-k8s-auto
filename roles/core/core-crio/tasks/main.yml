@@ -1,22 +1,30 @@
 ---
-# tasks file for crio
-- name: Gather the package facts
-  ansible.builtin.package_facts:
-    manager: auto
-
-- name: remove cri-o if installed
-  package:
-    name: cri-o
-    state: absent
-  when: "'cri-o' in ansible_facts.packages"
-
-- name: install to cri-o
-  package:
-    name: cri-o
+- name: Install pinned CRI-O without uninstalling the running runtime
+  ansible.builtin.dnf:
+    name: "cri-o-{{ crio_version }}"
     state: present
 
-- name: enable and start to cri-o .service
-  service:
+- name: Create CRI-O drop-in directory
+  ansible.builtin.file:
+    path: /etc/crio/crio.conf.d
+    state: directory
+    mode: '0755'
+
+- name: Configure CRI-O systemd cgroups and SELinux
+  ansible.builtin.copy:
+    dest: /etc/crio/crio.conf.d/20-kubernetes.conf
+    mode: '0644'
+    content: |
+      [crio.runtime]
+      cgroup_manager = "systemd"
+      enable_selinux = {{ (k8s_selinux_state == 'enforcing') | lower }}
+  notify: Restart CRI-O
+
+- name: Start and enable CRI-O
+  ansible.builtin.systemd_service:
     name: crio
     enabled: true
     state: started
+
+- name: Apply runtime configuration before kubeadm
+  ansible.builtin.meta: flush_handlers

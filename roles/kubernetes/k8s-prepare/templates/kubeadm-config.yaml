@@ -1,72 +1,71 @@
----
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: InitConfiguration
-bootstrapTokens:
-  - token: {{ kubeadm_bootstrap_token }}
-    description: "kubeadm bootstrap token"
-    ttl: "24h"
-  - token: {{ kubeadm_join_token }}
-    description: "another bootstrap token"
-    usages:
-    - authentication
-    - signing
-    groups:
-    - system:bootstrappers:kubeadm:default-node-token
-# nodeRegistration:
-#   name: "bootstrap"
-#   taints: []
-#   kubeletExtraArgs:
-#     service-node-port-range: 80-32767
-#   imagePullPolicy: "IfNotPresent"
 localAPIEndpoint:
-  advertiseAddress: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
-  bindPort: 6443
-certificateKey: {{ kubeadm_certificateKey }}
+  advertiseAddress: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
+  bindPort: {{ k8s_endpoint_port }}
+nodeRegistration:
+  name: "{{ nodename }}"
+  criSocket: "{{ k8s_cri_socket }}"
+  kubeletExtraArgs:
+    - name: node-ip
+      value: "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
 ---
-apiVersion: kubeadm.k8s.io/v1beta3
+apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
-kubernetesVersion: v{{ k8s_version }}
+kubernetesVersion: "v{{ k8s_version }}"
+clusterName: "{{ k8s_cluster_name }}"
+controlPlaneEndpoint: "{{ k8s_api_endpoint }}"
+certificatesDir: /etc/kubernetes/pki
+imageRepository: "{{ k8s_repo_image_addr }}"
 apiServer:
   certSANs:
-  - 127.0.0.1
-  - {{ ansible_facts[k8s_interface]['ipv4']['address'] }}
-  - {{ k8s_vip_address }}
-  # extraArgs:
-  #   authorization-mode: Node,RBAC
-  #   feature-gates: "TTLAfterFinished=true"
-  #   audit-policy-file: "/etc/kubernetes/audit-policy.yaml"
-  #   audit-log-path: "/etc/kubernetes/audit/kube-apiserver-audit.log"
-  #   audit-log-maxage: "2"
-  # extraVolumes:
-  # - name: "audit-policy"
-  #   hostPath: "/etc/kubernetes/audit-policy.yaml"
-  #   mountPath: "/etc/kubernetes/audit-policy.yaml"
-  #   readOnly: false
-  #   pathType: File
-  # - name: "audit-volume"
-  #   hostPath: "/var/log/kubernetes/audit"
-  #   mountPath: "/etc/kubernetes/audit"
-  #   readOnly: false
-  #   pathType: DirectoryOrCreate
-  timeoutForControlPlane: 4m0s
-certificatesDir: /etc/kubernetes/pki
-clusterName: {{ k8s_cluster_name }}
-controlPlaneEndpoint: {{ ansible_facts[k8s_interface]['ipv4']['address'] }}:{{ k8s_endpoint_port }}
-controllerManager: 
+    - "127.0.0.1"
+    - "{{ k8s_api_domain }}"
+    - "{{ ansible_facts[k8s_interface]['ipv4']['address'] }}"
+{% if k8s_proxy_mode_enable %}
+    - "{{ k8s_vip_address }}"
+{% endif %}
   extraArgs:
+    - name: service-node-port-range
+      value: "{{ k8s_svc_node_port_range }}"
+{% if k8s_audit_enabled %}
+    - name: audit-policy-file
+      value: /etc/kubernetes/audit-policy.yaml
+    - name: audit-log-path
+      value: /var/log/kubernetes/audit/kube-apiserver-audit.log
+    - name: audit-log-maxage
+      value: "7"
+    - name: audit-log-maxbackup
+      value: "10"
+    - name: audit-log-maxsize
+      value: "100"
+  extraVolumes:
+    - name: audit-policy
+      hostPath: /etc/kubernetes/audit-policy.yaml
+      mountPath: /etc/kubernetes/audit-policy.yaml
+      readOnly: true
+      pathType: File
+    - name: audit-log
+      hostPath: /var/log/kubernetes/audit
+      mountPath: /var/log/kubernetes/audit
+      pathType: DirectoryOrCreate
+{% endif %}
 etcd:
   local:
     dataDir: /var/lib/etcd
-imageRepository: {{ k8s_repo_image_addr }}
 networking:
-  dnsDomain: {{ k8s_cluster_domain }}
-  podSubnet: {{ k8s_pod_cidr }}
-  serviceSubnet: {{ k8s_cluster_svc_ip }}
-scheduler:
-  extraArgs:
+  dnsDomain: "{{ k8s_cluster_domain }}"
+  podSubnet: "{{ k8s_pod_cidr }}"
+  serviceSubnet: "{{ k8s_cluster_svc_ip }}"
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
+cgroupDriver: systemd
+rotateCertificates: true
+serverTLSBootstrap: true
+protectKernelDefaults: false
+seccompDefault: true
 ---
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
-kind: KubeProxyConfiguration  
+kind: KubeProxyConfiguration
+mode: iptables

@@ -1,0 +1,22 @@
+---
+# Parse dynamically included roles without executing them.
+- name: Parse shared join role
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  roles:
+    - role: kubernetes/k8s-join
+
+- name: Parse external CLI installers and compatibility entry points
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  roles:
+    - role: common/cli-tool
+    - role: kubernetes/k8s-ocm/hub
+    - role: kubernetes/k8s-ocm/spoke
+    - role: extension/kubevirt
+    - role: core/core-virt
+    - role: extension/helm

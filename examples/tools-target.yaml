@@ -1,0 +1,4 @@
+---
+cli_tools: [clusteradm, virtctl]
+cli_tool_source: target
+cli_tool_staging_dir: /var/cache/duststack/incoming

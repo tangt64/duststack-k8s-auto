@@ -3,5 +3,5 @@
   hosts: local_server
   serial: 1
   tags: classroom
-  roles:  
+  roles:
     - { role: virtualizations/virt-k8s }

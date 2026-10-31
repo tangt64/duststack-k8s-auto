@@ -1,0 +1,48 @@
+---
+- name: Inspect node membership
+  ansible.builtin.stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: k8s_node_membership
+
+- name: Join only nodes that are not already enrolled
+  when: not k8s_node_membership.stat.exists and not ansible_check_mode
+  block:
+    - name: Create a short-lived join command on the first control plane
+      ansible.builtin.command:
+        argv: [kubeadm, token, create, --print-join-command, --ttl, "{{ k8s_bootstrap_token_ttl }}"]
+      delegate_to: "{{ groups['k8s_master'][0] }}"
+      register: k8s_join_command
+      no_log: true
+
+    - name: Upload control plane certificates using a freshly generated key
+      ansible.builtin.command:
+        argv: [kubeadm, init, phase, upload-certs, --upload-certs]
+      delegate_to: "{{ groups['k8s_master'][0] }}"
+      register: k8s_upload_certs
+      when: k8s_join_control_plane
+      no_log: true
+
+    - name: Validate generated certificate key
+      ansible.builtin.assert:
+        that: k8s_upload_certs.stdout_lines | select('match', '^[0-9a-f]{64}$') | list | length == 1
+      when: k8s_join_control_plane
+      no_log: true
+
+    - name: Render private join configuration
+      ansible.builtin.template:
+        src: kubeadm-join.yaml.j2
+        dest: /etc/kubernetes/kubeadm-join.yaml
+        mode: '0600'
+      no_log: true
+      diff: false
+
+    - name: Join Kubernetes cluster
+      ansible.builtin.command:
+        argv: [kubeadm, join, --config, /etc/kubernetes/kubeadm-join.yaml]
+        creates: /etc/kubernetes/kubelet.conf
+      no_log: true
+  always:
+    - name: Remove join configuration containing credentials
+      ansible.builtin.file:
+        path: /etc/kubernetes/kubeadm-join.yaml
+        state: absent

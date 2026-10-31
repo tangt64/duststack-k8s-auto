@@ -1,23 +1,31 @@
-- name: disable selinux
-  selinux:
+---
+- name: Configure SELinux policy
+  ansible.posix.selinux:
     policy: targeted
-    state: permissive
-    
-- name: kubernetes auditor
-  file:
+    state: "{{ k8s_selinux_state }}"
+  register: k8s_selinux
+
+- name: Require reboot when SELinux mode cannot be applied live
+  ansible.builtin.assert:
+    that: not k8s_selinux.reboot_required
+    fail_msg: SELinux requires a reboot. Reboot and rerun installation.
+
+- name: Create Kubernetes directories with traversable permissions
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
+    owner: root
+    group: root
+    mode: '0755'
   loop:
-    - /etc/kubernetes/
+    - /etc/kubernetes
+    - /etc/kubernetes/manifests
     - /var/log/kubernetes/audit
 
-- name: copy the kubernetes auditor YAML
-  copy:
+- name: Install stable audit policy
+  ansible.builtin.copy:
     src: audit-policy.yaml
     dest: /etc/kubernetes/audit-policy.yaml
-
-- name: create a manifest directory into /etc/kubernetes/
-  file:
-    path: /etc/kubernetes/manifests
-    state: directory
-    mode: 0644    
+    owner: root
+    group: root
+    mode: '0600'
