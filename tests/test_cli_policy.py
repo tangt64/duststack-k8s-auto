@@ -1,4 +1,4 @@
-"""Regression checks for release locks and binary-free project sources."""
+"""Regression checks for release locks and narrowly scoped documentation images."""
 import copy
 import importlib.util
 from pathlib import Path
@@ -44,9 +44,26 @@ class CliPolicyTests(unittest.TestCase):
                 engine = templar(self.tool_variables(cli_tool_catalog=changed))
                 self.assertFalse(all(engine.evaluate_conditional(trust_as_template(x)) for x in assertions))
 
-    def test_source_tree_contains_no_binary_or_broken_markdown_links(self):
+    def test_source_tree_contains_no_unapproved_binary_or_broken_markdown_links(self):
         errors, _ = policy.check()
         self.assertEqual(errors, [])
+
+    def test_only_named_bounded_jpeg_frames_are_allowed_as_documentation(self):
+        # A small format fixture checks framing metadata; real captures are also reviewed visually.
+        frame = b'\xff\xd8\xff\xc0\x00\x0b\x08\x01\x90\x03\x20\x01\x01\x11\x00\xff\xd9'
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            screenshot = root / 'docs/screenshots/01-lab-vms.jpg'
+            screenshot.parent.mkdir(parents=True)
+            screenshot.write_bytes(frame)
+            self.assertEqual(policy.check(root)[0], [])
+            screenshot.write_bytes(b'\x7fELF\x00masquerading-as-a-screenshot')
+            self.assertIn('Invalid or oversized documentation screenshot', policy.check(root)[0][0])
+            screenshot.write_bytes(frame)
+            (root / 'unexpected.jpg').write_bytes(frame)
+            self.assertTrue(any('Binary payload' in item for item in policy.check(root)[0]))
+            self.assertFalse(policy.valid_documentation_jpeg(frame + b'\x00'))
+            self.assertFalse(policy.valid_documentation_jpeg(b'\xff\xd8\xff' + b'\x00' * (2 * 1024 * 1024) + b'\xff\xd9'))
 
     def test_policy_detects_binary_payload_and_empty_legacy_executable(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,4 +1,4 @@
-"""Reject binary payloads and broken local Markdown links in project sources."""
+"""Reject executable artifacts; allow only named, validated documentation screenshots."""
 from pathlib import Path
 import re
 import subprocess
@@ -11,6 +11,43 @@ REMOVED_EXECUTABLES = (
     'roles/kubernetes/k8s-ocm/hub/files/clusteradm',
     'roles/kubernetes/k8s-ocm/spoke/files/clusteradm',
 )
+APPROVED_SCREENSHOTS = {
+    'docs/screenshots/' + name for name in (
+        '01-lab-vms.jpg', '02-controller-ready.jpg', '03-source-validation.jpg',
+        '04-cilium-connectivity.jpg', '05-nfs-pvc-io.jpg', '06-rook-pvc-io.jpg',
+    )
+}
+
+
+def valid_documentation_jpeg(data):
+    """Check JPEG framing, bounded size and an actual frame-size marker."""
+    if not (data.startswith(b'\xff\xd8\xff') and data.endswith(b'\xff\xd9')) or len(data) > 2 * 1024 * 1024:
+        return False
+    position = 2
+    while position + 4 < len(data):
+        if data[position] != 0xff:
+            return False
+        while position < len(data) and data[position] == 0xff:
+            position += 1
+        if position >= len(data):
+            return False
+        marker = data[position]
+        position += 1
+        if marker in (0xda, 0xd9):
+            return False
+        if marker == 0x01 or 0xd0 <= marker <= 0xd7:
+            continue
+        length = int.from_bytes(data[position:position + 2], 'big')
+        if length < 2 or position + length > len(data):
+            return False
+        if marker in (0xc0, 0xc1, 0xc2):
+            if length < 8:
+                return False
+            height = int.from_bytes(data[position + 3:position + 5], 'big')
+            width = int.from_bytes(data[position + 5:position + 7], 'big')
+            return 100 <= width <= 4096 and 100 <= height <= 4096
+        position += length
+    return False
 
 
 def check(root=ROOT):
@@ -39,6 +76,11 @@ def check(root=ROOT):
             errors.append(f'Removed bundled executable is present: {name}')
     for path in files:
         data = path.read_bytes()
+        relative = path.relative_to(root).as_posix()
+        if relative in APPROVED_SCREENSHOTS:
+            if not valid_documentation_jpeg(data):
+                errors.append(f'Invalid or oversized documentation screenshot: {relative}')
+            continue
         try:
             if b'\0' in data:
                 raise ValueError('NUL byte')

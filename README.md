@@ -61,6 +61,9 @@ NFS 서버·export 또는 Rook 전용 빈 디스크와 3개 스토리지 worker�
 설정·수동 차트 공급·요구사항은 [CNI·CSI 안내](docs/CNI-CSI.md), 웹 콘솔 검증은
 [터미널랩 안내](docs/TERMINAL-LAB.md)를 참고하세요.
 
+[실제 화면을 포함한 단계별 사용 안내](docs/TERMINAL-LAB-WALKTHROUGH.md)에서
+랩 준비·명령 실행 방법과 예상 출력 예시를 확인할 수 있습니다.
+
 ## 준비
 
 ```bash
