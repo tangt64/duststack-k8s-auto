@@ -116,6 +116,12 @@ RBD의 `WaitForFirstConsumer`가 동작하도록 `nodeName` 대신 `nodeSelector
 전체 완료 판정에는 두 provider 모두 포함해야 합니다. `--cluster-domain`은 설치한
 DNS 도메인이 `cluster.local`과 다를 때 지정합니다.
 
+NFS 또는 Rook만 선택한 실행은 `LIVE_CLUSTER_VALIDATION=PARTIAL_PASS`와
+`status: partial_passed`로 기록합니다. JSON의 `requested_providers`,
+`completed_providers`, `scope`를 함께 확인하세요. 전체 CNI·두 CSI 검증의 성공 표시는
+`LIVE_CLUSTER_VALIDATION=PASS`입니다. Pod 준비와 볼륨 재연결 대기는 짧은 메타데이터
+조회와 요청 타임아웃을 분리해 이미지 다운로드·CSI attach 대기 시간을 확보합니다.
+
 결과는 `.tools/duststack-e2e-*.json`에 소스 커밋, 체크별 결과, PVC/PV와 노드,
 오류를 기록합니다. 실패 시 해당 namespace의 Pod/PVC/event 진단도 남깁니다.
 모든 검사를 통과한 경우에만 `LIVE_CLUSTER_VALIDATION=PASS`를 출력합니다.

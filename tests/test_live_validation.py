@@ -2,8 +2,10 @@
 import importlib.util
 import contextlib
 import io
+import json
 from pathlib import Path
 import subprocess
+import tempfile
 from unittest import mock
 import unittest
 
@@ -15,6 +17,37 @@ SPEC.loader.exec_module(LIVE)
 
 
 class LiveValidationTests(unittest.TestCase):
+    def test_partial_storage_run_is_never_reported_as_full_cluster_success(self):
+        nodes = [{'metadata': {'name': 'worker' + str(i)}, 'spec': {},
+                  'status': {'conditions': [{'type': 'Ready', 'status': 'True'}]}}
+                 for i in range(1, 4)]
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder) / 'result.json'
+            stdout = io.StringIO()
+            with mock.patch('sys.argv', ['test_live_cluster.py', '--confirm-test-workloads',
+                            '--providers', 'nfs', '--output', str(output)]), \
+                    mock.patch.object(LIVE, 'Cluster') as cluster_type, \
+                    mock.patch.object(LIVE, 'network_tests'), \
+                    mock.patch.object(LIVE, 'storage_tests'), contextlib.redirect_stdout(stdout):
+                cluster_type.return_value.read.side_effect = [
+                    {'items': nodes}, {'status': {'desiredNumberScheduled': 4, 'numberReady': 4}}]
+                LIVE.main()
+            result = json.loads(output.read_text(encoding='utf-8'))
+            self.assertEqual(result['status'], 'partial_passed')
+            self.assertEqual(result['requested_providers'], ['nfs'])
+            self.assertEqual(result['completed_providers'], ['nfs'])
+            self.assertIn('LIVE_CLUSTER_VALIDATION=PARTIAL_PASS', stdout.getvalue().splitlines())
+            self.assertNotIn('LIVE_CLUSTER_VALIDATION=PASS', stdout.getvalue().splitlines())
+
+    def test_pod_wait_is_not_cut_short_by_a_metadata_request_timeout(self):
+        with mock.patch.object(LIVE.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, '', '')) as run:
+            LIVE.Cluster('/unused', 'duststack-e2e-test').ready('reader')
+            command = run.call_args.args[0]
+            self.assertIn('--timeout=600s', command)
+            self.assertIn('--request-timeout=620s', command)
+            self.assertNotIn('--request-timeout=30s', command)
+            self.assertGreater(run.call_args.kwargs['timeout'], 620)
+
     def test_production_namespace_is_rejected_before_any_kubectl_call(self):
         with mock.patch('sys.argv', ['test_live_cluster.py', '--confirm-test-workloads', '--namespace', 'production']), \
                 mock.patch.object(LIVE.subprocess, 'run') as execute, contextlib.redirect_stderr(io.StringIO()):

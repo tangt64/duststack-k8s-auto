@@ -11,11 +11,11 @@ import uuid
 
 class Cluster:
     def __init__(self, kubeconfig, namespace):
-        self.base = ['kubectl', '--kubeconfig', kubeconfig, '--request-timeout=30s']
+        self.base = ['kubectl', '--kubeconfig', kubeconfig]
         self.namespace = namespace
 
-    def run(self, *args, namespace=None, body=None, required=True, timeout=90):
-        command = self.base + (['-n', namespace] if namespace else []) + list(args)
+    def run(self, *args, namespace=None, body=None, required=True, timeout=90, request_timeout=30):
+        command = self.base + ['--request-timeout=' + str(request_timeout) + 's'] + (['-n', namespace] if namespace else []) + list(args)
         result = subprocess.run(command, input=json.dumps(body) if body else None,
                                 capture_output=True, text=True, timeout=timeout)
         if required and result.returncode:
@@ -34,7 +34,7 @@ class Cluster:
 
     def ready(self, pod):
         self.run('wait', '--for=condition=Ready', 'pod/' + pod, '--timeout=600s',
-                 namespace=self.namespace, timeout=640)
+                 namespace=self.namespace, timeout=640, request_timeout=620)
 
 
 def eventually(check, description, seconds=120):
@@ -163,7 +163,7 @@ def storage_tests(cluster, workers, image, storage_class, provider, record):
         if cluster.execute(writer, 'cat /data/reader-ack') != 'shared-write':
             raise RuntimeError('NFS cross-node shared write was not visible')
         record('nfs-rwx-cross-node-read-write', {'nodes': workers[:2]})
-    cluster.run('delete', 'pod', writer, '--wait=true', '--timeout=120s', namespace=ns, timeout=150)
+    cluster.run('delete', 'pod', writer, '--wait=true', '--timeout=120s', namespace=ns, timeout=150, request_timeout=140)
     reattach = provider + '-reattach'
     target = workers[2] if provider == 'nfs' else workers[1]
     cluster.create(pod(ns, reattach, target, image, claim=claim))
@@ -194,7 +194,10 @@ def main():
         parser.error('Use a fresh duststack-e2e-* namespace')
     cluster = Cluster(args.kubeconfig, args.namespace)
     report = {'status': 'running', 'namespace': args.namespace,
-              'started_at': datetime.now(timezone.utc).isoformat(), 'checks': []}
+              'started_at': datetime.now(timezone.utc).isoformat(), 'checks': [],
+              'requested_providers': list(dict.fromkeys(args.providers)),
+              'completed_providers': [],
+              'scope': 'full' if set(args.providers) == {'nfs', 'rook'} else 'partial'}
     source = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=Path(__file__).resolve().parents[1],
                             capture_output=True, text=True)
     report['source_commit'] = source.stdout.strip() if source.returncode == 0 else 'unknown'
@@ -225,6 +228,7 @@ def main():
         network_tests(cluster, workers, args.image, record, args.cluster_domain)
         if 'nfs' in args.providers:
             storage_tests(cluster, workers, args.image, args.nfs_class, 'nfs', record)
+            report['completed_providers'].append('nfs')
         if 'rook' in args.providers:
             def ceph_healthy():
                 ceph = cluster.read('cephcluster', args.rook_namespace, namespace=args.rook_namespace)
@@ -235,8 +239,13 @@ def main():
                 raise RuntimeError('Ceph block pool must have three replicas')
             record('ceph-health-and-replication', {'ceph_health': 'HEALTH_OK', 'replicas': 3})
             storage_tests(cluster, workers, args.image, args.rook_class, 'rook', record)
-        report['status'] = 'passed'
-        print('LIVE_CLUSTER_VALIDATION=PASS', flush=True)
+            report['completed_providers'].append('rook')
+        if report['scope'] == 'full':
+            report['status'] = 'passed'
+            print('LIVE_CLUSTER_VALIDATION=PASS', flush=True)
+        else:
+            report['status'] = 'partial_passed'
+            print('LIVE_CLUSTER_VALIDATION=PARTIAL_PASS', flush=True)
     except Exception as error:
         report['status'] = 'failed'
         report['error'] = str(error)
