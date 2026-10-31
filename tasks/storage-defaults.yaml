@@ -1,0 +1,7 @@
+---
+- name: Fill missing addon defaults for externally located inventories
+  ansible.builtin.set_fact:
+    "{{ item.key }}": "{{ item.value }}"
+  loop: "{{ lookup('file', playbook_dir + '/../inventory/group_vars/kubernetes/addons') | from_yaml | dict2items }}"
+  when: query('ansible.builtin.varnames', '^' ~ (item.key | regex_escape) ~ '$') | length == 0
+  no_log: true

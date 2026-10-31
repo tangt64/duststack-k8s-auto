@@ -1,4 +1,7 @@
 ---
+- name: Preserve inventory overrides while loading newly added defaults
+  ansible.builtin.import_tasks: storage-defaults.yaml
+
 - name: Validate storage configuration before changing hosts
   ansible.builtin.assert:
     that:

@@ -1,4 +1,7 @@
 ---
+- name: Load missing addon defaults without replacing CPU profile overrides
+  ansible.builtin.import_tasks: storage-defaults.yaml
+
 - name: Inspect glibc supported CPU levels before installing Ceph CSI
   ansible.builtin.command:
     argv: [/lib64/ld-linux-x86-64.so.2, --help]

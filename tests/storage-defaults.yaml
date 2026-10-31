@@ -1,0 +1,21 @@
+---
+- name: Verify new defaults work with external generated inventories
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    rook_csi_version: v3.16.3
+    rook_csi_legacy_lab: true
+    rook_allow_csi_image_change: true
+    nfs_server: inventory.example
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/storage-defaults.yaml
+    - name: Require newly loaded digests while preserving explicit inventory choices
+      ansible.builtin.assert:
+        that:
+          - rook_csi_image_digests['v3.16.3'] | length == 64
+          - rook_csi_version == 'v3.16.3'
+          - rook_csi_legacy_lab
+          - rook_allow_csi_image_change
+          - nfs_server == 'inventory.example'
+          - rook_namespace == 'rook-ceph'

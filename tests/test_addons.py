@@ -111,7 +111,7 @@ class AddonTests(unittest.TestCase):
                     self.assertNotIn('*', rule['resources'])
 
     def test_rook_csi_cpu_guard_and_official_compatibility_image(self):
-        task = read_yaml('tasks/rook-csi-cpu.yaml')[1]
+        task = next(x for x in read_yaml('tasks/rook-csi-cpu.yaml') if 'ansible.builtin.assert' in x)
         expression = task['ansible.builtin.assert']['that'][0]
         for legacy, flags, accepted in [(False, 'x86-64-v2 (supported, searched)', False),
                                         (True, 'x86-64-v2 (supported, searched)', True),
@@ -125,7 +125,7 @@ class AddonTests(unittest.TestCase):
             self.assertEqual(rendered['csi']['cephcsi']['tag'], version + '@sha256:' + values['rook_csi_image_digests'][version])
 
     def test_storage_guards_reject_missing_backends_and_conflicting_defaults(self):
-        expressions = read_yaml('tasks/storage-settings.yaml')[0]['ansible.builtin.assert']['that']
+        expressions = next(x['ansible.builtin.assert']['that'] for x in read_yaml('tasks/storage-settings.yaml') if 'ansible.builtin.assert' in x)
         def valid(**options):
             engine = templar(variables(**options))
             return all(engine.evaluate_conditional(trust_as_template(x)) for x in expressions)
@@ -150,7 +150,7 @@ class AddonTests(unittest.TestCase):
             self.assertEqual(engine.evaluate_conditional(trust_as_template(guard['ansible.builtin.assert']['that'][0])), accepted)
 
     def test_rook_rejects_kubernetes_beyond_official_csi_tested_range(self):
-        expressions = read_yaml('tasks/storage-settings.yaml')[0]['ansible.builtin.assert']['that']
+        expressions = next(x['ansible.builtin.assert']['that'] for x in read_yaml('tasks/storage-settings.yaml') if 'ansible.builtin.assert' in x)
         for version, accepted in [('1.36.6', True), ('1.37.2', False)]:
             values = self.ceph_variables()
             values.update(k8s_version=version, k8s_csi_providers=['rook'], rook_confirm_devices=True)

@@ -18,6 +18,7 @@ ansible-playbook playbooks/terminal-lab-time.yaml --syntax-check
 ansible-playbook tests/roles.yaml --syntax-check
 ansible-playbook -i localhost, tests/cli-tools.yaml --syntax-check
 python -m unittest discover -s tests -v
+ansible-playbook -i localhost, tests/storage-defaults.yaml
 if [[ "${RUN_CLI_INTEGRATION:-0}" == "1" ]]; then
   python tests/run_cli_integration.py
 fi
