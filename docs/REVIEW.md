@@ -157,3 +157,27 @@ NFS 서버 HA·quota·백업, CephFS/RWX·snapshot·암호화/KMS, Ceph 업그�
 용량/health 경보도 운영 절차가 필요합니다. Terminal Lab의 노드 선택·사양/디스크 확인과
 인벤토리 생성기를 연결하면 주소와 장치 입력 실수를 줄일 수 있습니다. 현재 포털 자체를
 변경한 것은 아니며 다중 control-plane 생성기와 단계별 진단·resume는 후속 과제입니다.
+
+
+### 2026-11-01 실제 검증 결과
+
+검증 대상: `06d1233f1d56667db5a6f3880b92c4f599ab07c0`
+(Cilium과 NFS·Rook CSI 선택 설치 및 간편 설정 추가).
+
+| 환경 | 결과 |
+| --- | --- |
+| 로컬 Rocky 9 WSL / Ansible 2.21.5 | 소스·링크·Ansible 문법, 회귀 25개 전부 통과. 실제 kubeadm 1.37.2 스키마 포함 |
+| 로컬 CLI·차트 | HTTPS/수동 배치·재실행·오류 거부 통합 검증 통과. 공식 Cilium 25/NFS 9/Rook 88개 리소스 lint·렌더링 통과 |
+| GitHub Actions | [해당 커밋 실행](https://github.com/tangt64/duststack-k8s-auto/actions/runs/41213609443) success. 회귀 24개 통과·kubeadm 스키마 1개 생략, CLI 통합·3개 차트 통과 |
+| Terminal Lab 웹 콘솔 | RHEL 9 계열, 커널 5.14.0-611.11.1.el9_7, Python 3.12.14, 약 4 GiB. 회귀 24개 통과·스키마 1개 생략, CLI 통합·3개 차트 통과. `TERMINAL_LAB_VALIDATION=PASS`, 종료 코드 0 |
+
+터미널랩에서는 검증 전용 홈 디렉터리와 Python 가상환경을 사용했습니다. Python 3.12와
+pip은 공식 OS 저장소로 준비했습니다. kubeadm 바이너리가 없는 랩·CI에서는 해당 스키마
+검사만 생략했고 로컬에서 별도 통과했습니다. 랩의 결과 파일은
+`.tools/terminal-lab-validation.json`, 실행 로그는 `.tools/terminal-lab-check.log`입니다.
+
+이번 터미널랩 검증은 신규 Kubernetes/Cilium/CSI 설치나 PVC mount·입출력을 수행하지
+않았습니다. 현재 교육용 랩을 교체하지 않았으며 약 4 GiB 노드는 Rook의 최소 8 GiB
+조건에도 미달합니다. 실제 배포의 완료 조건은 [터미널랩 단계 2·3](TERMINAL-LAB.md)에
+명시했습니다. CNI 정책·Pod 통신·Ceph health·장애 복구·스토리지 I/O는 전용 신규 랩에서
+추가 검증해야 합니다.
