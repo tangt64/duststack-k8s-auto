@@ -141,6 +141,12 @@ Node Ready인데 `logs/exec`가 `tls: internal error`로 실패한다면
 `playbooks/k8s-serving-certs.yaml`로 인벤토리에 맞는 kubelet 서버 CSR를 검토합니다.
 서버 인증서 bootstrap을 끄거나 임의의 CSR를 일괄 승인하지 않습니다.
 
+Ceph가 `MON_CLOCK_SKEW`를 보고하면 모든 노드의 시간 동기화를 확인합니다. 확인한 새
+전용 랩에서는 `playbooks/terminal-lab-time.yaml`로 누락된 chrony를 준비할 수 있습니다.
+이 플레이북은 `terminal_lab_confirm_dedicated: true`가 필요하며 기존 NTP source를
+교체하거나 `makestep`을 직접 실행하지 않습니다. chronyd의 기존 초기 보정 정책은
+서비스 시작 시 동작할 수 있으므로 운영 클러스터에 실습용 플레이북을 적용하지 마세요.
+
 ## 6. 실제 Cilium 통신과 두 CSI 입출력
 
 admin.conf를 사용할 수 있는 control plane에서 실행합니다.
@@ -172,6 +178,12 @@ LIVE_CLUSTER_VALIDATION=PASS
 
 `--providers nfs`처럼 일부 CSI만 실행하면 `PARTIAL_PASS`/`partial_passed`로 기록합니다.
 전체 완료 판정은 NFS와 Rook을 모두 검증한 실행의 JSON과 실제 결과로 확인하세요.
+
+구형 커널의 CephX 클라이언트 호환성 경고만 남았음을 확인한 경우에는
+`--allow-ceph-legacy-client-key-warnings`를 추가할 수 있습니다. 기본 검증은 엄격한
+`HEALTH_OK`를 유지합니다. 명시적으로 호환성을 선택한 결과는 경고 목록과 실제 건강
+상태를 보존하며 `PASS_WITH_WARNINGS`로 구분합니다. 시계·디스크·복제 오류를 허용하는
+옵션은 아닙니다. [CephX 호환성](CNI-CSI.md#cephx와-구형-커널-호환성)을 먼저 확인하세요.
 
 ### 실제 선행 결과: Cilium·NFS
 

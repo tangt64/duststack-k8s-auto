@@ -126,6 +126,23 @@ ansible-playbook -i inventory/local-live/hosts.yaml playbooks/k8s-storage-hosts.
 Rook operator 차트에 포함된 Ceph CSI operator도 설치합니다. CephFS/RWX, RGW,
 외부 Ceph, snapshot, 암호화·KMS는 후속 확장 항목입니다.
 
+### CephX와 구형 커널 호환성
+
+Ceph 20.2.4의 새 AES256K 키는 커널 RBD/CephFS 클라이언트에서 Linux 7.0+ 또는
+해당 기능을 backport한 커널이 필요합니다. 버전 숫자만으로 RHEL 계열의 backport를
+추정하지 마세요. Rook은 새 클러스터의 핵심 daemon·서비스 티켓을 AES256K로
+설정하면서 구형 클라이언트용 AES 호환성을 남길 수 있습니다. 따라서 `Ready`와
+`HEALTH_OK`는 서로 다른 조건이며 키 호환성 경고가 남을 수 있습니다.
+기존 CSI 키를 임의로 회전하거나 허용 cipher를 일괄 제한하면 mount가 끊길 수 있습니다.
+[공식 키·커널 호환성 안내](https://rook.io/docs/rook/latest-release/Storage-Configuration/Advanced/cephx-key-rotation/)
+
+실증 실행기는 기본적으로 `HEALTH_OK`를 요구합니다. 위 호환성을 확인한 전용 랩에서는
+`--allow-ceph-legacy-client-key-warnings`를 명시할 수 있습니다. 이때에도 MGR/OSD의
+AES256K 키 메타데이터와 MON의 AES256K 서비스 티켓을 검증하며, 시계 차이·OSD·PG·
+서비스 키 오류나 알 수 없는 경고는 통과시키지 않습니다. 허용한 경고는 JSON에 그대로
+기록하고 전체 성공 표시도 `PASS_WITH_WARNINGS`/`passed_with_warnings`로 구분합니다.
+Ceph의 경고 자체를 mute하지 않습니다.
+
 ## 기본 StorageClass와 데이터 정책
 
 NFS와 Rook을 함께 선택할 수 있지만 `k8s_default_storage_class`에는 하나만 지정합니다.

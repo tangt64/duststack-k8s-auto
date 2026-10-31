@@ -1,0 +1,20 @@
+---
+- name: Prepare chrony only for fresh hosts or an explicitly acknowledged dedicated lab
+  when: not (k8s_existing_node.stat.exists | default(false)) or (k8s_allow_time_bootstrap | default(false) | bool)
+  block:
+    - name: Install the distribution time synchronization daemon
+      ansible.builtin.dnf:
+        name: chrony
+        state: present
+
+    - name: Start chronyd with the existing distribution or administrator source configuration
+      ansible.builtin.systemd_service:
+        name: chronyd
+        enabled: true
+        state: started
+
+- name: Require synchronization with less than ten milliseconds of remaining correction
+  ansible.builtin.command:
+    argv: [chronyc, waitsync, '60', '0.01', '0', '1']
+  changed_when: false
+  when: not ansible_check_mode

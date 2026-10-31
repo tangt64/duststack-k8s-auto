@@ -89,6 +89,35 @@ def require_ready_workers(nodes):
     return sorted(x['metadata']['name'] for x in workers)[:3]
 
 
+LEGACY_CLIENT_KEY_WARNINGS = {
+    'AUTH_INSECURE_KEYS_ALLOWED', 'AUTH_INSECURE_KEYS_CREATABLE', 'AUTH_INSECURE_CLIENT_KEY_TYPE',
+}
+
+
+def ceph_health_result(ceph, allow_legacy_client_warnings=False):
+    status = ceph.get('status', {})
+    if status.get('phase') != 'Ready':
+        return None
+    health = status.get('ceph', {}).get('health')
+    details = status.get('ceph', {}).get('details', {})
+    if health == 'HEALTH_OK' and not details:
+        return {'health': health, 'warnings': {}}
+    if (allow_legacy_client_warnings and health == 'HEALTH_WARN' and details
+            and set(details) <= LEGACY_CLIENT_KEY_WARNINGS
+            and all(value.get('severity') == 'HEALTH_WARN' for value in details.values())
+            and all(status.get('cephx', {}).get(daemon, {}).get('keyType') == 'aes256k'
+                    for daemon in ['mgr', 'osd'])):
+        return {'health': health, 'warnings': details}
+    return None
+
+
+def require_secure_service_cipher(mon_status):
+    cipher = mon_status.get('monmap', {}).get('auth_service_cipher', {}).get('name')
+    if cipher != 'aes256k':
+        raise RuntimeError('Legacy client compatibility requires verified AES256K Ceph service tickets')
+    return cipher
+
+
 def network_tests(cluster, workers, image, record, cluster_domain='cluster.local'):
     ns = cluster.namespace
     token = uuid.uuid4().hex
@@ -185,6 +214,8 @@ def main():
     parser.add_argument('--rook-namespace', default='rook-ceph')
     parser.add_argument('--cluster-domain', default='cluster.local')
     parser.add_argument('--providers', nargs='+', choices=['nfs', 'rook'], default=['nfs', 'rook'])
+    parser.add_argument('--allow-ceph-legacy-client-key-warnings', action='store_true',
+                        help='Acknowledge only documented legacy-client warnings; require AES256K service tickets and report warnings')
     parser.add_argument('--confirm-test-workloads', action='store_true')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
@@ -197,6 +228,8 @@ def main():
               'started_at': datetime.now(timezone.utc).isoformat(), 'checks': [],
               'requested_providers': list(dict.fromkeys(args.providers)),
               'completed_providers': [],
+              'warnings': {},
+              'ceph_legacy_client_key_warnings_allowed': args.allow_ceph_legacy_client_key_warnings,
               'scope': 'full' if set(args.providers) == {'nfs', 'rook'} else 'partial'}
     source = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=Path(__file__).resolve().parents[1],
                             capture_output=True, text=True)
@@ -232,20 +265,26 @@ def main():
         if 'rook' in args.providers:
             def ceph_healthy():
                 ceph = cluster.read('cephcluster', args.rook_namespace, namespace=args.rook_namespace)
-                return ceph.get('status', {}).get('phase') == 'Ready' and ceph['status'].get('ceph', {}).get('health') == 'HEALTH_OK'
-            eventually(ceph_healthy, 'CephCluster Ready and HEALTH_OK', seconds=300)
+                return ceph_health_result(ceph, args.allow_ceph_legacy_client_key_warnings)
+            health = eventually(ceph_healthy, 'CephCluster Ready and acceptable explicitly selected health policy', seconds=300)
+            if health['warnings']:
+                mon = cluster.run('exec', 'deployment/rook-ceph-mon-a', '--', 'ceph', '--admin-daemon',
+                                  '/run/ceph/ceph-mon.a.asok', 'mon_status', namespace=args.rook_namespace)
+                report['ceph_auth_service_cipher'] = require_secure_service_cipher(json.loads(mon.stdout))
+                report['warnings'] = health['warnings']
             pool = cluster.read('cephblockpool', 'replicated-pool', namespace=args.rook_namespace)
             if pool['spec']['replicated']['size'] != 3:
                 raise RuntimeError('Ceph block pool must have three replicas')
-            record('ceph-health-and-replication', {'ceph_health': 'HEALTH_OK', 'replicas': 3})
+            record('ceph-health-and-replication', {'ceph_health': health['health'], 'replicas': 3,
+                                                'compatibility_warnings': sorted(health['warnings'])})
             storage_tests(cluster, workers, args.image, args.rook_class, 'rook', record)
             report['completed_providers'].append('rook')
         if report['scope'] == 'full':
-            report['status'] = 'passed'
-            print('LIVE_CLUSTER_VALIDATION=PASS', flush=True)
+            report['status'] = 'passed_with_warnings' if report['warnings'] else 'passed'
+            print('LIVE_CLUSTER_VALIDATION=' + ('PASS_WITH_WARNINGS' if report['warnings'] else 'PASS'), flush=True)
         else:
-            report['status'] = 'partial_passed'
-            print('LIVE_CLUSTER_VALIDATION=PARTIAL_PASS', flush=True)
+            report['status'] = 'partial_passed_with_warnings' if report['warnings'] else 'partial_passed'
+            print('LIVE_CLUSTER_VALIDATION=' + ('PARTIAL_PASS_WITH_WARNINGS' if report['warnings'] else 'PARTIAL_PASS'), flush=True)
     except Exception as error:
         report['status'] = 'failed'
         report['error'] = str(error)

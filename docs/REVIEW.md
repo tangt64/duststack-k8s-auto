@@ -251,3 +251,12 @@ Rook 실증에서는 `chown-container-data-dir` 초기화가 `container_var_lib_
 쓰기·세 번째 worker 재연결 I/O가 통과했습니다. `partial_passed`, 완료 provider는
 `[nfs]`이며 Rook 실증을 포함하지 않습니다. 실제 화면은
 [사용 안내](TERMINAL-LAB-WALKTHROUGH.md)에 있습니다.
+
+Ceph Ready 이후 시간 동기화 누락과 구형 커널용 키 호환성 경고를 확인했습니다.
+새 호스트에는 chrony 준비와 동기화 확인을 추가하고, 기존 클러스터는 NTP 설정을
+자동 변경하지 않습니다. live 검증의 기본 `HEALTH_OK` 조건은 유지합니다. 명시적으로
+선택한 CephX 클라이언트 호환성은 핵심 키·서비스 티켓을 검증한 뒤 경고를 JSON에
+보존하고 `PASS_WITH_WARNINGS`로만 구분합니다. 시계 차이·OSD·PG·서비스 키 오류는
+이 호환성 모드에서도 실패합니다. 경고를 숨겨 건강 상태를 바꾸지 않습니다.
+이 변경은 로컬 필수 검사와 회귀 41개를 통과했습니다. 구형 클라이언트 경고를
+명시적으로 허용해도 무조건적인 전체 PASS로 표시하지 않는 회귀를 포함합니다.

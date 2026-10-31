@@ -19,6 +19,11 @@ bash setup-k8s.sh install -i inventory/local-lab/hosts.yaml
 `configure`는 인벤토리만 생성하며 서버 접속·랩 생성·설치는 수행하지 않습니다.
 SSH 사용자·키와 sudo 권한은 사전에 준비하세요.
 
+새 호스트에는 OS 저장소의 chrony를 준비하고 기존 OS/관리자 NTP 설정으로 동기화를
+확인합니다. 클러스터 생성 전에 남은 시간 보정량이 10 ms 미만인지 검사합니다.
+기존 클러스터에서는 동기화 상태를 검사하며 NTP source를 덮어쓰거나 강제로 시간을
+step하지 않습니다. NTP가 없거나 접속할 수 없다면 관리자 정책에 맞춰 먼저 준비하세요.
+
 ## 명령으로 재현 가능한 설정 생성
 
 ```bash

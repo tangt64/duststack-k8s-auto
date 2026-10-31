@@ -1,4 +1,7 @@
 ---
+- name: Prepare synchronized clocks before Kubernetes and Ceph bootstrap
+  ansible.builtin.import_tasks: ntp.yaml
+
 - name: Set inventory hostname
   ansible.builtin.hostname:
     name: "{{ nodename }}"

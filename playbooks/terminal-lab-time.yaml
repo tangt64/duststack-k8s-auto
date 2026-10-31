@@ -1,0 +1,12 @@
+---
+- name: Repair clock bootstrap only in an explicitly acknowledged dedicated lab
+  hosts: k8s_master:k8s_node
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Require the dedicated lab acknowledgement before starting clock bootstrap
+      ansible.builtin.assert:
+        that: terminal_lab_confirm_dedicated | default(false) | bool
+  tasks:
+    - ansible.builtin.import_tasks: ../roles/os/os-prepare/tasks/ntp.yaml
+      vars:
+        k8s_allow_time_bootstrap: true

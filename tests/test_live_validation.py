@@ -17,6 +17,52 @@ SPEC.loader.exec_module(LIVE)
 
 
 class LiveValidationTests(unittest.TestCase):
+    def test_compatibility_mode_does_not_accept_clock_storage_or_security_errors(self):
+        import copy
+        value = {'status': {'phase': 'Ready', 'ceph': {'health': 'HEALTH_WARN', 'details': {
+            'AUTH_INSECURE_KEYS_ALLOWED': {'severity': 'HEALTH_WARN', 'message': 'legacy clients'}}},
+            'cephx': {'mgr': {'keyType': 'aes256k'}, 'osd': {'keyType': 'aes256k'}}}}
+        self.assertIsNone(LIVE.ceph_health_result(value))
+        self.assertEqual(LIVE.ceph_health_result(value, True)['health'], 'HEALTH_WARN')
+        for warning in ['MON_CLOCK_SKEW', 'OSD_DOWN', 'PG_DEGRADED', 'AUTH_INSECURE_SERVICE_KEY_TYPE', 'UNKNOWN']:
+            changed = copy.deepcopy(value)
+            changed['status']['ceph']['details'][warning] = {'severity': 'HEALTH_WARN'}
+            with self.subTest(warning=warning):
+                self.assertIsNone(LIVE.ceph_health_result(changed, True))
+        changed = copy.deepcopy(value)
+        changed['status']['cephx']['osd']['keyType'] = 'aes'
+        self.assertIsNone(LIVE.ceph_health_result(changed, True))
+        for cipher in ['aes', None]:
+            with self.assertRaises(RuntimeError):
+                LIVE.require_secure_service_cipher({'monmap': {'auth_service_cipher': {'name': cipher}}})
+
+    def test_full_run_with_acknowledged_warnings_never_reports_unqualified_pass(self):
+        nodes = [{'metadata': {'name': 'worker' + str(i)}, 'spec': {},
+                  'status': {'conditions': [{'type': 'Ready', 'status': 'True'}]}} for i in range(1, 4)]
+        ceph = {'status': {'phase': 'Ready', 'ceph': {'health': 'HEALTH_WARN', 'details': {
+            'AUTH_INSECURE_KEYS_ALLOWED': {'severity': 'HEALTH_WARN', 'message': 'legacy clients'}}},
+            'cephx': {'mgr': {'keyType': 'aes256k'}, 'osd': {'keyType': 'aes256k'}}}}
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder) / 'result.json'
+            stdout = io.StringIO()
+            with mock.patch('sys.argv', ['test_live_cluster.py', '--confirm-test-workloads',
+                            '--allow-ceph-legacy-client-key-warnings', '--output', str(output)]), \
+                    mock.patch.object(LIVE, 'Cluster') as cluster_type, \
+                    mock.patch.object(LIVE, 'network_tests'), mock.patch.object(LIVE, 'storage_tests'), \
+                    contextlib.redirect_stdout(stdout):
+                cluster_type.return_value.read.side_effect = [
+                    {'items': nodes}, {'status': {'desiredNumberScheduled': 4, 'numberReady': 4}},
+                    ceph, {'spec': {'replicated': {'size': 3}}}]
+                cluster_type.return_value.run.return_value.stdout = json.dumps({
+                    'monmap': {'auth_service_cipher': {'name': 'aes256k'}}})
+                LIVE.main()
+            result = json.loads(output.read_text())
+            self.assertEqual(result['status'], 'passed_with_warnings')
+            self.assertEqual(result['completed_providers'], ['nfs', 'rook'])
+            self.assertIn('AUTH_INSECURE_KEYS_ALLOWED', result['warnings'])
+            self.assertIn('LIVE_CLUSTER_VALIDATION=PASS_WITH_WARNINGS', stdout.getvalue().splitlines())
+            self.assertNotIn('LIVE_CLUSTER_VALIDATION=PASS', stdout.getvalue().splitlines())
+
     def test_partial_storage_run_is_never_reported_as_full_cluster_success(self):
         nodes = [{'metadata': {'name': 'worker' + str(i)}, 'spec': {},
                   'status': {'conditions': [{'type': 'Ready', 'status': 'True'}]}}
