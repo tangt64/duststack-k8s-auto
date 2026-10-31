@@ -1,0 +1,74 @@
+---
+- name: Prepare the NFS backend on explicitly dedicated test hosts
+  hosts: k8s_lab_nfs
+  any_errors_fatal: true
+  vars:
+    _lab_nfs_root: "{{ terminal_lab_nfs_root | default('/srv/duststack-e2e') }}"
+  pre_tasks:
+    - name: Require a dedicated test host and explicit lab export
+      ansible.builtin.assert:
+        that:
+          - terminal_lab_confirm_dedicated | default(false) | bool
+          - ansible_facts['os_family'] == 'RedHat'
+          - _lab_nfs_root is match('^/srv/duststack-e2e[-a-z0-9]*$')
+          - nfs_share == _lab_nfs_root
+          - groups.get('k8s_node', []) | length >= 3
+        fail_msg: This fixture is only for a dedicated disposable lab, not an existing NFS server.
+
+    - name: Inspect export root before using it
+      ansible.builtin.stat:
+        path: "{{ _lab_nfs_root }}"
+      register: lab_nfs_root
+
+    - name: Inspect lab ownership marker
+      ansible.builtin.stat:
+        path: "{{ _lab_nfs_root }}/.duststack-lab-owned"
+      register: lab_nfs_marker
+
+    - name: Refuse an unrelated existing directory
+      ansible.builtin.assert:
+        that:
+          - not lab_nfs_root.stat.islnk | default(false)
+          - not lab_nfs_root.stat.exists or lab_nfs_root.stat.isdir | default(false)
+          - not lab_nfs_root.stat.exists or lab_nfs_marker.stat.isreg | default(false)
+  tasks:
+    - name: Install official NFS server utilities
+      ansible.builtin.dnf:
+        name: nfs-utils
+        state: present
+
+    - name: Create the isolated lab export root
+      ansible.builtin.file:
+        path: "{{ _lab_nfs_root }}"
+        state: directory
+        mode: '0777'
+
+    - name: Mark the directory as owned by this lab fixture
+      ansible.builtin.copy:
+        dest: "{{ _lab_nfs_root }}/.duststack-lab-owned"
+        content: "Dedicated duststack live-validation NFS data. Retain until reviewed.\n"
+        mode: '0644'
+
+    - name: Export only to the cluster node addresses with root squash
+      ansible.builtin.copy:
+        dest: /etc/exports.d/duststack-e2e.exports
+        content: |
+          # Dedicated duststack lab export; never use for production data.
+          {{ _lab_nfs_root }} {% for host in groups['k8s_master'] | union(groups['k8s_node']) %}{{ hostvars[host]['k8s_ip4'].split('/')[0] }}(rw,sync,root_squash,anonuid=1000,anongid=1000,no_subtree_check) {% endfor %}
+        mode: '0644'
+      register: lab_nfs_exports
+
+    - name: Start the dedicated lab NFS server
+      ansible.builtin.systemd_service:
+        name: nfs-server
+        state: started
+        enabled: true
+
+    - name: Apply the reviewed export list
+      ansible.builtin.command: exportfs -ra
+      when: lab_nfs_exports.changed
+      changed_when: true
+
+    - name: Display the actual exported client restrictions
+      ansible.builtin.command: exportfs -v
+      changed_when: false

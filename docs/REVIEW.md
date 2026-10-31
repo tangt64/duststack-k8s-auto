@@ -181,3 +181,14 @@ pip은 공식 OS 저장소로 준비했습니다. kubeadm 바이너리가 없는
 조건에도 미달합니다. 실제 배포의 완료 조건은 [터미널랩 단계 2·3](TERMINAL-LAB.md)에
 명시했습니다. CNI 정책·Pod 통신·Ceph health·장애 복구·스토리지 I/O는 전용 신규 랩에서
 추가 검증해야 합니다.
+
+
+### 전용 랩 실증 준비
+
+`playbooks/terminal-lab-nfs.yaml`로 새 실습용 NFS backend를 준비하고,
+`scripts/test_live_cluster.py`로 Cilium의 서로 다른 노드 간 통신·서비스/DNS·정책과
+NFS/RBD PVC의 실제 체크섬·교차 노드 쓰기·재연결을 검증할 수 있게 했습니다.
+기존 namespace 재사용을 거부하고 테스트 데이터는 자동 삭제하지 않습니다.
+API/exec 실패를 정책 차단 성공으로 간주하지 않으며 RBD WFFC PVC는 스케줄러를
+거치도록 구성합니다. 준비 코드의 로컬 검증과 실제 클러스터의 실행 결과는 별개입니다.
+실제 수행 결과가 나오기 전에는 CNI 통신이나 PVC I/O 통과로 기록하지 않습니다.

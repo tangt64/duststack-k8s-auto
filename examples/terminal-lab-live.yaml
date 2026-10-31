@@ -1,0 +1,11 @@
+---
+# Merge into a private inventory for a NEW dedicated lab only.
+# Add the NFS host to k8s_lab_nfs and three workers to k8s_storage_ceph.
+# Set the server address and verify every rook_devices entry before acknowledging.
+k8s_csi_providers: [nfs, rook]
+k8s_default_storage_class: nfs-csi
+nfs_server: ''
+nfs_share: /srv/duststack-e2e
+terminal_lab_nfs_root: /srv/duststack-e2e
+terminal_lab_confirm_dedicated: false
+rook_confirm_devices: false
