@@ -237,3 +237,11 @@ success입니다. 이 결과는 실제 Kubernetes 배포·Cilium 통신·PVC I/O
 Pending serving CSR를 처리하는 단계가 빠져 있었습니다. 후처리에 인벤토리 IP·노드명,
 요청자·그룹, 실제 CSR 서명·주체·SAN·용도 검증을 추가하고 별도 갱신 플레이북도
 제공합니다. 상시 승인 권한을 만들거나 TLS bootstrap을 해제하지 않습니다.
+
+Rook 실증에서는 `chown-container-data-dir` 초기화가 `container_var_lib_t` 경로의
+`setattr` AVC로 실패했습니다. SELinux Enforcing을 유지하며 전용 Rook 디렉터리에만
+영구 컨테이너 데이터 라벨을 적용하는 준비 작업을 추가했습니다. symlink·상위 경로를
+거부하고 파일시스템 경계를 넘지 않습니다. MON의 privileged 실행은 추가하지 않으며
+디스크 hotplug 자동 orchestration도 명시적으로 해제합니다.
+이 변경은 로컬 필수 검사·회귀 39개와 Cilium/NFS/Rook 공식 차트의 실제 렌더링을
+통과했습니다. 호스트 적용 후의 Ceph Ready·PVC I/O 결과는 별도로 확인합니다.

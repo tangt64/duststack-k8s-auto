@@ -39,10 +39,8 @@
       check_mode: false
       when: not hostvars[groups['k8s_master'][0]].rook_existing_cluster
 
-    - name: Install Ceph host prerequisites
-      ansible.builtin.dnf:
-        name: [lvm2]
-        state: present
+    - name: Prepare dedicated Ceph host data and SELinux labels
+      ansible.builtin.import_tasks: ../tasks/rook-host-path.yaml
 
 - name: Prepare NFS clients on Kubernetes nodes
   hosts: k8s_master:k8s_node

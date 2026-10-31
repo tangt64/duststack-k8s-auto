@@ -1,0 +1,10 @@
+---
+- name: Prepare dedicated Ceph host directories without changing disks or cluster resources
+  hosts: k8s_storage_ceph
+  any_errors_fatal: true
+  pre_tasks:
+    - ansible.builtin.meta: end_play
+      when: "'rook' not in k8s_csi_providers"
+    - ansible.builtin.import_tasks: ../tasks/storage-settings.yaml
+  tasks:
+    - ansible.builtin.import_tasks: ../tasks/rook-host-path.yaml

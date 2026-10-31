@@ -12,6 +12,7 @@
       - "'nfs' not in k8s_csi_providers or nfs_server | length > 0"
       - "'nfs' not in k8s_csi_providers or nfs_share is match('^/[^\n]*$')"
       - "'rook' not in k8s_csi_providers or rook_confirm_devices"
+      - "'rook' not in k8s_csi_providers or rook_data_dir is match('^/var/lib/rook(?:-[A-Za-z0-9_-]+)?$')"
       - "'rook' not in k8s_csi_providers or groups.get('k8s_storage_ceph', []) | length >= 3"
       - "'rook' not in k8s_csi_providers or groups.get('k8s_storage_ceph', []) | difference(groups.get('k8s_node', [])) | length == 0"
       - rook_replicas | int == 3

@@ -103,6 +103,24 @@ confirmation은 비워 두며 CephCluster나 PV를 자동 삭제하지 않습니
 기존 CephCluster의 디스크·Ceph 이미지·data directory가 다르면 재구성을 차단합니다.
 이미 사용 중인 정상 Ceph 디스크에는 신규 빈 디스크 검사를 다시 적용하지 않습니다.
 
+SELinux Enforcing 환경에서는 Ceph hostPath의 데이터 라벨도 준비합니다. 관리 경로는
+`/var/lib/rook` 또는 `/var/lib/rook-NAME` 형태의 전용 디렉터리로 제한하며 symlink와
+상위 디렉터리·경로 이탈을 거부합니다. 해당 경로에만 영구 `container_file_t:s0` 규칙을
+등록하고 다른 파일시스템을 넘지 않도록 `restorecon -x`로 적용합니다. 기존에 다른
+경로를 쓰는 클러스터는 자동 이동하지 않으며 별도 검토가 필요합니다.
+MON을 추가 privileged 모드로 올리지 않고 `hostpathRequiresPrivileged: false`를
+유지합니다. OSD에는 원래 필요한 장치 접근 권한이 별도로 사용됩니다.
+장치 hotplug에 따른 자동 orchestration도 끄고 명시한 디스크만 사용합니다.
+
+MON의 `chown-container-data-dir` 초기화가 AVC로 실패한 기존 설치에서는 다음 명령으로
+같은 경로 라벨 준비만 다시 실행할 수 있습니다. 디스크 포맷·데이터 정리는 수행하지 않습니다.
+
+```bash
+ansible-playbook -i inventory/local-live/hosts.yaml playbooks/k8s-storage-hosts.yaml
+```
+
+[컨테이너 SELinux 파일 유형](https://github.com/containers/container-selinux/blob/main/container_selinux.8)
+
 `rook-ceph-block`은 `Retain`, `WaitForFirstConsumer`를 사용합니다. PVC만 생성하면
 소비 Pod가 생길 때까지 Pending일 수 있으므로 PVC와 테스트 Pod를 함께 생성하세요.
 Rook operator 차트에 포함된 Ceph CSI operator도 설치합니다. CephFS/RWX, RGW,

@@ -1,0 +1,12 @@
+---
+- name: Install Ceph and SELinux host prerequisites
+  ansible.builtin.dnf:
+    name: [lvm2, container-selinux, policycoreutils-python-utils]
+    state: present
+
+- name: Prepare the dedicated Rook host path with persistent container data labels
+  ansible.builtin.command:
+    argv: ["{{ ansible_facts['python']['executable'] }}", -c, "{{ lookup('file', playbook_dir + '/../scripts/prepare_rook_host_path.py') }}", "{{ rook_data_dir }}"]
+  register: rook_host_path_result
+  changed_when: (rook_host_path_result.stdout | from_json)['changed']
+  when: not ansible_check_mode
