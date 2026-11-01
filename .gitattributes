@@ -4,3 +4,5 @@
 *.yml text eol=lf
 *.j2 text eol=lf
 docs/screenshots/*.jpg binary
+docs/validation/*.json text eol=lf
+docs/validation/*.txt text eol=lf

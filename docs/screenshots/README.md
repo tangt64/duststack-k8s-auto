@@ -13,6 +13,8 @@
 | 05-nfs-pvc-io.jpg | 2026-11-01 | bdc2c83의 실제 NFS RWX·4 MiB 체크섬·교차 노드 재연결 입출력 통과. Rook은 이 부분 실행에 미포함 |
 | 06-rook-pvc-io.jpg | 2026-11-01 | dc49538의 실제 전체 12개 검사 PASS_WITH_WARNINGS. RBD 4 MiB 체크섬·worker2 재연결 입출력, CSI AES 2세대, MGR/OSD·서비스 티켓 AES256K 유지, 재부팅 전 NFS 데이터 보존 확인 |
 | 07-gitea-actions.jpg | 2026-11-01 | 6791495의 Gitea Actions 실행 2 재실행 성공. 공식 runner 5.2.0·rootless Podman에서 실제 API/CLI/차트 검증. VM의 HA 실증과 구분 |
+| 08-ha-vip-failover.jpg | 2026-11-01 | 실제 HA 결과 파일과 촬영 시점 API·노드 상태. VIP 이동 10.01초, probe 21회 중 7회 실패 후 복구, HAProxy 복원, 노드 5대 Ready |
+| 09-kam-live-cluster.jpg | 2026-11-01 | 실제 KAM 결과와 촬영 시점 controller 2개 분산 배치. 리더 인수 90.37초, CR 삭제·만료 회수, 남은 Grant 없음과 회수된 subject의 can-i=no |
 
 이전 RBD 실패 화면은 [당시 커밋](https://github.com/tangt64/duststack-k8s-auto/blob/dc49538c95b74142796ed1b4942c2a83cb0ca658/docs/screenshots/06-rook-pvc-io.jpg)에
 남아 있습니다. 현재 06번 사진은 승인한 키 호환 변경 후 실제 통과 화면입니다.

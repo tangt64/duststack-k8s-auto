@@ -6,13 +6,13 @@ spec:
   calicoNetwork:
     bgp: Disabled
     nodeAddressAutodetectionV4:
+{% if calico_use_node_internal_ip | default(false) | bool %}
+      kubernetes: NodeInternalIP
+{% else %}
       interface: "{{ k8s_interface }}"
+{% endif %}
     ipPools:
-      - blockSize: 26
-        cidr: "{{ k8s_pod_cidr }}"
-        encapsulation: VXLAN
-        natOutgoing: Enabled
-        nodeSelector: all()
+{{ [(calico_preserved_pool | default({})) | combine({'blockSize': 26, 'cidr': k8s_pod_cidr, 'encapsulation': 'VXLAN', 'natOutgoing': 'Enabled', 'nodeSelector': 'all()'})] | to_nice_yaml(indent=2) | indent(6, true) }}
 ---
 apiVersion: operator.tigera.io/v1
 kind: APIServer

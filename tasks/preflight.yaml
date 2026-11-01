@@ -39,6 +39,15 @@
       load balancer for HA. Legacy host network rewrites and add-ons are not
       supported by this installer. See README.md and docs/REVIEW.md.
 
+- name: Require explicit Calico node IP selection for different NIC names
+  ansible.builtin.assert:
+    that:
+      - calico_use_node_internal_ip | default(false) | bool or calico_private_nics | unique | length <= 1
+    fail_msg: Calico cannot use one interface name across different private NICs. For a new cluster, verify kubelet InternalIPs and set calico_use_node_internal_ip=true. Review an existing cluster address-policy change separately.
+  vars:
+    calico_private_nics: "{{ (groups['k8s_master'] + groups.get('k8s_node', [])) | map('extract', hostvars) | map(attribute='k8s_interface', default=k8s_interface) | list }}"
+  when: k8s_network == 'calico'
+
 - name: Validate storage inputs before preparing Kubernetes hosts
   ansible.builtin.import_tasks: storage-settings.yaml
 

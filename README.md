@@ -201,7 +201,10 @@ CI에서도 소스·문법·회귀·CLI 통합 검증과 공식 차트 SHA-256·
 2026-11-01 전용 VM 4대에서는 Cilium 통신·NetworkPolicy, NFS RWX와 RBD의 교차 노드
 재연결 입출력까지 12개 검사를 통과했습니다. 구형 CPU용 CSI와 AES 클라이언트 키의
 호환성 경고를 보존한 `PASS_WITH_WARNINGS` 결과입니다.
-[실제 화면과 원문 결과](docs/validation/README.md)를 확인하세요. HA failover·백업 복구와
+[실제 화면과 원문 결과](docs/validation/README.md)를 확인하세요.
+별도 VM 7대에서는 [HA·KAM 실증](docs/HA-KAM-LIVE.md)을 완료했습니다.
+VIP 이동 10.01초(API probe 7회 실패 후 복구), KAM 두 worker 배치와 리더 인수,
+CR 삭제·만료에 따른 권한 회수를 확인했습니다. VM 전원 장애·etcd quorum·백업 복구와
 표준 최신 CSI 조합의 실증은 별도로 필요합니다.
 
 ## 공식 참고

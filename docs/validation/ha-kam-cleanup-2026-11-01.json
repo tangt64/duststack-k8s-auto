@@ -1,0 +1,56 @@
+{
+  "finished_at": "2026-11-01T09:32:12.093429+00:00",
+  "temporary_ssh_key_hosts": {
+    "cp02": {
+      "removed": 1,
+      "remaining": 0
+    },
+    "lb02": {
+      "removed": 1,
+      "remaining": 0
+    },
+    "cp03": {
+      "removed": 1,
+      "remaining": 0
+    },
+    "worker01": {
+      "removed": 1,
+      "remaining": 0
+    },
+    "lb01": {
+      "removed": 1,
+      "remaining": 0
+    },
+    "worker02": {
+      "removed": 1,
+      "remaining": 0
+    }
+  },
+  "temporary_ssh_key_remaining": 0,
+  "controller_temporary_key_files_removed": true,
+  "bootstrap_tokens_revoked": 8,
+  "encrypted_upload_secret_removed": true,
+  "test_grants_remaining": 0,
+  "api_readyz": "ok",
+  "control_plane_readiness": [
+    {
+      "ip": "172.30.62.128",
+      "tls_verified": true,
+      "http_status": 200,
+      "readyz": "ok"
+    },
+    {
+      "ip": "172.30.62.158",
+      "tls_verified": true,
+      "http_status": 200,
+      "readyz": "ok"
+    },
+    {
+      "ip": "172.30.62.170",
+      "tls_verified": true,
+      "http_status": 200,
+      "readyz": "ok"
+    }
+  ],
+  "readiness_checked_at": "2026-11-01T09:33:38.670915+00:00"
+}

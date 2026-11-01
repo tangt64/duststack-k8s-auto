@@ -1,0 +1,47 @@
+[
+  {
+    "name": "ha-cp01.lab.dustbox.kr",
+    "calico_ipv4": [
+      "172.30.62.128"
+    ],
+    "internal_ip": [
+      "172.30.62.128"
+    ]
+  },
+  {
+    "name": "ha-cp02.lab.dustbox.kr",
+    "calico_ipv4": [
+      "172.30.62.158"
+    ],
+    "internal_ip": [
+      "172.30.62.158"
+    ]
+  },
+  {
+    "name": "ha-cp03.lab.dustbox.kr",
+    "calico_ipv4": [
+      "172.30.62.170"
+    ],
+    "internal_ip": [
+      "172.30.62.170"
+    ]
+  },
+  {
+    "name": "ha-worker01.lab.dustbox.kr",
+    "calico_ipv4": [
+      "172.30.62.108"
+    ],
+    "internal_ip": [
+      "172.30.62.108"
+    ]
+  },
+  {
+    "name": "ha-worker02.lab.dustbox.kr",
+    "calico_ipv4": [
+      "172.30.62.86"
+    ],
+    "internal_ip": [
+      "172.30.62.86"
+    ]
+  }
+]

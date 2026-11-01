@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 import stat
+import sys
 import subprocess
 import tempfile
 from types import SimpleNamespace
@@ -237,6 +238,25 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(data['all']['vars']['crio_version'], '1.36.7')
         self.assertFalse(data['all']['vars']['k8s_proxy_mode_enable'])
         self.assertIn('worker1', data['all']['children']['kubernetes']['children']['k8s_node']['hosts'])
+
+    def test_generated_options_survive_adjacent_group_defaults(self):
+        # Resolve through Ansible, including the on-disk parent group_vars;
+        # checking the generated dictionary alone misses precedence bugs.
+        with tempfile.TemporaryDirectory(dir=ROOT / '.tools') as folder:
+            directory = Path(folder)
+            group_vars = directory / 'group_vars' / 'kubernetes'
+            group_vars.mkdir(parents=True)
+            (group_vars / 'defaults.yaml').write_text(yaml.safe_dump({
+                'k8s_network': 'calico', 'k8s_version': '1.37.2',
+                'k8s_proxy_mode_enable': True, 'k8s_interface': 'wrong0'}))
+            inventory = directory / 'hosts.yaml'
+            inventory.write_text(yaml.safe_dump(self_inventory := configure.build_inventory(self.arguments(cni='cilium'))))
+            for host in ['cp1', 'worker1']:
+                result = subprocess.run([sys.executable, '-m', 'ansible.cli.inventory',
+                    '-i', str(inventory), '--host', host], text=True, capture_output=True, check=True)
+                actual = json.loads(result.stdout)
+                for key in ['k8s_network', 'k8s_version', 'k8s_proxy_mode_enable', 'k8s_interface']:
+                    self.assertEqual(actual[key], self_inventory['all']['vars'][key], (host, key))
 
     def test_invalid_or_missing_backend_configuration_is_rejected(self):
         for options in [{'worker': []}, {'worker': ['cp1=192.0.2.11@10.10.10.11/24']},

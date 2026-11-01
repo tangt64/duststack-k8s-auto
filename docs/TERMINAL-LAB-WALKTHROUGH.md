@@ -254,3 +254,20 @@ PVC 데이터 확인에는 기존 claim을 새 읽기 전용 비루트 Pod에 �
 테스트 namespace·PVC·데이터는 자동 삭제하지 않습니다. Retain 데이터의 소유자와
 보존 필요성을 확인한 뒤 이번 랩에서 만든 자원만 정리하세요. VM 중지나 볼륨 분리만으로
 디스크 보관 요금이 없어지지는 않습니다. 승인한 시간·비용 한도 전에 종료 상태를 확인합니다.
+
+## 8. 별도 HA·KAM 랩의 실제 화면
+
+2026-11-01 후속 VM 7대에서는 control plane 3대·worker 2대와 이중 LB 설치를
+완료했습니다. 아래 화면은 실제 테스트 원문과 촬영 시점의 API·Pod 상태입니다.
+앞 절의 Cilium·NFS·RBD 랩과 분리된 실행입니다.
+
+![HA VIP 실제 결과와 노드 상태](screenshots/08-ha-vip-failover.jpg)
+
+VIP는 HAProxy 중지 후 10.01초에 이동했습니다. API probe 21회 중 7회 실패 후
+복구됐습니다. VM 전원 장애나 무손실 watch 재연결까지 검증한 결과는 아닙니다.
+
+![KAM 실제 배치와 권한 회수](screenshots/09-kam-live-cluster.jpg)
+
+KAM 두 Pod의 분산 배치, 리더 인수 90.37초, namespace 경계·권한 상승 거부,
+CR 삭제와 만료에 따른 회수, 실제 `kubectl kam` 동작을 확인했습니다.
+[명령·원문·수정한 실패·운영 제한](HA-KAM-LIVE.md)을 참고하세요.

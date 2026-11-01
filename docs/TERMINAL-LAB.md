@@ -157,3 +157,11 @@ CSI 3.16.3/Kubernetes 1.36.6은 공식 검증 범위 밖의 구형 CPU 전용 �
 Ceph 인증 호환성 경고를 보존한 `passed_with_warnings` 결과입니다.
 [원문 JSON·암호 설정 비교](validation/README.md)와
 [실제 화면](TERMINAL-LAB-WALKTHROUGH.md)을 참고하세요.
+
+## 후속 HA·KAM 실증
+
+별도 VM 7대의 Kubernetes 1.37.2/Calico 클러스터에서 2026-11-01 18:25 KST에
+HA·KAM 실증을 완료했습니다. 위 Cilium·CSI 검증과 다른 클러스터입니다.
+HAProxy 중지 후 VIP 이동 10.01초, KAM 두 worker 배치·리더 인수 90.37초,
+CR 삭제·만료 후 권한 회수를 확인했습니다. 전환 중 API probe 7회 실패도 기록했습니다.
+[실행 방법·실제 화면·원문·제한](HA-KAM-LIVE.md)을 참고하세요.

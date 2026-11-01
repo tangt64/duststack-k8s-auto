@@ -11,6 +11,12 @@ controller 코드·ServiceAccount·Lease는 관리자 전용 `kam-system`에 분
 대상 namespace의 승인한 프로필만 bind합니다. 실제 API 통합·검증 범위와
 GitHub/Gitea 운영 절차는 [HA·KAM 안내](HA-KAM-GIT.md)에 정리했습니다.
 
+같은 날 18:25 KST에 [실제 HA·KAM 실증](HA-KAM-LIVE.md)을 완료했습니다.
+전용 VM 7대에서 발견한 인벤토리 우선순위·SELinux health check·다중 NIC 인증서
+업로드·태그 실행 facts 누락·Calico 주소 선택/SSA 재적용 문제를 수정했습니다.
+회귀 70개, 실제 API·CLI 통합과 공식 차트 검사, 실제 VIP 이동·KAM 배치·권한 회수를
+구분해 기록했습니다. HA 전환 중 API 실패와 90.37초 리더 인수도 숨기지 않았습니다.
+
 | 문제 | 변경 |
 | --- | --- |
 | Kubernetes 1.28, kubeadm v1beta3, 폐기된 감사 정책 API | 1.37.2 / v1beta4 / audit.k8s.io/v1 적용 |

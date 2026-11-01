@@ -1,5 +1,35 @@
 # 터미널랩 실제 실행 기록
 
+## HA·KAM 후속 실증: 실제 VM 설치와 장애·권한 회수 통과
+
+2026-11-01 18:25 KST에 별도 VM 7대의 HA·KAM 실증이 통과했습니다.
+Kubernetes 노드 5대 Ready, 전용망 Calico 주소, HAProxy 중지 후 VIP 이동 10.01초,
+KAM 두 worker 배치·리더 인수 90.37초·namespace 권한·CR 삭제/만료 회수를 확인했습니다.
+API probe 21회 중 전환 중 7회 실패한 사실도 원문에 보존했습니다.
+[실행 방법·실제 화면·제한](../HA-KAM-LIVE.md)을 참고하세요.
+
+실증 checkout의 기준은 `a6f5ff11106818e1519967868e3e7a93eb5c7c76`이며,
+이번 수정으로 적용한 런타임 파일 6개의 SHA-256을 메타데이터에 기록해 저장소와 대조했습니다.
+각 JSON은 VM의 파일 바이트를 브라우저 터미널에서 내보내고 SHA-256 일치를 확인했습니다.
+인증서·개인키·토큰·계정 잔액은 포함하지 않습니다.
+검증 원문의 줄바꿈은 `.gitattributes`로 LF를 유지해 Windows checkout에서도
+기록한 SHA-256이 바뀌지 않도록 합니다.
+
+| 실제 원문 | SHA-256 |
+| --- | --- |
+| [HA VIP 결과](ha-vip-2026-11-01.json) | `3fc62efb7003a7d1ec73b7e39dbeded4566087b423f6a7736cc0773da1fb80fe` |
+| [KAM 실제 배치·회수](kam-live-2026-11-01.json) | `1b5f17e6e3da94e2f2e401cb2899b76779ef4d2b62ff9916c5394ff45fa5790d` |
+| [실제 버전·보안·소스 해시](ha-kam-metadata-2026-11-01.json) | `59d9a16bb0f583cc04c4444744431274f909dcff472e355476161b6345e870f1` |
+| [Calico 전용망 주소](calico-private-2026-11-01.json) | `635d7888e0cd024766b46f899674e665ab15fc9603c4f41be9e5918722a1caf6` |
+| [임시 접근 회수·세 API TLS 확인](ha-kam-cleanup-2026-11-01.json) | `c73b25b4739b9994653f4d243a287d225faf952718c8757bee7ff25f27ef9069` |
+
+VM 파일 원문과 별도로, 18:35 KST의 [관리 SDK 종료 확인 응답](ha-lab-stop-2026-11-01.json)은
+이번 VM 7대의 `SHUTOFF`를 기록합니다. SHA-256은
+`3079b587736029947bef4baafcd509d9e344ad3ff9e9fad125d9aeeb13515cd5`입니다.
+디스크 240 GiB와 전용 네트워크·보안그룹은 보관했습니다.
+
+아래 CNI·CSI 실증은 앞선 별도 VM 4대의 기록이며 위 HA 랩과 구성·검사 범위가 다릅니다.
+
 ## 최종 전체 실행: 12개 검사 통과, 호환성 경고 보존
 
 2026-11-01 12:12 KST에 소스 `dc49538c95b74142796ed1b4942c2a83cb0ca658`의

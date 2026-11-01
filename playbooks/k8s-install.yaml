@@ -1,9 +1,14 @@
 ---
 - name: Validate and prepare Kubernetes hosts
   hosts: k8s_master:k8s_node
+  gather_facts: false
   any_errors_fatal: true
   tags: [k8s-prepare]
   pre_tasks:
+    - name: Gather prerequisite facts even for a tagged installation
+      ansible.builtin.setup:
+      tags: [always]
+
     - name: Validate supported platform and installation settings
       ansible.builtin.import_tasks: ../tasks/preflight.yaml
       tags: [always]

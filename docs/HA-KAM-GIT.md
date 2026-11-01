@@ -10,7 +10,7 @@ endpoint를 변경하는 마이그레이션을 대신하지 않습니다.
 비공개 인벤토리에 다음을 반영하세요.
 
 ```yaml
-# all.vars 또는 kubernetes.vars
+# 공통 설정: 생성기의 호스트 YAML merge 또는 별도 -e @vars.yaml로 적용
 k8s_proxy_mode_enable: true
 k8s_proxy_mode: haproxy_keepalived
 k8s_api_domain: api.example.com  # 두 LB의 VIP를 가리키는 DNS
@@ -33,6 +33,10 @@ lb:
 ```
 
 위 조각을 기존 인벤토리에 병합하고 `lb`를 `kubernetes.children`에 포함합니다.
+같은 디렉터리의 `group_vars`는 인벤토리에 직접 쓴 그룹 변수보다 우선합니다.
+직접 작성한 인벤토리는 호스트 변수나 비공개 extra vars 파일로 설정을 확정하고,
+`ansible-inventory -i 인벤토리 --host 호스트이름`으로 실제 적용 값을 대조하세요.
+`configure` 생성 결과는 공통 블록을 호스트 YAML merge로 공유해 이 충돌을 방지합니다.
 두 LB는 control plane과 분리합니다. Keepalived는 unicast peer와 로컬 HAProxy
 검사로 VIP를 전환하며, 검사 실패 시 FAULT 처리합니다. HAProxy는 TLS passthrough로
 API 서버에 연결합니다. 신규 bootstrap 동안 TCP 검사 후 클러스터 공개 CA를 공급해
@@ -40,6 +44,30 @@ CA 검증을 사용하는 `/readyz` 검사로 전환하며, 재실행 때 TCP �
 공개 CA만 LB로 복사하고 관리자 개인키는 복사하지 않습니다.
 API의 비인증 health endpoint가 금지된 환경은 별도의 최소 권한 probe 인증 설계가
 필요합니다. `--tags k8s-haproxy`는 최초 설치를 대신하지 않습니다.
+
+로컬 상태 검사는 `127.0.0.1:8404/health`만 사용합니다. HAProxy가 중지되면 연결이
+실패하며, SELinux에서 실행이 거부되는 `systemctl`을 검사 스크립트에서 호출하지 않습니다.
+SELinux enforcing 호스트에서는 이 TCP 포트만 `http_port_t`로 등록합니다.
+`keepalived_connect_any`나 unconfined 스크립트 전환은 사용하지 않습니다.
+적용 후 Keepalived journal과 AVC를 확인하세요. 배포판의
+[Keepalived 정책](https://github.com/fedora-selinux/selinux-policy/blob/rawhide/policy/modules/contrib/keepalived.te)은
+HTTP 포트 연결과 전체 포트 연결을 구분합니다.
+
+추가 control plane용 인증서 업로드는 첫 노드의
+`/etc/kubernetes/kubeadm-init.yaml`을 명시해 수행합니다. 다중 NIC 환경에서
+기본 API 주소 추론에 의존하지 않습니다. 기존 클러스터에 이 파일이 없으면
+현재 클러스터와 일치하는 검토된 초기화 설정을 복원한 뒤 재시도하세요.
+가입 토큰·인증서 암호화 키는 로그에 출력하지 않으며 가입 설정 파일은 성공·실패
+모두 정리합니다. 기존 클러스터의 주소·CIDR를 새 기본값으로 덮어쓰면 안 됩니다.
+
+Calico 재적용은 기존 pool의 CIDR·blockSize·VXLAN·NAT·nodeSelector·BGP 정책이
+현재 인벤토리와 일치하는지 먼저 검사합니다. operator가 채운 `allowedUses`,
+`assignmentMode`, pool 이름 등의 추가 필드는 보존해 SSA 충돌을 방지합니다.
+정책이 다르면 중단하며 `--force-conflicts`로 덮어쓰지 않습니다.
+기존 operator 이미지가 고정 매니페스트와 같으면 CRD·operator 묶음을 다시 적용하지
+않습니다. operator가 관리하는 admission mutation 정책을 보존하기 위한 동작입니다.
+이미지가 다르면 자동 교체하지 않습니다. CRD 복구나 Calico 업그레이드는 별도 절차로
+진행하세요.
 
 같은 L2의 VIP 이동·unicast VRRP·TCP 6443을 네트워크에서 허용해야 합니다.
 OpenStack은 VIP의 allowed-address-pairs/가상 포트 정책을 먼저 확인하세요.
@@ -173,6 +201,10 @@ HAProxy 3.2.26의 bootstrap/readiness 설정 파서도 통과했습니다. 사�
 ID는 `29d2ff67f15897d9b79939b3303743c3543eb391702e3aa0e0ac1a3caa036756`입니다.
 API 도구는 공식 envtest v1.37.0이며, SHA-512를 업스트림 배포 파일과 대조하고 고정
 SHA-256으로 캐시 다운로드·실행을 검증합니다. 실행 바이너리·차트·인증키는 Git에서 제외합니다.
+
+후속 수정의 회귀는 70개로 확대했습니다. 전용 VM의 실제 클러스터 설치와 HA VIP
+이동·KAM 두 노드 배치·리더 인수·CR 삭제/만료 회수도 통과했습니다.
+[실증 결과와 실제 화면](HA-KAM-LIVE.md)에 API 실패 표본·소스 해시·미검증 범위를 기록했습니다.
 
 ## GitHub와 Gitea 동시 운영
 

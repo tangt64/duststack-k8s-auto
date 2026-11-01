@@ -11,6 +11,23 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class ConfiguredHost(dict):
+    """Share the editable settings block using a YAML merge at host scope."""
+    def __init__(self, settings, host):
+        super().__init__(host)
+        self.settings = settings
+
+
+def represent_configured_host(dumper, host):
+    node = dumper.represent_dict(host)
+    node.value.insert(0, (yaml.nodes.ScalarNode('tag:yaml.org,2002:merge', '<<'),
+                          dumper.represent_data(host.settings)))
+    return node
+
+
+yaml.SafeDumper.add_representer(ConfiguredHost, represent_configured_host)
+
+
 def parse_node(text):
     try:
         name, addresses = text.split('=', 1)
@@ -77,8 +94,10 @@ def build_inventory(args):
     if pod_net.overlaps(service_net) or any(ipaddress.ip_interface(n[1]['k8s_ip4']).network.overlaps(net) for n in nodes for net in [pod_net, service_net]):
         raise ValueError('Pod, service and internal node network ranges must not overlap; use --pod-cidr/--service-cidr for a new cluster')
     return {'all': {'vars': settings, 'children': {'kubernetes': {'children': {
-        'k8s_master': {'hosts': {control[0]: control[1]}},
-        'k8s_node': {'hosts': dict(workers)},
+        # Inventory host variables take precedence over adjacent group_vars
+        # even when --output is saved beside the bundled default inventory.
+        'k8s_master': {'hosts': {control[0]: ConfiguredHost(settings, control[1])}},
+        'k8s_node': {'hosts': {name: ConfiguredHost(settings, host) for name, host in workers}},
         'k8s_storage_ceph': {'hosts': ceph},
         'lb': {'hosts': {}}, 'k8s_hub': {'hosts': {}}, 'k8s_spoke': {'hosts': {}},
     }}}}}

@@ -13,13 +13,35 @@
     mode: '0644'
   loop: "{{ calico_manifests }}"
 
-- name: Apply Calico CRDs and operator using server-side apply
+- name: Read the pinned operator manifest for version comparison
+  ansible.builtin.slurp:
+    src: /etc/kubernetes/addons/tigera-operator.yaml
+  register: calico_operator_manifest
+  when: not ansible_check_mode
+
+- name: Inspect the existing Calico operator
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, --namespace=tigera-operator, get, deployment, tigera-operator, --ignore-not-found, --output=json]
+  register: calico_operator_existing
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Reject implicit operator version changes
+  ansible.builtin.assert:
+    that:
+      - (calico_operator_existing.stdout | from_json).spec.template.spec.containers | map(attribute='image') | list == calico_expected_operator.spec.template.spec.containers | map(attribute='image') | list
+    fail_msg: Existing Calico operator images differ from the pinned manifest. Use a reviewed Calico upgrade or recovery procedure.
+  vars:
+    calico_expected_operator: "{{ (calico_operator_manifest.content | b64decode | from_yaml_all) | select | selectattr('kind', 'equalto', 'Deployment') | selectattr('metadata.name', 'equalto', 'tigera-operator') | first }}"
+  when: calico_operator_existing.stdout | default('') | length > 0
+
+- name: Bootstrap Calico CRDs and operator using server-side apply
   ansible.builtin.command:
     argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, --server-side, --field-manager=duststack, -f, "/etc/kubernetes/addons/{{ item.file }}"]
   loop: "{{ calico_manifests }}"
   register: calico_apply
   changed_when: "'unchanged' not in calico_apply.stdout"
-  when: not ansible_check_mode
+  when: not ansible_check_mode and calico_operator_existing.stdout | default('') | length == 0
 
 - name: Wait for Installation and APIServer APIs
   ansible.builtin.command:
@@ -27,6 +49,33 @@
   loop: [installations.operator.tigera.io, apiservers.operator.tigera.io]
   changed_when: false
   when: not ansible_check_mode
+
+- name: Read existing Calico installation before preserving operator defaults
+  ansible.builtin.command:
+    argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, installation.operator.tigera.io, default, --ignore-not-found, --output=json]
+  register: calico_existing_installation
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Reject changes to an existing Calico pool or routing policy
+  ansible.builtin.assert:
+    that:
+      - calico_existing_pools | length == 1
+      - calico_existing_pools[0].cidr == k8s_pod_cidr
+      - calico_existing_pools[0].blockSize == 26
+      - calico_existing_pools[0].encapsulation == 'VXLAN'
+      - calico_existing_pools[0].natOutgoing == 'Enabled'
+      - calico_existing_pools[0].nodeSelector == 'all()'
+      - calico_existing_network.bgp == 'Disabled'
+    fail_msg: Existing Calico pool or routing policy differs. Preserve it and plan a separate network migration.
+  vars:
+    calico_existing_network: "{{ (calico_existing_installation.stdout | from_json).spec.calicoNetwork }}"
+    calico_existing_pools: "{{ calico_existing_network.ipPools | default([], true) }}"
+  when: calico_existing_installation.stdout | default('') | length > 0
+
+- name: Preserve additional IP pool fields supplied by the operator
+  ansible.builtin.set_fact:
+    calico_preserved_pool: "{{ (calico_existing_installation.stdout | from_json).spec.calicoNetwork.ipPools[0] if calico_existing_installation.stdout | default('') | length > 0 else {} }}"
 
 - name: Render Calico networking using inventory pod CIDR and interface
   ansible.builtin.template:

@@ -1,0 +1,152 @@
+{
+  "collected_at": "2026-11-01T09:26:37.484937+00:00",
+  "resource_prefix": "duststack-ha-20261101",
+  "source_base": "a6f5ff11106818e1519967868e3e7a93eb5c7c76",
+  "runtime_file_sha256": {
+    "playbooks/k8s-install.yaml": "a4ea4ba5b51d253404ae0e795194851f8f9c0257fe0a0cbe8eeacbca91f496c5",
+    "roles/core/core-keepalived/tasks/main.yaml": "cff13a36d1b4ae13b2b2ceacc4f478820449dbc9e0da640918880675b8ea54bd",
+    "roles/kubernetes/k8s-join/tasks/main.yaml": "23afc70af39f8bb5a212f58c1f1d6be98c53318b9fc7bd959d0d8e17afaf4335",
+    "tasks/preflight.yaml": "c732e035226ed07ced676dcee937da5213eb86e510cdc845339d8ccf1cb48800",
+    "roles/cni/cni-calico/tasks/main.yaml": "f3c673abea022121de713888810592f0577552228cb0da7e6af485dbcbdc43af",
+    "roles/cni/cni-calico/templates/custom-resources.yaml": "a50dfd8a3bbbb14f1de4f5fdcab7b79ff90886cce5dd88912dddf1be68bf774d"
+  },
+  "nodes": [
+    {
+      "name": "ha-cp01.lab.dustbox.kr",
+      "internal_ip": [
+        "172.30.62.128"
+      ],
+      "kubelet_version": "v1.37.2",
+      "ready": true
+    },
+    {
+      "name": "ha-cp02.lab.dustbox.kr",
+      "internal_ip": [
+        "172.30.62.158"
+      ],
+      "kubelet_version": "v1.37.2",
+      "ready": true
+    },
+    {
+      "name": "ha-cp03.lab.dustbox.kr",
+      "internal_ip": [
+        "172.30.62.170"
+      ],
+      "kubelet_version": "v1.37.2",
+      "ready": true
+    },
+    {
+      "name": "ha-worker01.lab.dustbox.kr",
+      "internal_ip": [
+        "172.30.62.108"
+      ],
+      "kubelet_version": "v1.37.2",
+      "ready": true
+    },
+    {
+      "name": "ha-worker02.lab.dustbox.kr",
+      "internal_ip": [
+        "172.30.62.86"
+      ],
+      "kubelet_version": "v1.37.2",
+      "ready": true
+    }
+  ],
+  "load_balancers": [
+    {
+      "ip": "172.30.62.149",
+      "verification": [
+        "haproxy-2.8.14-3.el9_8.2.x86_64",
+        "keepalived-2.2.8-6.el9.x86_64",
+        "Enforcing",
+        "keepalived_connect_any --> off",
+        "http_port_t                    tcp      8404",
+        "active",
+        "active",
+        "3"
+      ]
+    },
+    {
+      "ip": "172.30.62.43",
+      "verification": [
+        "haproxy-2.8.14-3.el9_8.2.x86_64",
+        "keepalived-2.2.8-6.el9.x86_64",
+        "Enforcing",
+        "keepalived_connect_any --> off",
+        "http_port_t                    tcp      8404",
+        "active",
+        "active",
+        "3"
+      ]
+    }
+  ],
+  "kam_pods": [
+    {
+      "name": "kam-467237b227cc2f05-f4f7bf76f-fxcr8",
+      "node": "ha-worker02.lab.dustbox.kr",
+      "ready": true,
+      "images": [
+        "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487"
+      ],
+      "run_as_user": 1000
+    },
+    {
+      "name": "kam-467237b227cc2f05-f4f7bf76f-tqf5z",
+      "node": "ha-worker01.lab.dustbox.kr",
+      "ready": true,
+      "images": [
+        "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487"
+      ],
+      "run_as_user": 1000
+    }
+  ],
+  "kubectl_kam_plugin": "passed",
+  "api_readyz": "ok",
+  "calico_private_transport": [
+    {
+      "name": "ha-cp01.lab.dustbox.kr",
+      "calico_ipv4": [
+        "172.30.62.128"
+      ],
+      "internal_ip": [
+        "172.30.62.128"
+      ]
+    },
+    {
+      "name": "ha-cp02.lab.dustbox.kr",
+      "calico_ipv4": [
+        "172.30.62.158"
+      ],
+      "internal_ip": [
+        "172.30.62.158"
+      ]
+    },
+    {
+      "name": "ha-cp03.lab.dustbox.kr",
+      "calico_ipv4": [
+        "172.30.62.170"
+      ],
+      "internal_ip": [
+        "172.30.62.170"
+      ]
+    },
+    {
+      "name": "ha-worker01.lab.dustbox.kr",
+      "calico_ipv4": [
+        "172.30.62.108"
+      ],
+      "internal_ip": [
+        "172.30.62.108"
+      ]
+    },
+    {
+      "name": "ha-worker02.lab.dustbox.kr",
+      "calico_ipv4": [
+        "172.30.62.86"
+      ],
+      "internal_ip": [
+        "172.30.62.86"
+      ]
+    }
+  ]
+}

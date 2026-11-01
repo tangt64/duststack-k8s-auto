@@ -1,5 +1,6 @@
 """Local regression checks; never connect to inventory hosts."""
 import json
+import base64
 import os
 from pathlib import Path
 import subprocess
@@ -95,6 +96,23 @@ class ConfigurationTests(unittest.TestCase):
                     if control_plane:
                         self.assertEqual(value['controlPlane']['certificateKey'], 'b' * 64)
 
+    def test_cni_can_use_kubelet_addresses_with_different_nic_names(self):
+        for interface in ['ens3', 'ens7']:
+            values = variables(k8s_interface=interface, calico_use_node_internal_ip=True)
+            install = list(yaml.safe_load_all(render('roles/cni/cni-calico/templates/custom-resources.yaml', values)))[0]
+            self.assertEqual(install['spec']['calicoNetwork']['nodeAddressAutodetectionV4'],
+                             {'kubernetes': 'NodeInternalIP'})
+
+    def test_mixed_calico_nics_require_explicit_address_policy(self):
+        task = next(t for t in read_yaml('tasks/preflight.yaml')
+                    if t.get('name', '').startswith('Require explicit Calico'))
+        for nics, opt_in, expected in [(['ens7', 'ens7'], False, True),
+                                       (['ens7', 'ens3'], False, False),
+                                       (['ens7', 'ens3'], True, True)]:
+            engine = templar(variables(calico_private_nics=nics, calico_use_node_internal_ip=opt_in))
+            self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x))
+                                 for x in task['ansible.builtin.assert']['that']), expected)
+
     def test_cni_matches_custom_cidr_and_interface(self):
         values = variables(k8s_pod_cidr='172.20.0.0/16', k8s_interface='ens192')
         install = list(yaml.safe_load_all(render('roles/cni/cni-calico/templates/custom-resources.yaml', values)))[0]
@@ -105,6 +123,46 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(json.loads(config['data']['net-conf.json'])['Network'], '172.20.0.0/16')
         daemon = next(x for x in flannel if x['kind'] == 'DaemonSet')
         self.assertIn('--iface=ens192', daemon['spec']['template']['spec']['containers'][0]['args'])
+
+    def test_calico_reapply_preserves_operator_pool_defaults(self):
+        extra = {'allowedUses': ['Workload', 'Tunnel'], 'assignmentMode': 'Automatic',
+                 'disableBGPExport': False, 'name': 'default-ipv4-ippool'}
+        install = list(yaml.safe_load_all(render('roles/cni/cni-calico/templates/custom-resources.yaml',
+                                                variables(calico_preserved_pool=extra))))[0]
+        pool = install['spec']['calicoNetwork']['ipPools'][0]
+        self.assertEqual({key: pool[key] for key in extra}, extra)
+        self.assertEqual(pool['cidr'], variables()['k8s_pod_cidr'])
+
+    def test_calico_reapply_rejects_existing_pool_policy_changes(self):
+        task = next(t for t in read_yaml('roles/cni/cni-calico/tasks/main.yaml')
+                    if t.get('name', '').startswith('Reject changes'))
+        pool = {'cidr': variables()['k8s_pod_cidr'], 'blockSize': 26,
+                'encapsulation': 'VXLAN', 'natOutgoing': 'Enabled', 'nodeSelector': 'all()'}
+        for change, expected in [({}, True), ({'cidr': '172.22.0.0/16'}, False),
+                                 ({'blockSize': 24}, False), ({'encapsulation': 'IPIP'}, False)]:
+            engine = templar(variables(calico_existing_pools=[dict(pool, **change)],
+                                       calico_existing_network={'bgp': 'Disabled'}))
+            self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x))
+                                 for x in task['ansible.builtin.assert']['that']), expected)
+
+    def test_existing_operator_is_preserved_and_version_changes_are_rejected(self):
+        tasks = read_yaml('roles/cni/cni-calico/tasks/main.yaml')
+        guard = next(t for t in tasks if t.get('name') == 'Reject implicit operator version changes')
+        bootstrap = next(t for t in tasks if t.get('name', '').startswith('Bootstrap Calico CRDs'))
+        expected = {'kind': 'Deployment', 'metadata': {'name': 'tigera-operator'},
+                    'spec': {'template': {'spec': {'containers': [{'image': 'operator:pinned'}]}}}}
+        content = base64.b64encode(yaml.safe_dump(expected).encode()).decode()
+        for image, allowed in [('operator:pinned', True), ('operator:other', False)]:
+            current = {'spec': {'template': {'spec': {'containers': [{'image': image}]}}}}
+            engine = templar(variables(calico_operator_existing={'stdout': json.dumps(current)},
+                calico_operator_manifest={'content': content},
+                calico_expected_operator=guard['vars']['calico_expected_operator'], ansible_check_mode=False))
+            self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x))
+                                 for x in guard['ansible.builtin.assert']['that']), allowed)
+            self.assertFalse(engine.evaluate_conditional(trust_as_template(bootstrap['when'])))
+        for checking in [False, True]:
+            engine = templar(variables(calico_operator_existing={'stdout': ''}, ansible_check_mode=checking))
+            self.assertEqual(engine.evaluate_conditional(trust_as_template(bootstrap['when'])), not checking)
 
     def test_containerd_configuration_is_valid_toml(self):
         import tomllib

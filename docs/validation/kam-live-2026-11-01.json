@@ -1,0 +1,38 @@
+{
+  "started_at": "2026-11-01T09:22:20.461582+00:00",
+  "namespace": "kam-e2e",
+  "subject": "kam-e2e-11f33130d12a",
+  "status": "passed",
+  "checks": {
+    "distinct_node_placement": true,
+    "namespace_view_and_escalation_denied": true,
+    "leader_failover_and_native_gc": true,
+    "expiry_revocation": true
+  },
+  "pods_before": [
+    {
+      "name": "kam-467237b227cc2f05-f4f7bf76f-fxcr8",
+      "node": "ha-worker02.lab.dustbox.kr"
+    },
+    {
+      "name": "kam-467237b227cc2f05-f4f7bf76f-lgvgb",
+      "node": "ha-worker01.lab.dustbox.kr"
+    }
+  ],
+  "leader_failover": {
+    "from": "kam-467237b227cc2f05-f4f7bf76f-lgvgb:541c9d18-d61a-4a0f-939a-97126995e7b5",
+    "to": "kam-467237b227cc2f05-f4f7bf76f-fxcr8:fcf5b479-4e03-4193-8dfa-1fc2a53b15de",
+    "seconds": 90.37
+  },
+  "pods_after": [
+    {
+      "name": "kam-467237b227cc2f05-f4f7bf76f-fxcr8",
+      "node": "ha-worker02.lab.dustbox.kr"
+    },
+    {
+      "name": "kam-467237b227cc2f05-f4f7bf76f-tqf5z",
+      "node": "ha-worker01.lab.dustbox.kr"
+    }
+  ],
+  "finished_at": "2026-11-01T09:25:18.614751+00:00"
+}

@@ -51,9 +51,25 @@ CIDR를 사용할 수 없습니다. 다른 관리 NIC·VPN·라우팅 대역도 
 읽습니다. 출력 위치는 `--output inventory/local-다른랩/hosts.yaml`로 바꿀 수 있습니다.
 `inventory/local*`는 Git에서 제외됩니다. 비밀번호·토큰·개인키는 파일에 쓰지 않습니다.
 
+생성기는 `all.vars`의 공통 설정을 YAML anchor와 호스트의 `<<` merge로 공유합니다.
+출력 파일 옆에 `group_vars/kubernetes`가 있어도 선택한 CNI·호환 버전·API 방식이
+기본값으로 덮이지 않습니다. 공통 값은 `all.vars`에서 한 번 수정하고, 개별 노드의
+예외는 해당 호스트에 직접 지정하세요. 설치 전에 실제 해석 결과를 확인합니다.
+
+```bash
+ansible-inventory -i inventory/local-lab/hosts.yaml --host cp1
+# k8s_network, k8s_version, k8s_proxy_mode_enable, CIDR와 NIC를 대조
+```
+
 CNI는 `calico`, `flannel`, `cilium`, CSI는 `none`, `nfs`, `rook`을 선택합니다.
 Cilium은 공식 지원 대상인 Kubernetes 1.36.6 조합을 자동 선택합니다. 기본 Calico는
 1.37.2를 사용합니다. 기존 클러스터의 업·다운그레이드를 생성기로 자동 처리하지 않습니다.
+
+Calico 신규 클러스터에서 노드마다 전용 NIC 이름이 다르면 공통 설정에
+`calico_use_node_internal_ip: true`를 지정할 수 있습니다. kubelet의 명시된
+`k8s_ip4`가 실제 Node InternalIP에 반영됐는지 확인한 뒤 사용하세요. 기본값은
+기존 interface 선택을 유지합니다. 운영 중인 Calico의 주소 선택 정책 변경은
+일반 설치 재실행에 섞지 말고 별도 유지보수로 검토하세요.
 
 ## Rook 설정 생성
 

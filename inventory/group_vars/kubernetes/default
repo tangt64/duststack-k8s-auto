@@ -5,6 +5,8 @@ k8s_repo_version: "{{ k8s_version.split('.')[:2] | join('.') }}"
 crio_version: "1.37.2"
 containerd_version: "2.4.2"
 calico_version: "v3.33.0"
+# Opt in on a new cluster with different private NIC names across nodes.
+calico_use_node_internal_ip: false
 flannel_version: "v0.28.10"
 k8s_runtime_environment: crio
 k8s_cri_socket: "{{ 'unix:///var/run/crio/crio.sock' if k8s_runtime_environment == 'crio' else 'unix:///run/containerd/containerd.sock' }}"

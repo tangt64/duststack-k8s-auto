@@ -4,6 +4,20 @@
     name: [keepalived, curl]
     state: present
 
+- name: Install SELinux port management utilities for the loopback HTTP probe
+  ansible.builtin.dnf:
+    name: policycoreutils-python-utils
+    state: present
+  when: k8s_proxy_mode == 'haproxy_keepalived' and ansible_facts['selinux']['status'] == 'enabled'
+
+- name: Label only the HAProxy loopback health port as HTTP
+  community.general.seport:
+    ports: '8404'
+    proto: tcp
+    setype: http_port_t
+    state: present
+  when: k8s_proxy_mode == 'haproxy_keepalived' and ansible_facts['selinux']['status'] == 'enabled'
+
 - name: Configure root-owned API health check
   ansible.builtin.copy:
     dest: /etc/keepalived/check-kube-apiserver.sh
@@ -13,7 +27,8 @@
     content: |
       #!/bin/sh
       {% if k8s_proxy_mode == 'haproxy_keepalived' %}
-      /usr/bin/systemctl is-active --quiet haproxy || exit 1
+      # The dedicated loopback listener fails when HAProxy stops. Avoid
+      # systemctl: confined keepalived_t cannot execute it on enforcing hosts.
       exec /usr/bin/curl --fail --silent --max-time 2 http://127.0.0.1:8404/health
       {% else %}
       exec /usr/bin/curl --fail --silent --max-time 2 --cacert /etc/kubernetes/pki/ca.crt https://{{ k8s_ip4.split('/')[0] }}:{{ k8s_endpoint_port }}/readyz

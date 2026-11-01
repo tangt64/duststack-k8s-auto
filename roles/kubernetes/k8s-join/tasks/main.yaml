@@ -14,9 +14,22 @@
       register: k8s_join_command
       no_log: true
 
+    - name: Inspect the first control plane initialization configuration
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubeadm-init.yaml
+      delegate_to: "{{ groups['k8s_master'][0] }}"
+      register: k8s_upload_config
+      when: k8s_join_control_plane
+
+    - name: Require the reviewed initialization configuration for certificate upload
+      ansible.builtin.assert:
+        that: k8s_upload_config.stat.isreg | default(false)
+        fail_msg: Restore the reviewed /etc/kubernetes/kubeadm-init.yaml on the first control plane before adding another control plane. Do not infer the API address from the default NIC.
+      when: k8s_join_control_plane
+
     - name: Upload control plane certificates using a freshly generated key
       ansible.builtin.command:
-        argv: [kubeadm, init, phase, upload-certs, --upload-certs]
+        argv: [kubeadm, init, phase, upload-certs, --upload-certs, --config, /etc/kubernetes/kubeadm-init.yaml]
       delegate_to: "{{ groups['k8s_master'][0] }}"
       register: k8s_upload_certs
       when: k8s_join_control_plane
