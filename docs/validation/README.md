@@ -1,5 +1,25 @@
 # 터미널랩 실제 실행 기록
 
+## VM 전원·quorum 후속 실증과 KAM 인수 개선
+
+같은 전용 VM 7대에서 LB HARD 재부팅, control plane 1대·2대 HARD 재부팅을
+순서대로 검증했습니다. 단일 CP 상실에서도 2/3 quorum이 유지됐고, 두 CP 동시 상실에서는
+실제 쓰기 중단과 자동 복구·sentinel 보존을 확인했습니다. KAM 정상 리더 Pod 삭제
+3회 인수는 2.60·2.66·2.70초였고 namespace·삭제/만료 권한 회수도 통과했습니다.
+API 전환 중 실패 횟수와 강제 종료 시 60초 Lease 만료의 제한을 함께 기록했습니다.
+[방법·실제 화면·전체 결과](../HA-POWER-LIVE.md)를 참고하세요.
+원문은 VM 파일과 SHA-256을 대조해 저장했으며 관리 API 응답은 별도로 표시했습니다.
+
+| 실제 원문·관리 응답 | SHA-256 |
+| --- | --- |
+| [kam-fast-live-2026-11-01.json](kam-fast-live-2026-11-01.json) | `2d9c1e58a66c5a5592ac3869a87ffb7f898fab1fa8b9c8a5147a6cb04bcd91c0` |
+| [power-lb-2026-11-01.json](power-lb-2026-11-01.json) | `4ce52993b311ecc09d096f13be5ea59cef1e64e149d964172cc56ff3d4cbe39a` |
+| [power-cp-single-2026-11-01.json](power-cp-single-2026-11-01.json) | `ce28f384ee1e7437cef3da4ce6c1dbd024fb7849c58523d5070a69426bc94a43` |
+| [power-cp-quorum-2026-11-01.json](power-cp-quorum-2026-11-01.json) | `27a746bcf47b3ecdc7fab949dcad31946faa4b1c71d0478252a268654ec3c53b` |
+| [power-fault-actions-2026-11-01.json](power-fault-actions-2026-11-01.json) | `306a462dd57b998498d65c34664a4f4b0675f7bc8b0c4d1c1dc5863133152a1f` |
+| [power-cleanup-2026-11-01.json](power-cleanup-2026-11-01.json) | `a82cb31031579b797e27fd4fdfe6cc33bccea115df63c431067982f41edd5065` |
+| [ha-power-lab-stop-2026-11-01.json](ha-power-lab-stop-2026-11-01.json) | `3ef1e169c9e885d5e2b8e0a832f2f107a8534dbffbbe2829b3f51105d9a5640a` |
+
 ## HA·KAM 후속 실증: 실제 VM 설치와 장애·권한 회수 통과
 
 2026-11-01 18:25 KST에 별도 VM 7대의 HA·KAM 실증이 통과했습니다.

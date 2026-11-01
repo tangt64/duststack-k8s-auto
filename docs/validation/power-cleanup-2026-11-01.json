@@ -1,0 +1,85 @@
+{
+  "checked_at": "2026-11-01T10:39:23.434644+00:00",
+  "ssh_key_cleanup": [
+    {
+      "ip": "172.30.62.158",
+      "removed": 1,
+      "remaining": 0
+    },
+    {
+      "ip": "172.30.62.170",
+      "removed": 1,
+      "remaining": 0
+    },
+    {
+      "ip": "172.30.62.108",
+      "removed": 1,
+      "remaining": 0
+    },
+    {
+      "ip": "172.30.62.86",
+      "removed": 1,
+      "remaining": 0
+    },
+    {
+      "ip": "172.30.62.149",
+      "removed": 1,
+      "remaining": 0
+    },
+    {
+      "ip": "172.30.62.43",
+      "removed": 1,
+      "remaining": 0
+    }
+  ],
+  "cp01_temporary_key_files_absent": true,
+  "nodes": [
+    {
+      "name": "ha-cp01.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-cp02.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-cp03.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-worker01.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-worker02.lab.dustbox.kr",
+      "ready": true
+    }
+  ],
+  "api_readyz": {
+    "172.30.62.250": "ok",
+    "172.30.62.128": "ok",
+    "172.30.62.158": "ok",
+    "172.30.62.170": "ok"
+  },
+  "remaining_test_grants": 0,
+  "remaining_power_test_namespaces": [],
+  "runtime_sha256_lf": {
+    "addons/kam/controller.py": "b4133acfd055e7e4250ce5de152993683723d0297d12e00356bd93f0fb588b11",
+    "addons/kam/render.py": "dfbf8a209d9373c9773ca8ccbe043986b43be2ce1c4f8691fa63fc23890f0172",
+    "scripts/test_live_kam.py": "b3821a06ba8668073ae6b91f5bc45845f8234d9c50b9f9e78b6517e853a87493",
+    "scripts/test_live_power.py": "07ee01c4a444c84ca430e553dc81f9b911925662661c84eb33ad44ce7a725d29"
+  },
+  "kam_pods_after_power_faults": [
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-bhjmm",
+      "node": "ha-worker01.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-hvdcv",
+      "node": "ha-worker02.lab.dustbox.kr",
+      "ready": true
+    }
+  ],
+  "kam_configmap_source_sha256": "b4133acfd055e7e4250ce5de152993683723d0297d12e00356bd93f0fb588b11"
+}

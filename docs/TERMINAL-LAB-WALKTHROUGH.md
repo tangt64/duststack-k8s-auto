@@ -271,3 +271,17 @@ VIP는 HAProxy 중지 후 10.01초에 이동했습니다. API probe 21회 중 7�
 KAM 두 Pod의 분산 배치, 리더 인수 90.37초, namespace 경계·권한 상승 거부,
 CR 삭제와 만료에 따른 회수, 실제 `kubectl kam` 동작을 확인했습니다.
 [명령·원문·수정한 실패·운영 제한](HA-KAM-LIVE.md)을 참고하세요.
+
+## VM 전원·etcd quorum과 빠른 KAM 인수: 실제 후속 화면
+
+아래는 같은 HA 랩에서 HARD 재부팅과 KAM 개선판을 실제로 검증한 결과 화면입니다.
+예상 출력이 아닙니다. 정상 리더 Pod 삭제 3회는 2.60·2.66·2.70초였으며, VM 강제 종료의
+60초 Lease 만료와 구분합니다. 전환 중 API 실패도 원문에 보존했습니다.
+
+![LB VM 전원 장애 실제 결과](screenshots/10-ha-vm-power-loss.jpg)
+
+![etcd quorum 상실·복구 실제 결과](screenshots/11-etcd-quorum.jpg)
+
+![KAM 인수 개선과 실제 두 worker 배치](screenshots/12-kam-fast-handover.jpg)
+
+[재현 명령·실제 원문·검증 제한](HA-POWER-LIVE.md)을 확인하세요.

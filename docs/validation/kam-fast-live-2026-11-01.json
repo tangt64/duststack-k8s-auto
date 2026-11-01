@@ -1,0 +1,55 @@
+{
+  "started_at": "2026-11-01T10:26:11.025926+00:00",
+  "namespace": "kam-e2e",
+  "subject": "kam-e2e-cfff0af88190",
+  "status": "passed",
+  "checks": {
+    "distinct_node_placement": true,
+    "namespace_view_and_escalation_denied": true,
+    "leader_failover_and_native_gc": true,
+    "expiry_revocation": true
+  },
+  "pods_before": [
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-85cpk",
+      "node": "ha-worker01.lab.dustbox.kr"
+    },
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-bf28f",
+      "node": "ha-worker02.lab.dustbox.kr"
+    }
+  ],
+  "leader_failovers": [
+    {
+      "from": "kam-467237b227cc2f05-7656d7586f-bf28f:362565d0-3468-4234-87b1-fd661a732b28",
+      "to": "kam-467237b227cc2f05-7656d7586f-85cpk:fa655e59-b3c0-412b-bde2-cac41b09af13",
+      "seconds": 2.6
+    },
+    {
+      "from": "kam-467237b227cc2f05-7656d7586f-85cpk:fa655e59-b3c0-412b-bde2-cac41b09af13",
+      "to": "kam-467237b227cc2f05-7656d7586f-sx7lk:d135e50c-fc3d-402b-b617-de3e3534fb8c",
+      "seconds": 2.66
+    },
+    {
+      "from": "kam-467237b227cc2f05-7656d7586f-sx7lk:d135e50c-fc3d-402b-b617-de3e3534fb8c",
+      "to": "kam-467237b227cc2f05-7656d7586f-bhjmm:58c41694-cc3b-46cd-85e8-a29726eebce8",
+      "seconds": 2.7
+    }
+  ],
+  "leader_failover": {
+    "from": "kam-467237b227cc2f05-7656d7586f-sx7lk:d135e50c-fc3d-402b-b617-de3e3534fb8c",
+    "to": "kam-467237b227cc2f05-7656d7586f-bhjmm:58c41694-cc3b-46cd-85e8-a29726eebce8",
+    "seconds": 2.7
+  },
+  "pods_after": [
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-bhjmm",
+      "node": "ha-worker01.lab.dustbox.kr"
+    },
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-hvdcv",
+      "node": "ha-worker02.lab.dustbox.kr"
+    }
+  ],
+  "finished_at": "2026-11-01T10:29:05.338300+00:00"
+}

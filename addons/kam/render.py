@@ -80,7 +80,10 @@ def manifests(namespace, image, profiles):
     lease_binding = {'apiVersion': 'rbac.authorization.k8s.io/v1', 'kind': 'RoleBinding', 'metadata': dict(secure_meta),
                      'roleRef': {'apiGroup': 'rbac.authorization.k8s.io', 'kind': 'Role', 'name': name}, 'subjects': binding['subjects']}
     deployment['metadata'] = dict(secure_meta)
+    deployment['spec']['strategy'] = {'type': 'RollingUpdate',
+                                    'rollingUpdate': {'maxSurge': 0, 'maxUnavailable': 1}}
     pod = deployment['spec']['template']['spec']
+    pod['terminationGracePeriodSeconds'] = 45
     pod['serviceAccountName'] = name
     pod['volumes'][0]['configMap']['name'] = name
     pod['containers'][0]['env'] += [{'name': 'KAM_LEASE_NAMESPACE', 'value': 'kam-system'}, {'name': 'KAM_LEASE_NAME', 'value': name},

@@ -204,8 +204,10 @@ CI에서도 소스·문법·회귀·CLI 통합 검증과 공식 차트 SHA-256·
 [실제 화면과 원문 결과](docs/validation/README.md)를 확인하세요.
 별도 VM 7대에서는 [HA·KAM 실증](docs/HA-KAM-LIVE.md)을 완료했습니다.
 VIP 이동 10.01초(API probe 7회 실패 후 복구), KAM 두 worker 배치와 리더 인수,
-CR 삭제·만료에 따른 권한 회수를 확인했습니다. VM 전원 장애·etcd quorum·백업 복구와
-표준 최신 CSI 조합의 실증은 별도로 필요합니다.
+CR 삭제·만료에 따른 권한 회수를 확인했습니다. 후속 [VM 전원·quorum 실증](docs/HA-POWER-LIVE.md)에서
+LB·control plane HARD 재부팅, quorum 상실 후 자동 복구와 데이터 보존을 확인했고
+KAM 정상 리더 교체는 3회 2.60~2.70초로 줄였습니다. 전환 중 API 실패도 기록했습니다.
+영구 과반수 손실의 백업 복원과 표준 최신 CSI 조합의 실증은 별도로 필요합니다.
 
 ## 공식 참고
 

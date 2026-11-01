@@ -116,6 +116,9 @@ def main():
             api.tls = ssl.create_default_context(cafile=str(root / 'ca.crt'))
             assert kam.acquire(api, 'kam-system', 'leader-one')
             assert not kam.acquire(api, 'kam-system', 'leader-two')
+            assert not kam.release(api, 'kam-system', 'leader-two')
+            assert kam.release(api, 'kam-system', 'leader-one')
+            assert kam.acquire(api, 'kam-system', 'leader-two')
             g = {'apiVersion': kam.VERSION, 'kind': 'KamAccessGrant', 'metadata': {'name': 'alice', 'namespace': 'dev'},
                  'spec': {'subject': {'kind': 'User', 'name': 'alice@example.com'}, 'profile': 'view'}}
             kubectl('apply', '-f', '-', body=g)
@@ -149,7 +152,7 @@ def main():
                                     '--client-certificate=' + str(root / 'admin.crt'), '--client-key=' + str(root / 'admin.key'),
                                     'auth', 'can-i', 'list', 'pods', '-n', 'dev', '--as=alice@example.com'], capture_output=True, text=True)
             assert result.stdout.strip() == 'no'
-            print('KAM_REAL_API_PASS: CRD admission/CEL, kubectl plugin via KUBECONFIG, namespace Role bind, status update, repeated reconciliation, Lease exclusion, RBAC allow, escalation denial, expiry revocation')
+            print('KAM_REAL_API_PASS: CRD admission/CEL, kubectl plugin via KUBECONFIG, namespace Role bind, status update, repeated reconciliation, Lease exclusion/release/immediate takeover, RBAC allow, escalation denial, expiry revocation')
             print('Not tested: kubelet scheduling, native garbage collection, multi-VM HA failover')
         except Exception:
             for log in logs:

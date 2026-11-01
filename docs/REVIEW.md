@@ -5,6 +5,11 @@
 
 ## 반영한 수정
 
+후속 [전원 장애·quorum 실증](HA-POWER-LIVE.md)에서 LB·control plane HARD 재부팅과
+etcd quorum 상실 후 복구·데이터 보존을 확인했습니다. KAM 정상 리더 Pod 삭제 인수를
+90.37초에서 3회 2.60~2.70초로 개선했고, 회귀 73개와 실제 API·CLI·차트 검증을 통과했습니다.
+강제 종료의 60초 Lease와 전환 중 API 실패는 별도로 명시했습니다.
+
 2026-11-01 후속 변경으로 별도 LB의 `haproxy_keepalived` 조합과 namespace
 `KamAccessGrant` CRD/controller, `kubectl kam` 플러그인을 추가했습니다.
 controller 코드·ServiceAccount·Lease는 관리자 전용 `kam-system`에 분리하고

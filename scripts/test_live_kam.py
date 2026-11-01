@@ -25,7 +25,11 @@ def main():
     parser.add_argument('--namespace', required=True)
     parser.add_argument('--confirm-disposable-lab', action='store_true', required=True)
     parser.add_argument('--output', default='.tools/live-kam-result.json')
+    parser.add_argument('--leader-trials', type=int, choices=range(1, 6), default=1)
+    parser.add_argument('--max-handover-seconds', type=float, default=150)
     args = parser.parse_args()
+    if args.max_handover_seconds <= 0 or args.max_handover_seconds > 150:
+        parser.error('handover limit must be in (0, 150]')
     if args.namespace in {'default', 'kam-system'} or args.namespace.startswith('kube-'):
         parser.error('Use a dedicated, disposable target namespace')
     base = ['kubectl', '--kubeconfig', args.kubeconfig, '--request-timeout=15s']
@@ -96,19 +100,29 @@ def main():
         assert not allowed(ns='default'), 'Grant escaped its namespace'
         evidence['checks']['namespace_view_and_escalation_denied'] = True
 
-        lease = read('lease', name, ns='kam-system')
-        holder = lease['spec']['holderIdentity']
-        leader = next((p for p in ready if holder.split(':', 1)[0] == p['metadata']['name']), None)
-        assert leader, 'Lease holder must match a running controller Pod'
-        started = time.monotonic()
-        run('delete', 'pod', leader['metadata']['name'], '--wait=false', ns='kam-system')
-        def new_leader():
-            obj = read('lease', name, ns='kam-system')
-            value = obj['spec'].get('holderIdentity')
-            return value if value and value != holder else None
-        replacement = eventually(new_leader, 'leader failover')
-        evidence['leader_failover'] = {'from': holder, 'to': replacement, 'seconds': round(time.monotonic() - started, 2)}
-        assert allowed(), 'Existing view permission disappeared during controller failover'
+        evidence['leader_failovers'] = []
+        for _ in range(args.leader_trials):
+            pods = read('pods', ns='kam-system', selector='app=' + name)['items']
+            ready = [p for p in pods if not p['metadata'].get('deletionTimestamp') and
+                     any(c.get('type') == 'Ready' and c.get('status') == 'True' for c in p.get('status', {}).get('conditions', []))]
+            assert len(ready) == 2 and len({p['spec']['nodeName'] for p in ready}) == 2
+            lease = read('lease', name, ns='kam-system')
+            holder = lease['spec']['holderIdentity']
+            leader = next((p for p in ready if holder.split(':', 1)[0] == p['metadata']['name']), None)
+            assert leader, 'Lease holder must match a running controller Pod'
+            started = time.monotonic()
+            run('delete', 'pod', leader['metadata']['name'], '--wait=false', ns='kam-system')
+            def new_leader():
+                obj = read('lease', name, ns='kam-system')
+                value = obj['spec'].get('holderIdentity')
+                return value if value and value != holder else None
+            replacement = eventually(new_leader, 'leader failover')
+            evidence['leader_failover'] = {'from': holder, 'to': replacement, 'seconds': round(time.monotonic() - started, 2)}
+            assert allowed(), 'Existing view permission disappeared during controller failover'
+            trial = evidence['leader_failover'].copy()
+            evidence['leader_failovers'].append(trial)
+            assert trial['seconds'] <= args.max_handover_seconds, 'Leader handover exceeded requested limit'
+            run('rollout', 'status', 'deployment/' + name, '--timeout=60s', ns='kam-system')
         run('delete', 'kag', grant_name, ns=target)
         eventually(lambda: missing('rolebinding', binding), 'native garbage collection of owned binding')
         eventually(lambda: not allowed(), 'permission revoked after CR deletion')

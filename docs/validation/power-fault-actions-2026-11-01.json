@@ -1,0 +1,36 @@
+{
+  "actions": [
+    {
+      "id": "ec88d1d6-9340-4d63-b4b7-edbf592f86e6",
+      "name": "duststack-ha-20261101-lb-01",
+      "action": "reboot",
+      "type": "HARD",
+      "requested_at": "2026-11-01T10:29:32.540862+00:00",
+      "accepted_at": "2026-11-01T10:29:32.729955+00:00"
+    },
+    {
+      "id": "c6aff28a-29f0-4dda-bd57-aa65773865f7",
+      "name": "duststack-ha-20261101-cp-02",
+      "action": "reboot",
+      "type": "HARD",
+      "requested_at": "2026-11-01T10:32:32.221501+00:00",
+      "accepted_at": "2026-11-01T10:32:32.416679+00:00"
+    },
+    {
+      "id": "c6aff28a-29f0-4dda-bd57-aa65773865f7",
+      "name": "duststack-ha-20261101-cp-02",
+      "action": "reboot",
+      "type": "HARD",
+      "requested_at": "2026-11-01T10:36:16.533325+00:00",
+      "accepted_at": "2026-11-01T10:36:16.813057+00:00"
+    },
+    {
+      "id": "dc5df408-6e05-4a41-ab7b-d22b1f8a8785",
+      "name": "duststack-ha-20261101-cp-03",
+      "action": "reboot",
+      "type": "HARD",
+      "requested_at": "2026-11-01T10:36:16.544817+00:00",
+      "accepted_at": "2026-11-01T10:36:16.810829+00:00"
+    }
+  ]
+}

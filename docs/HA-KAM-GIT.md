@@ -153,6 +153,10 @@ native API dry-run, CRD Established, 해당 controller rollout을 검사합니�
 controller는 대상 namespace마다 2개 replica와 resourceVersion 기반 Lease 경쟁을 사용하며,
 서로 다른 호스트에 배치하도록 제한하고 PDB `minAvailable: 1`을 제공합니다.
 두 replica를 실행할 스케줄 가능한 노드 2대가 필요합니다.
+정상 SIGTERM 종료 시 새 조정을 멈춘 뒤 자신의 Lease만 resourceVersion을 포함해
+반납합니다. 대기 replica는 2초마다 재확인합니다. 종료 유예는 45초이며 rolling update는
+`maxSurge: 0`, `maxUnavailable: 1`입니다. 강제 종료·VM 전원 장애처럼 반납이 불가능하면
+기존 60초 Lease 만료를 기다립니다. 이 변경은 장애 시 만료 시간을 줄이지 않습니다.
 기본 bind 허용 대상은 `view`뿐입니다. `--profile view --profile edit`로 렌더링하면
 해당 프로필과 bind 권한이 함께 확장되므로 관리자 정책 검토 후 설치하세요.
 controller ServiceAccount에는 Secrets 읽기·ServiceAccount 변경·ClusterRoleBinding
@@ -202,7 +206,7 @@ ID는 `29d2ff67f15897d9b79939b3303743c3543eb391702e3aa0e0ac1a3caa036756`입니�
 API 도구는 공식 envtest v1.37.0이며, SHA-512를 업스트림 배포 파일과 대조하고 고정
 SHA-256으로 캐시 다운로드·실행을 검증합니다. 실행 바이너리·차트·인증키는 Git에서 제외합니다.
 
-후속 수정의 회귀는 70개로 확대했습니다. 전용 VM의 실제 클러스터 설치와 HA VIP
+후속 수정과 KAM 종료 개선의 회귀는 73개로 확대했습니다. 전용 VM의 실제 클러스터 설치와 HA VIP
 이동·KAM 두 노드 배치·리더 인수·CR 삭제/만료 회수도 통과했습니다.
 [실증 결과와 실제 화면](HA-KAM-LIVE.md)에 API 실패 표본·소스 해시·미검증 범위를 기록했습니다.
 
@@ -245,3 +249,7 @@ Gitea Actions는 별도의 runner가 온라인인 경우에만 실행됩니다. 
 
 [Gitea 호환성](https://docs.gitea.com/usage/actions/comparison/) ·
 [Kubernetes CRD](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)
+
+후속 [VM 전원·etcd quorum·KAM 인수 실증](HA-POWER-LIVE.md)에서는 LB·control plane
+HARD 재부팅과 quorum 상실 후 데이터 보존을 확인했습니다. KAM 정상 리더 교체는
+3회 2.60·2.66·2.70초였습니다. 강제 종료 시에는 60초 Lease 만료가 적용됩니다.

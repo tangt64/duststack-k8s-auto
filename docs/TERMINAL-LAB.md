@@ -165,3 +165,7 @@ HA·KAM 실증을 완료했습니다. 위 Cilium·CSI 검증과 다른 클러스
 HAProxy 중지 후 VIP 이동 10.01초, KAM 두 worker 배치·리더 인수 90.37초,
 CR 삭제·만료 후 권한 회수를 확인했습니다. 전환 중 API probe 7회 실패도 기록했습니다.
 [실행 방법·실제 화면·원문·제한](HA-KAM-LIVE.md)을 참고하세요.
+
+후속 [VM 전원·etcd quorum·KAM 인수 실증](HA-POWER-LIVE.md)에서는 LB·control plane
+HARD 재부팅과 quorum 상실 후 데이터 보존을 확인했습니다. KAM 정상 리더 교체는
+3회 2.60·2.66·2.70초였습니다. 강제 종료 시에는 60초 Lease 만료가 적용됩니다.

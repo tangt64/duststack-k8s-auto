@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import ssl
+import signal
 import time
 import threading
 import uuid
@@ -19,8 +20,11 @@ LAST_API_SUCCESS = 0.0
 
 
 class Health(BaseHTTPRequestHandler):
+    stop_event = None
+
     def do_GET(self):
-        healthy = self.path == '/healthz' or (self.path == '/readyz' and time.monotonic() - LAST_API_SUCCESS < 30)
+        stopping = self.stop_event is not None and self.stop_event.is_set()
+        healthy = self.path == '/healthz' or (self.path == '/readyz' and not stopping and time.monotonic() - LAST_API_SUCCESS < 30)
         self.send_response(200 if healthy else 503)
         self.end_headers()
 
@@ -130,9 +134,10 @@ def acquire(api, namespace, identity, at=None):
     lease = api.call('GET', base + '/' + lease_name)
     if lease:
         spec = lease['spec']
-        renew = datetime.fromisoformat(spec['renewTime'].replace('Z', '+00:00'))
-        if spec.get('holderIdentity') != identity and (at - renew).total_seconds() < spec['leaseDurationSeconds']:
-            return False
+        if spec.get('holderIdentity') and spec['holderIdentity'] != identity:
+            renew = datetime.fromisoformat(spec['renewTime'].replace('Z', '+00:00'))
+            if (at - renew).total_seconds() < spec['leaseDurationSeconds']:
+                return False
     else:
         lease = {'apiVersion': 'coordination.k8s.io/v1', 'kind': 'Lease',
                  'metadata': {'name': lease_name, 'namespace': namespace}}
@@ -142,29 +147,64 @@ def acquire(api, namespace, identity, at=None):
     return True
 
 
-def run():
+def release(api, namespace, identity):
+    """Release only our current term, with the API resourceVersion precondition."""
+    path = '/apis/coordination.k8s.io/v1/namespaces/' + namespace + '/leases/' + os.environ.get('KAM_LEASE_NAME', 'kam-controller')
+    current = api.call('GET', path)
+    if not current or current['spec'].get('holderIdentity') != identity:
+        return False
+    updated = copy.deepcopy(current)
+    updated['spec']['holderIdentity'] = ''
+    api.call('PUT', path, updated)
+    return True
+
+
+def run(stop=None):
     global LAST_API_SUCCESS
+    if stop is None:
+        stop = threading.Event()
+        # PID 1 needs an explicit handler; never perform API writes in it.
+        for sig in (signal.SIGTERM, signal.SIGINT):
+            signal.signal(sig, lambda *_: stop.set())
     namespace = os.environ['KAM_NAMESPACE']
     lease_namespace = os.environ.get('KAM_LEASE_NAMESPACE', 'kam-system')
     profiles = set(os.environ.get('KAM_PROFILES', 'view').split(','))
     if not profiles or not profiles <= {'view', 'edit', 'admin'}:
         raise ValueError('Only reviewed built-in profiles are supported')
     api = API()
+    Health.stop_event = stop
     health_server = HTTPServer(('0.0.0.0', 8080), Health)
     threading.Thread(target=health_server.serve_forever, daemon=True).start()
     # Include the Pod name for incident diagnosis; a fresh UUID fences restarts.
     identity = os.environ.get('KAM_POD_NAME', 'controller') + ':' + str(uuid.uuid4())
     path = '/apis/' + VERSION + '/namespaces/' + namespace + '/kamaccessgrants'
-    while True:
+    try:
+        run_loop(api, namespace, lease_namespace, profiles, identity, path, stop)
+    finally:
+        # No reconciliation can run after this point. A stale PUT is rejected
+        # by resourceVersion; failed release falls back to the 60-second lease.
+        try:
+            release(api, lease_namespace, identity)
+        except Exception as error:
+            print('KAM lease release failed: ' + str(error), flush=True)
+        health_server.shutdown()
+        health_server.server_close()
+
+
+def run_loop(api, namespace, lease_namespace, profiles, identity, path, stop):
+    global LAST_API_SUCCESS
+    while not stop.is_set():
         try:
             leader = acquire(api, lease_namespace, identity)
             LAST_API_SUCCESS = time.monotonic()
             if not leader:
-                time.sleep(10)
+                stop.wait(2)
                 continue
             grants = api.call('GET', path)['items']
             for grant in grants:
-                if not acquire(api, lease_namespace, identity):
+                if stop.is_set():
+                    break
+                if not acquire(api, lease_namespace, identity) or stop.is_set():
                     break
                 if grant['metadata'].get('deletionTimestamp'):
                     continue  # Native garbage collection removes owned bindings.
@@ -187,7 +227,7 @@ def run():
                     api.call('PUT', path + '/' + grant['metadata']['name'] + '/status', body)
         except Exception as error:
             print('KAM reconciliation failed: ' + str(error), flush=True)
-        time.sleep(10)
+        stop.wait(10)
 
 
 if __name__ == '__main__':

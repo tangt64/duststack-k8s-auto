@@ -1,0 +1,3192 @@
+{
+  "started_at": "2026-11-01T10:32:00.066307+00:00",
+  "phase": "cp-single",
+  "namespace": "power-e2e-fcdbcf27ac",
+  "status": "passed",
+  "samples": [
+    {
+      "seconds": 0.03,
+      "at": "2026-11-01T10:32:04.401614+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched (no change)"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"68.336352ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13345,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":18952,\"raftTerm\":10,\"raftAppliedIndex\":18952,\"dbSizeInUse\":6516736,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 1.33,
+      "at": "2026-11-01T10:32:05.708103+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"48.065648ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13351,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":18961,\"raftTerm\":10,\"raftAppliedIndex\":18961,\"dbSizeInUse\":6520832,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 2.64,
+      "at": "2026-11-01T10:32:07.016093+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"21.801273ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13353,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":18968,\"raftTerm\":10,\"raftAppliedIndex\":18968,\"dbSizeInUse\":6524928,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 3.96,
+      "at": "2026-11-01T10:32:08.328957+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"68.410441ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13361,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":18978,\"raftTerm\":10,\"raftAppliedIndex\":18978,\"dbSizeInUse\":6529024,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 5.28,
+      "at": "2026-11-01T10:32:09.649776+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"55.188495ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13367,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":18988,\"raftTerm\":10,\"raftAppliedIndex\":18988,\"dbSizeInUse\":6533120,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 6.56,
+      "at": "2026-11-01T10:32:10.930400+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"68.760178ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13373,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":18999,\"raftTerm\":10,\"raftAppliedIndex\":18999,\"dbSizeInUse\":6537216,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 8.01,
+      "at": "2026-11-01T10:32:12.385085+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"83.517457ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13377,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19004,\"raftTerm\":10,\"raftAppliedIndex\":19004,\"dbSizeInUse\":6529024,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 9.43,
+      "at": "2026-11-01T10:32:13.804713+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"79.044691ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13381,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19010,\"raftTerm\":10,\"raftAppliedIndex\":19010,\"dbSizeInUse\":6541312,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 10.75,
+      "at": "2026-11-01T10:32:15.124942+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"64.264504ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13384,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19016,\"raftTerm\":10,\"raftAppliedIndex\":19016,\"dbSizeInUse\":6533120,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 12.1,
+      "at": "2026-11-01T10:32:16.473376+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"24.752406ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13389,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19024,\"raftTerm\":10,\"raftAppliedIndex\":19024,\"dbSizeInUse\":6537216,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 13.4,
+      "at": "2026-11-01T10:32:17.770976+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"65.532807ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13396,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19035,\"raftTerm\":10,\"raftAppliedIndex\":19035,\"dbSizeInUse\":6549504,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 14.69,
+      "at": "2026-11-01T10:32:19.059880+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"44.392727ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13399,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19042,\"raftTerm\":10,\"raftAppliedIndex\":19042,\"dbSizeInUse\":6553600,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 15.98,
+      "at": "2026-11-01T10:32:20.354984+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"71.493656ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13408,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19054,\"raftTerm\":10,\"raftAppliedIndex\":19054,\"dbSizeInUse\":6557696,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 17.28,
+      "at": "2026-11-01T10:32:21.653681+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"52.411019ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13414,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19063,\"raftTerm\":10,\"raftAppliedIndex\":19063,\"dbSizeInUse\":6561792,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 18.54,
+      "at": "2026-11-01T10:32:22.911749+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"61.545258ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13415,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19066,\"raftTerm\":10,\"raftAppliedIndex\":19066,\"dbSizeInUse\":6553600,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 19.79,
+      "at": "2026-11-01T10:32:24.163888+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"67.26867ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13419,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19071,\"raftTerm\":10,\"raftAppliedIndex\":19071,\"dbSizeInUse\":6565888,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 21.06,
+      "at": "2026-11-01T10:32:25.437563+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"90.720478ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13422,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19077,\"raftTerm\":10,\"raftAppliedIndex\":19077,\"dbSizeInUse\":6569984,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 22.41,
+      "at": "2026-11-01T10:32:26.780242+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"57.092324ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13428,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19087,\"raftTerm\":10,\"raftAppliedIndex\":19087,\"dbSizeInUse\":6574080,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 23.74,
+      "at": "2026-11-01T10:32:28.118602+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"56.77898ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13435,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19096,\"raftTerm\":10,\"raftAppliedIndex\":19096,\"dbSizeInUse\":6574080,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 25.03,
+      "at": "2026-11-01T10:32:29.399642+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"28.328124ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13438,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19104,\"raftTerm\":10,\"raftAppliedIndex\":19104,\"dbSizeInUse\":6578176,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 26.24,
+      "at": "2026-11-01T10:32:30.615074+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"57.81905ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13446,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19115,\"raftTerm\":10,\"raftAppliedIndex\":19115,\"dbSizeInUse\":6582272,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 27.57,
+      "at": "2026-11-01T10:32:31.946888+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"42.759543ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13452,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19123,\"raftTerm\":10,\"raftAppliedIndex\":19123,\"dbSizeInUse\":6586368,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 28.84,
+      "at": "2026-11-01T10:32:33.214935+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"95.553985ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13453,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19127,\"raftTerm\":10,\"raftAppliedIndex\":19127,\"dbSizeInUse\":6578176,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 30.17,
+      "at": "2026-11-01T10:32:34.540304+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"57.133218ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13457,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19134,\"raftTerm\":10,\"raftAppliedIndex\":19134,\"dbSizeInUse\":6582272,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 31.49,
+      "at": "2026-11-01T10:32:35.859907+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"34.045241ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13463,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19142,\"raftTerm\":10,\"raftAppliedIndex\":19142,\"dbSizeInUse\":6594560,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 32.76,
+      "at": "2026-11-01T10:32:37.131079+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"49.173371ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13466,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19149,\"raftTerm\":10,\"raftAppliedIndex\":19149,\"dbSizeInUse\":6598656,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 34.09,
+      "at": "2026-11-01T10:32:38.463206+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": false,
+        "output": "Unable to connect to the server: context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"61.46364ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13469,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19153,\"raftTerm\":10,\"raftAppliedIndex\":19153,\"dbSizeInUse\":6598656,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 37.34,
+      "at": "2026-11-01T10:32:41.714749+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": false,
+        "output": "Unable to connect to the server: context deadline exceeded"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"50.492709ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13477,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19165,\"raftTerm\":10,\"raftAppliedIndex\":19165,\"dbSizeInUse\":6602752,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 40.65,
+      "at": "2026-11-01T10:32:45.021081+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"68.119545ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13480,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19171,\"raftTerm\":10,\"raftAppliedIndex\":19171,\"dbSizeInUse\":6606848,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 42.06,
+      "at": "2026-11-01T10:32:46.435782+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": false,
+        "output": "Unable to connect to the server: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"59.352321ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13484,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19177,\"raftTerm\":10,\"raftAppliedIndex\":19177,\"dbSizeInUse\":6606848,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 45.25,
+      "at": "2026-11-01T10:32:49.628728+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": false,
+        "output": "Unable to connect to the server: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"92.506438ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13490,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19186,\"raftTerm\":10,\"raftAppliedIndex\":19186,\"dbSizeInUse\":6610944,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 48.59,
+      "at": "2026-11-01T10:32:52.963069+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"27.994458ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13498,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19200,\"raftTerm\":10,\"raftAppliedIndex\":19200,\"dbSizeInUse\":6615040,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 50.0,
+      "at": "2026-11-01T10:32:54.369105+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"34.861261ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13501,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19205,\"raftTerm\":10,\"raftAppliedIndex\":19205,\"dbSizeInUse\":6619136,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 51.4,
+      "at": "2026-11-01T10:32:55.778632+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"28.574008ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13504,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19208,\"raftTerm\":10,\"raftAppliedIndex\":19208,\"dbSizeInUse\":6619136,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 52.83,
+      "at": "2026-11-01T10:32:57.205712+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"22.939188ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13508,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19217,\"raftTerm\":10,\"raftAppliedIndex\":19217,\"dbSizeInUse\":6623232,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 54.24,
+      "at": "2026-11-01T10:32:58.611294+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"28.209406ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13511,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19222,\"raftTerm\":10,\"raftAppliedIndex\":19222,\"dbSizeInUse\":6623232,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 55.65,
+      "at": "2026-11-01T10:33:00.019265+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"95.92747ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13515,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19226,\"raftTerm\":10,\"raftAppliedIndex\":19226,\"dbSizeInUse\":6627328,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 57.08,
+      "at": "2026-11-01T10:33:01.458374+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"102.243096ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13521,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19235,\"raftTerm\":10,\"raftAppliedIndex\":19235,\"dbSizeInUse\":6631424,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 58.49,
+      "at": "2026-11-01T10:33:02.864563+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"104.04304ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13523,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19240,\"raftTerm\":10,\"raftAppliedIndex\":19240,\"dbSizeInUse\":6623232,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 59.8,
+      "at": "2026-11-01T10:33:04.174177+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"96.673423ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13526,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19245,\"raftTerm\":10,\"raftAppliedIndex\":19245,\"dbSizeInUse\":6635520,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 61.13,
+      "at": "2026-11-01T10:33:05.502878+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"75.846938ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13528,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19247,\"raftTerm\":10,\"raftAppliedIndex\":19247,\"dbSizeInUse\":6635520,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 62.48,
+      "at": "2026-11-01T10:33:06.854145+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"48.557331ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13533,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19257,\"raftTerm\":10,\"raftAppliedIndex\":19257,\"dbSizeInUse\":6643712,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 63.81,
+      "at": "2026-11-01T10:33:08.182133+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"125.993081ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13541,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19269,\"raftTerm\":10,\"raftAppliedIndex\":19269,\"dbSizeInUse\":6664192,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 65.19,
+      "at": "2026-11-01T10:33:09.564392+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"101.785851ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13543,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19272,\"raftTerm\":10,\"raftAppliedIndex\":19272,\"dbSizeInUse\":6660096,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 66.56,
+      "at": "2026-11-01T10:33:10.933444+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": false,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"58.42526ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13548,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19281,\"raftTerm\":10,\"raftAppliedIndex\":19281,\"dbSizeInUse\":6664192,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 67.9,
+      "at": "2026-11-01T10:33:12.274120+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"68.390197ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13553,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19288,\"raftTerm\":10,\"raftAppliedIndex\":19288,\"dbSizeInUse\":6656000,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 69.21,
+      "at": "2026-11-01T10:33:13.582473+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"112.26942ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13557,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19295,\"raftTerm\":10,\"raftAppliedIndex\":19295,\"dbSizeInUse\":6672384,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 70.55,
+      "at": "2026-11-01T10:33:14.923122+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"111.470507ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13565,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19304,\"raftTerm\":10,\"raftAppliedIndex\":19304,\"dbSizeInUse\":6676480,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 71.89,
+      "at": "2026-11-01T10:33:16.260167+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"60.803584ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13568,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19311,\"raftTerm\":10,\"raftAppliedIndex\":19311,\"dbSizeInUse\":6672384,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 73.27,
+      "at": "2026-11-01T10:33:17.647798+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"72.952461ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13574,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19322,\"raftTerm\":10,\"raftAppliedIndex\":19322,\"dbSizeInUse\":6709248,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 74.65,
+      "at": "2026-11-01T10:33:19.021230+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"19.47385ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13618,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19374,\"raftTerm\":10,\"raftAppliedIndex\":19374,\"dbSizeInUse\":6733824,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 76.14,
+      "at": "2026-11-01T10:33:20.515508+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"57.046408ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13649,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19405,\"raftTerm\":10,\"raftAppliedIndex\":19405,\"dbSizeInUse\":6938624,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 77.46,
+      "at": "2026-11-01T10:33:21.838791+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"147.300876ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13657,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19430,\"raftTerm\":10,\"raftAppliedIndex\":19430,\"dbSizeInUse\":6934528,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 78.84,
+      "at": "2026-11-01T10:33:23.217469+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"66.40789ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13664,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19457,\"raftTerm\":10,\"raftAppliedIndex\":19457,\"dbSizeInUse\":6950912,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 80.22,
+      "at": "2026-11-01T10:33:24.594123+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"125.985112ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13671,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19477,\"raftTerm\":10,\"raftAppliedIndex\":19477,\"dbSizeInUse\":6983680,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 81.54,
+      "at": "2026-11-01T10:33:25.912683+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"34.710707ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13678,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19485,\"raftTerm\":10,\"raftAppliedIndex\":19485,\"dbSizeInUse\":7049216,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 82.86,
+      "at": "2026-11-01T10:33:27.232999+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"60.501717ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13684,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19498,\"raftTerm\":10,\"raftAppliedIndex\":19498,\"dbSizeInUse\":7036928,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 84.24,
+      "at": "2026-11-01T10:33:28.616879+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"61.487718ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13695,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19512,\"raftTerm\":10,\"raftAppliedIndex\":19512,\"dbSizeInUse\":7122944,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 85.54,
+      "at": "2026-11-01T10:33:29.916738+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"20.416829ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13702,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19519,\"raftTerm\":10,\"raftAppliedIndex\":19519,\"dbSizeInUse\":7180288,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 86.81,
+      "at": "2026-11-01T10:33:31.182637+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"61.397112ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13711,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19534,\"raftTerm\":10,\"raftAppliedIndex\":19534,\"dbSizeInUse\":7213056,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 88.14,
+      "at": "2026-11-01T10:33:32.516110+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"75.773933ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13716,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19540,\"raftTerm\":10,\"raftAppliedIndex\":19540,\"dbSizeInUse\":7192576,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 89.41,
+      "at": "2026-11-01T10:33:33.786759+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"38.502245ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13720,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19547,\"raftTerm\":10,\"raftAppliedIndex\":19547,\"dbSizeInUse\":7196672,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 90.68,
+      "at": "2026-11-01T10:33:35.051698+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"32.390889ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13722,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19549,\"raftTerm\":10,\"raftAppliedIndex\":19549,\"dbSizeInUse\":7200768,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 91.94,
+      "at": "2026-11-01T10:33:36.313900+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"84.404012ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13730,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19562,\"raftTerm\":10,\"raftAppliedIndex\":19562,\"dbSizeInUse\":7274496,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 93.21,
+      "at": "2026-11-01T10:33:37.583039+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"60.069824ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13737,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19578,\"raftTerm\":10,\"raftAppliedIndex\":19578,\"dbSizeInUse\":7270400,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 94.53,
+      "at": "2026-11-01T10:33:38.903687+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"70.650176ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13741,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19584,\"raftTerm\":10,\"raftAppliedIndex\":19584,\"dbSizeInUse\":7270400,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 95.84,
+      "at": "2026-11-01T10:33:40.217743+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"91.652694ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13759,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19602,\"raftTerm\":10,\"raftAppliedIndex\":19602,\"dbSizeInUse\":7331840,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 97.28,
+      "at": "2026-11-01T10:33:41.654693+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"46.736614ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13769,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19618,\"raftTerm\":10,\"raftAppliedIndex\":19618,\"dbSizeInUse\":7364608,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 98.55,
+      "at": "2026-11-01T10:33:42.928736+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"74.396546ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13779,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19630,\"raftTerm\":10,\"raftAppliedIndex\":19630,\"dbSizeInUse\":7434240,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 99.8,
+      "at": "2026-11-01T10:33:44.177718+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"120.282291ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13799,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19661,\"raftTerm\":10,\"raftAppliedIndex\":19661,\"dbSizeInUse\":7458816,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 101.1,
+      "at": "2026-11-01T10:33:45.475196+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"93.787411ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13824,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19707,\"raftTerm\":10,\"raftAppliedIndex\":19707,\"dbSizeInUse\":7483392,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 102.53,
+      "at": "2026-11-01T10:33:46.908380+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"46.059759ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13828,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19717,\"raftTerm\":10,\"raftAppliedIndex\":19717,\"dbSizeInUse\":7491584,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 103.84,
+      "at": "2026-11-01T10:33:48.214153+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"66.545292ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13837,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19733,\"raftTerm\":10,\"raftAppliedIndex\":19733,\"dbSizeInUse\":7512064,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 105.21,
+      "at": "2026-11-01T10:33:49.582723+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"119.004995ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13844,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19741,\"raftTerm\":10,\"raftAppliedIndex\":19741,\"dbSizeInUse\":7516160,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 106.62,
+      "at": "2026-11-01T10:33:50.992074+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"32.608326ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13854,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19758,\"raftTerm\":10,\"raftAppliedIndex\":19758,\"dbSizeInUse\":7528448,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 107.95,
+      "at": "2026-11-01T10:33:52.326041+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"106.016061ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13858,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19764,\"raftTerm\":10,\"raftAppliedIndex\":19764,\"dbSizeInUse\":7528448,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 109.33,
+      "at": "2026-11-01T10:33:53.704703+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"37.547382ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13862,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19770,\"raftTerm\":10,\"raftAppliedIndex\":19770,\"dbSizeInUse\":7532544,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 110.77,
+      "at": "2026-11-01T10:33:55.144050+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"76.160955ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13867,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19777,\"raftTerm\":10,\"raftAppliedIndex\":19777,\"dbSizeInUse\":7536640,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 112.21,
+      "at": "2026-11-01T10:33:56.587242+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"67.568378ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13871,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19786,\"raftTerm\":10,\"raftAppliedIndex\":19786,\"dbSizeInUse\":7536640,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 113.6,
+      "at": "2026-11-01T10:33:57.973161+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"110.369788ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13877,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19797,\"raftTerm\":10,\"raftAppliedIndex\":19797,\"dbSizeInUse\":7561216,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 115.03,
+      "at": "2026-11-01T10:33:59.406765+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"47.536677ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13882,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19804,\"raftTerm\":10,\"raftAppliedIndex\":19804,\"dbSizeInUse\":7544832,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 116.26,
+      "at": "2026-11-01T10:34:00.638390+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"27.593034ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13886,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19809,\"raftTerm\":10,\"raftAppliedIndex\":19809,\"dbSizeInUse\":7548928,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 117.53,
+      "at": "2026-11-01T10:34:01.902373+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"38.36123ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13893,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19820,\"raftTerm\":10,\"raftAppliedIndex\":19820,\"dbSizeInUse\":7548928,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 118.77,
+      "at": "2026-11-01T10:34:03.145106+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"92.016116ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13897,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19827,\"raftTerm\":10,\"raftAppliedIndex\":19827,\"dbSizeInUse\":7544832,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 120.15,
+      "at": "2026-11-01T10:34:04.519778+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"61.216234ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13904,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19835,\"raftTerm\":10,\"raftAppliedIndex\":19835,\"dbSizeInUse\":7561216,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 121.47,
+      "at": "2026-11-01T10:34:05.848547+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"45.98617ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13906,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19839,\"raftTerm\":10,\"raftAppliedIndex\":19839,\"dbSizeInUse\":7561216,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 122.74,
+      "at": "2026-11-01T10:34:07.110800+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"67.383131ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13910,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19848,\"raftTerm\":10,\"raftAppliedIndex\":19848,\"dbSizeInUse\":7569408,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 124.01,
+      "at": "2026-11-01T10:34:08.383210+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"81.971255ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13915,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19858,\"raftTerm\":10,\"raftAppliedIndex\":19858,\"dbSizeInUse\":7565312,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 125.39,
+      "at": "2026-11-01T10:34:09.763122+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"36.091934ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13920,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19864,\"raftTerm\":10,\"raftAppliedIndex\":19864,\"dbSizeInUse\":7569408,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 126.64,
+      "at": "2026-11-01T10:34:11.010046+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"29.483996ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13928,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19878,\"raftTerm\":10,\"raftAppliedIndex\":19878,\"dbSizeInUse\":7577600,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 127.92,
+      "at": "2026-11-01T10:34:12.292571+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"62.994813ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13931,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19883,\"raftTerm\":10,\"raftAppliedIndex\":19883,\"dbSizeInUse\":7569408,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 129.27,
+      "at": "2026-11-01T10:34:13.648421+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"33.706997ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13936,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19889,\"raftTerm\":10,\"raftAppliedIndex\":19889,\"dbSizeInUse\":7581696,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 130.58,
+      "at": "2026-11-01T10:34:14.949361+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"57.760159ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13953,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19917,\"raftTerm\":10,\"raftAppliedIndex\":19917,\"dbSizeInUse\":7593984,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 131.82,
+      "at": "2026-11-01T10:34:16.197104+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"46.175531ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13955,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19925,\"raftTerm\":10,\"raftAppliedIndex\":19925,\"dbSizeInUse\":7589888,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 133.14,
+      "at": "2026-11-01T10:34:17.517981+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"33.055395ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13959,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19930,\"raftTerm\":10,\"raftAppliedIndex\":19930,\"dbSizeInUse\":7602176,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 134.54,
+      "at": "2026-11-01T10:34:18.909422+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"77.794406ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13966,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19942,\"raftTerm\":10,\"raftAppliedIndex\":19942,\"dbSizeInUse\":7602176,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 135.91,
+      "at": "2026-11-01T10:34:20.287297+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"51.31914ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13970,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19948,\"raftTerm\":10,\"raftAppliedIndex\":19948,\"dbSizeInUse\":7606272,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 137.19,
+      "at": "2026-11-01T10:34:21.559393+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"70.447103ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13978,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19960,\"raftTerm\":10,\"raftAppliedIndex\":19960,\"dbSizeInUse\":7610368,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 138.55,
+      "at": "2026-11-01T10:34:22.922290+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"42.196519ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13982,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19967,\"raftTerm\":10,\"raftAppliedIndex\":19967,\"dbSizeInUse\":7614464,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 139.78,
+      "at": "2026-11-01T10:34:24.156209+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"72.348308ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13987,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19973,\"raftTerm\":10,\"raftAppliedIndex\":19973,\"dbSizeInUse\":7634944,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 141.13,
+      "at": "2026-11-01T10:34:25.499517+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"58.33645ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13991,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19979,\"raftTerm\":10,\"raftAppliedIndex\":19979,\"dbSizeInUse\":7618560,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 142.46,
+      "at": "2026-11-01T10:34:26.830389+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"77.366485ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13996,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19989,\"raftTerm\":10,\"raftAppliedIndex\":19989,\"dbSizeInUse\":7626752,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 143.81,
+      "at": "2026-11-01T10:34:28.183724+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"32.749515ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":13999,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":19998,\"raftTerm\":10,\"raftAppliedIndex\":19998,\"dbSizeInUse\":7622656,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 145.11,
+      "at": "2026-11-01T10:34:29.486747+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"70.597701ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14004,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20004,\"raftTerm\":10,\"raftAppliedIndex\":20004,\"dbSizeInUse\":7626752,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 146.46,
+      "at": "2026-11-01T10:34:30.834121+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"39.83271ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14012,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20015,\"raftTerm\":10,\"raftAppliedIndex\":20015,\"dbSizeInUse\":7630848,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 147.78,
+      "at": "2026-11-01T10:34:32.150926+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"42.94349ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14017,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20024,\"raftTerm\":10,\"raftAppliedIndex\":20024,\"dbSizeInUse\":7626752,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 149.1,
+      "at": "2026-11-01T10:34:33.473382+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"54.004054ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14020,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20028,\"raftTerm\":10,\"raftAppliedIndex\":20028,\"dbSizeInUse\":7630848,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 150.45,
+      "at": "2026-11-01T10:34:34.825247+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"36.490574ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14028,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20037,\"raftTerm\":10,\"raftAppliedIndex\":20037,\"dbSizeInUse\":7643136,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 151.73,
+      "at": "2026-11-01T10:34:36.107703+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"22.515484ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14030,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20040,\"raftTerm\":10,\"raftAppliedIndex\":20040,\"dbSizeInUse\":7647232,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 153.0,
+      "at": "2026-11-01T10:34:37.371723+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"70.822102ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14034,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20051,\"raftTerm\":10,\"raftAppliedIndex\":20051,\"dbSizeInUse\":7647232,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 154.35,
+      "at": "2026-11-01T10:34:38.723162+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"63.122211ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14039,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20060,\"raftTerm\":10,\"raftAppliedIndex\":20060,\"dbSizeInUse\":7651328,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 155.69,
+      "at": "2026-11-01T10:34:40.064839+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"35.71012ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14044,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20067,\"raftTerm\":10,\"raftAppliedIndex\":20067,\"dbSizeInUse\":7655424,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 156.98,
+      "at": "2026-11-01T10:34:41.352218+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"31.118906ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14052,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20079,\"raftTerm\":10,\"raftAppliedIndex\":20079,\"dbSizeInUse\":7663616,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 158.28,
+      "at": "2026-11-01T10:34:42.653460+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"49.35385ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14055,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20085,\"raftTerm\":10,\"raftAppliedIndex\":20085,\"dbSizeInUse\":7667712,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 159.55,
+      "at": "2026-11-01T10:34:43.925942+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"41.588106ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14059,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20090,\"raftTerm\":10,\"raftAppliedIndex\":20090,\"dbSizeInUse\":7663616,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 160.84,
+      "at": "2026-11-01T10:34:45.214700+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"56.204372ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14066,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20098,\"raftTerm\":10,\"raftAppliedIndex\":20098,\"dbSizeInUse\":7671808,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 162.11,
+      "at": "2026-11-01T10:34:46.486551+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"29.700469ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14068,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20106,\"raftTerm\":10,\"raftAppliedIndex\":20106,\"dbSizeInUse\":7671808,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 163.37,
+      "at": "2026-11-01T10:34:47.744780+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"60.62769ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14074,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20115,\"raftTerm\":10,\"raftAppliedIndex\":20115,\"dbSizeInUse\":7692288,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 164.71,
+      "at": "2026-11-01T10:34:49.084433+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"54.400357ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14080,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20124,\"raftTerm\":10,\"raftAppliedIndex\":20124,\"dbSizeInUse\":7688192,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 166.02,
+      "at": "2026-11-01T10:34:50.396923+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"60.727171ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14083,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20128,\"raftTerm\":10,\"raftAppliedIndex\":20128,\"dbSizeInUse\":7692288,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 167.36,
+      "at": "2026-11-01T10:34:51.737608+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"77.413839ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14091,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20141,\"raftTerm\":10,\"raftAppliedIndex\":20141,\"dbSizeInUse\":7700480,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 168.64,
+      "at": "2026-11-01T10:34:53.016644+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"68.76443ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14096,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20149,\"raftTerm\":10,\"raftAppliedIndex\":20149,\"dbSizeInUse\":7700480,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 170.0,
+      "at": "2026-11-01T10:34:54.374693+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"96.365886ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14100,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20154,\"raftTerm\":10,\"raftAppliedIndex\":20154,\"dbSizeInUse\":7700480,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 171.4,
+      "at": "2026-11-01T10:34:55.770296+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"43.234008ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14105,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20160,\"raftTerm\":10,\"raftAppliedIndex\":20160,\"dbSizeInUse\":7704576,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 172.7,
+      "at": "2026-11-01T10:34:57.076023+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"77.87914ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14110,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20172,\"raftTerm\":10,\"raftAppliedIndex\":20172,\"dbSizeInUse\":7708672,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 174.03,
+      "at": "2026-11-01T10:34:58.406699+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"50.307063ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14113,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20179,\"raftTerm\":10,\"raftAppliedIndex\":20179,\"dbSizeInUse\":7712768,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 175.31,
+      "at": "2026-11-01T10:34:59.682986+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"84.918385ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14118,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20185,\"raftTerm\":10,\"raftAppliedIndex\":20185,\"dbSizeInUse\":7716864,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 176.68,
+      "at": "2026-11-01T10:35:01.056235+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"100.493402ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14128,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20201,\"raftTerm\":10,\"raftAppliedIndex\":20201,\"dbSizeInUse\":7725056,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 178.06,
+      "at": "2026-11-01T10:35:02.433014+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"34.790286ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14131,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20206,\"raftTerm\":10,\"raftAppliedIndex\":20206,\"dbSizeInUse\":7720960,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    },
+    {
+      "seconds": 179.32,
+      "at": "2026-11-01T10:35:03.698094+00:00",
+      "peer_etcd_tcp": {
+        "172.30.62.158": true,
+        "172.30.62.170": true
+      },
+      "api_ready": {
+        "ok": true,
+        "output": "ok"
+      },
+      "api_write": {
+        "ok": true,
+        "output": "configmap/write-probe patched"
+      },
+      "etcd_health": {
+        "ok": true,
+        "output": "[{\"endpoint\":\"https://127.0.0.1:2379\",\"health\":true,\"took\":\"78.355049ms\"}]"
+      },
+      "etcd_status": {
+        "ok": true,
+        "output": "[{\"Endpoint\":\"https://127.0.0.1:2379\",\"Status\":{\"header\":{\"cluster_id\":2942833692602529946,\"member_id\":6291188632817218287,\"revision\":14134,\"raft_term\":10},\"version\":\"3.7.0\",\"dbSize\":15343616,\"leader\":6291188632817218287,\"raftIndex\":20211,\"raftTerm\":10,\"raftAppliedIndex\":20211,\"dbSizeInUse\":7725056,\"storageVersion\":\"3.7.0\",\"dbSizeQuota\":2147483648,\"downgradeInfo\":{}}}]"
+      }
+    }
+  ],
+  "boot_before": {
+    "172.30.62.158": {
+      "ok": true,
+      "output": "a23c8930-bb99-434e-b9d7-760d1eb80145"
+    },
+    "172.30.62.170": {
+      "ok": true,
+      "output": "a299b0be-3440-4b8f-8827-a412a1799ec2"
+    },
+    "172.30.62.149": {
+      "ok": true,
+      "output": "a96afb47-bb0e-4df4-8028-c732964b5f78"
+    },
+    "172.30.62.43": {
+      "ok": true,
+      "output": "37210aa2-cdb3-455b-b973-8338e223323b"
+    }
+  },
+  "owners_before": {
+    "172.30.62.149": true,
+    "172.30.62.43": false
+  },
+  "boot_after": {
+    "172.30.62.158": {
+      "ok": true,
+      "output": "322bb4b3-5bfe-4fb5-a435-7cc117e85e84"
+    },
+    "172.30.62.170": {
+      "ok": true,
+      "output": "a299b0be-3440-4b8f-8827-a412a1799ec2"
+    },
+    "172.30.62.149": {
+      "ok": true,
+      "output": "a96afb47-bb0e-4df4-8028-c732964b5f78"
+    },
+    "172.30.62.43": {
+      "ok": true,
+      "output": "37210aa2-cdb3-455b-b973-8338e223323b"
+    }
+  },
+  "rebooted_ips": [
+    "172.30.62.158"
+  ],
+  "peer_api_after": {
+    "172.30.62.158": {
+      "ok": true,
+      "output": "ok"
+    },
+    "172.30.62.170": {
+      "ok": true,
+      "output": "ok"
+    }
+  },
+  "etcd_members_after": 3,
+  "owners_after": {
+    "172.30.62.149": true,
+    "172.30.62.43": false
+  },
+  "sentinel_preserved": true,
+  "test_namespace_cleanup": {
+    "ok": true,
+    "output": "namespace \"power-e2e-fcdbcf27ac\" deleted"
+  },
+  "finished_at": "2026-11-01T10:35:10.385824+00:00"
+}

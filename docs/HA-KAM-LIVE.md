@@ -105,12 +105,15 @@ python scripts/test_live_kam.py --kubeconfig /etc/kubernetes/admin.conf \
 
 ## 후속 검증과 운영 개선
 
-이번 HA 장애 주입은 HAProxy 프로세스 중지입니다. LB VM 전원 상실, control plane VM
-상실과 etcd quorum, 실제 물리 장애 영역 격리, 기존 watch 연결의 연속성·백업 복구는
-별도 검증 대상입니다. 10.01초와 90.37초는 한 번의 랩 관측값이며 운영 SLO 보장이 아닙니다.
+이 기록의 HA 장애 주입은 HAProxy 프로세스 중지입니다. 같은 랩의 후속
+[VM 전원·etcd quorum 실증](HA-POWER-LIVE.md)에서 LB·control plane HARD 재부팅과
+quorum 상실/복구를 확인하고 KAM 정상 인수를 3회 2.60~2.70초로 개선했습니다.
+실제 물리 장애 영역 격리, watch 연결 연속성과 영구 과반수 손실의 백업 복원은
+추가 검증 대상입니다. 10.01초와 90.37초는 당시 관측값이며 운영 SLO 보장이 아닙니다.
 
-KAM 운영 전에는 종료 시 Lease 반납·Pod 종료 유예·재시도 주기를 함께 검토해 리더
-교체 시간을 줄이고, 만료 처리 지연·Ready=False·Lease 갱신을 모니터링하세요.
+후속 변경에서 종료 시 Lease 반납·45초 Pod 종료 유예·대기 replica의 2초 재확인을
+반영했습니다. 강제 종료 시에는 기존 60초 Lease 만료가 적용됩니다. 운영 시 만료 처리
+지연·Ready=False·Lease 갱신을 모니터링하세요.
 controller 중단·교체 중에는 만료 회수가 지연될 수 있습니다. 이번 만료 검사는 리더
 교체가 끝난 뒤 수행했습니다.
 
