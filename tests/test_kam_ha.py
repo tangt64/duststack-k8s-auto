@@ -4,6 +4,8 @@ import importlib.util
 from pathlib import Path
 import unittest
 from test_configuration import variables, render, read_yaml
+from test_configuration import templar
+from ansible.template import trust_as_template
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -42,6 +44,14 @@ class FakeAPI:
 
 
 class KamTests(unittest.TestCase):
+    def test_install_requires_admin_ack_and_rejects_protected_namespaces(self):
+        checks = read_yaml('playbooks/k8s-kam.yaml')[0]['tasks'][0]['ansible.builtin.assert']['that']
+        for namespace, ack, expected in [('dev', True, True), ('kam-system', True, False),
+                                         ('kube-system', True, False), ('bad/name', True, False),
+                                         ('dev', False, False)]:
+            engine = templar(variables(kam_namespace=namespace, kam_confirm_admin=ack))
+            self.assertEqual(all(engine.evaluate_conditional(trust_as_template(x)) for x in checks), expected)
+
     def test_repeat_reconciliation_creates_only_once(self):
         api = FakeAPI()
         for _ in range(3):

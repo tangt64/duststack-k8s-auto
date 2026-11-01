@@ -72,6 +72,7 @@ Cilium은 공식 지원 대상인 Kubernetes 1.36.6 조합을 자동 선택합�
 | setup-k8s.sh plan | Ansible check/diff, 실제 초기화·join·Helm 적용 생략 |
 | setup-k8s.sh install | 기본 클러스터, CNI와 명시적으로 선택한 CSI 설치 |
 | setup-k8s.sh storage | 기존 클러스터에 선택한 CSI 설치 |
+| setup-k8s.sh kam | 명시적으로 승인한 namespace KAM CRD/controller 설치 |
 | setup-k8s.sh tools | CLI 도구만 설치 |
 
 `-i`, `--private-key`, `--ask-pass`, `--ask-become-pass`, `-e @변수파일` 등 Ansible

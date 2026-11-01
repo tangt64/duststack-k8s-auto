@@ -17,8 +17,9 @@ case "$operation" in
   plan) exec ansible-playbook playbooks/k8s-install.yaml --check --diff "$@" ;;
   install) exec ansible-playbook playbooks/k8s-install.yaml "$@" ;;
   storage) exec ansible-playbook playbooks/k8s-storage.yaml "$@" ;;
+  kam) exec ansible-playbook playbooks/k8s-kam.yaml "$@" ;;
   tools) exec ansible-playbook playbooks/k8s-tools.yaml "$@" ;;
   *)
-    printf '%s\n' '사용법: bash setup-k8s.sh {deps|configure|check|plan|install|storage|tools} [옵션]'       'configure --help: 설치 인벤토리 생성 안내'       'plan/install/storage/tools: -i 인벤토리 및 Ansible 옵션 전달'
+    printf '%s\n' '사용법: bash setup-k8s.sh {deps|configure|check|plan|install|storage|kam|tools} [옵션]'       'configure --help: 설치 인벤토리 생성 안내'       'plan/install/storage/kam/tools: -i 인벤토리 및 Ansible 옵션 전달'
     ;;
 esac

@@ -88,7 +88,8 @@ def main():
             kubectl('create', 'namespace', 'kam-system')
             docs = renderer.manifests('dev', 'python@sha256:' + 'a' * 64, ['view'])
             for doc in docs:
-                kubectl('apply', '-f', '-', body=doc)
+                kubectl('apply', '--server-side', '-f', '-', body=doc)
+                kubectl('diff', '--server-side', '-f', '-', body=doc)
             kubectl('wait', '--for=condition=Established', 'crd/kamaccessgrants.access.kam.dustbox.kr', '--timeout=30s')
             config = {'apiVersion': 'v1', 'kind': 'Config', 'current-context': 'test',
                       'clusters': [{'name': 'test', 'cluster': {'server': base, 'certificate-authority': str(root / 'ca.crt')}}],

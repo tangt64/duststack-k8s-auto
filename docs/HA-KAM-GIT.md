@@ -60,11 +60,12 @@ CRD 설치는 cluster 관리자, namespace별 controller 설치와 Grant 작성�
 추가하지 않습니다. 이 API는 로그인 계정·인증서·Group 멤버십·토큰을 발급하지 않습니다.
 
 Python 3.12+와 PyYAML, kubectl을 준비한 관리자 환경에서 실행합니다.
-공식 Python 컨테이너 이미지를 검토하고 실제 digest를 지정해야 합니다.
-아래 `$KAM_PYTHON_IMAGE`는 `python:검토한버전@sha256:실제64자리해시` 형식입니다.
+기본 이미지는 실제 비루트·읽기 전용 실행을 확인한 공식 Python 3.12.16
+slim-bookworm Linux amd64 이미지를 digest로 고정합니다. 다른 아키텍처·사내 미러는
+`--image 저장소:버전@sha256:실제64자리해시`로 검증한 이미지를 공급하세요.
 
 ```bash
-python addons/kam/render.py --namespace dev --image "$KAM_PYTHON_IMAGE" > /tmp/kam-dev.yaml
+python addons/kam/render.py --namespace dev > /tmp/kam-dev.yaml
 kubectl apply --server-side --dry-run=server -f /tmp/kam-dev.yaml
 kubectl apply --server-side -f /tmp/kam-dev.yaml
 kubectl wait --for=condition=Established crd/kamaccessgrants.access.kam.dustbox.kr
@@ -79,6 +80,10 @@ kubectl kam revoke alice@example.com -n dev --profile view
 ```
 
 namespace `dev`와 관리자 전용 `kam-system`은 설치 전에 있어야 합니다.
+기존 인벤토리의 control plane에서 설치할 때는
+`bash setup-k8s.sh kam -i inventory/local-lab/hosts.yaml -e kam_namespace=dev -e kam_confirm_admin=true`
+진입점도 사용할 수 있습니다. 이 명령은 기본 클러스터 설치와 분리돼 있으며
+native API dry-run, CRD Established, 해당 controller rollout을 검사합니다.
 `kam-system`에는 일반 사용자의 edit/admin·Pod 생성·ServiceAccount 사용 권한을
 부여하지 마세요. controller/소스 ConfigMap/ServiceAccount/Lease는 이 관리 namespace에
 배치하고 대상 namespace의 RoleBinding만 변경합니다. CRD Established 이전 CR 생성은 재시도하세요.
@@ -123,7 +128,7 @@ RUN_KAM_API_INTEGRATION=1 RUN_CHART_VALIDATION=1 bash scripts/validate.sh
 python tests/run_ha_config.py
 ```
 
-2026-11-01 로컬에서 회귀 63개, 공식 차트 4개, 실제 KAM API 통합 검사가 통과했습니다.
+2026-11-01 로컬에서 회귀 64개, 공식 차트 4개, 실제 KAM API 통합 검사가 통과했습니다.
 HAProxy 3.2.26의 bootstrap/readiness 설정 파서도 통과했습니다. 사용한 HAProxy 이미지
 ID는 `29d2ff67f15897d9b79939b3303743c3543eb391702e3aa0e0ac1a3caa036756`입니다.
 API 도구는 공식 envtest v1.37.0이며, SHA-512를 업스트림 배포 파일과 대조하고 고정
@@ -156,6 +161,12 @@ Gitea 대상은 `https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto`이며 �
 SSH 접속은 사용하지 않습니다. 두 원격의 최종 commit SHA를 대조해야 하며,
 Gitea Actions는 별도의 runner가 온라인인 경우에만 실행됩니다. 비밀번호·토큰을
 인벤토리나 저장소에 기록하지 마세요.
+
+최초 구현 커밋 `2643d33`은 두 원격의 `master` SHA 일치를 확인했고
+[GitHub Actions](https://github.com/tangt64/duststack-k8s-auto/actions/runs/41271582036)가
+통과했습니다. [Gitea 실행](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions/runs/1)은
+workflow를 접수했지만 `No matching online runner with label: ubuntu-latest`로 대기합니다.
+Gitea CI 통과로 판정하지 않으며, 해당 라벨의 runner를 온라인으로 준비한 뒤 확인하세요.
 
 [Gitea 호환성](https://docs.gitea.com/usage/actions/comparison/) ·
 [Kubernetes CRD](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)

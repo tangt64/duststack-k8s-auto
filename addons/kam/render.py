@@ -6,6 +6,8 @@ from pathlib import Path
 import re
 import yaml
 
+DEFAULT_IMAGE = 'docker.io/library/python:3.12.16-slim-bookworm@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487'
+
 
 def manifests(namespace, image, profiles):
     if not re.fullmatch(r'[a-z0-9](?:[-a-z0-9]{0,61}[a-z0-9])?', namespace):
@@ -93,7 +95,7 @@ def manifests(namespace, image, profiles):
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--namespace', required=True)
-    p.add_argument('--image', required=True, help='Official Python 3.12+ image pinned by digest')
+    p.add_argument('--image', default=DEFAULT_IMAGE, help='Python 3.12+ image pinned by digest; default verified Linux amd64 Python 3.12.16')
     p.add_argument('--profile', action='append', choices=['view', 'edit', 'admin'])
     a = p.parse_args()
     print(yaml.safe_dump_all(manifests(a.namespace, a.image, a.profile or ['view']), sort_keys=False))

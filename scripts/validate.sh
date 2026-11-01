@@ -12,6 +12,7 @@ ansible-playbook playbooks/k8s-uninstall.yaml --syntax-check
 ansible-playbook playbooks/k8s-kubevirt-install.yaml --syntax-check
 ansible-playbook playbooks/k8s-tools.yaml --syntax-check
 ansible-playbook playbooks/k8s-storage.yaml --syntax-check
+ansible-playbook playbooks/k8s-kam.yaml --syntax-check
 ansible-playbook playbooks/k8s-storage-hosts.yaml --syntax-check
 ansible-playbook playbooks/k8s-serving-certs.yaml --syntax-check
 ansible-playbook playbooks/terminal-lab-nfs.yaml --syntax-check
