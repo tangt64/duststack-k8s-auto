@@ -83,7 +83,8 @@ def manifests(namespace, image, profiles):
     pod = deployment['spec']['template']['spec']
     pod['serviceAccountName'] = name
     pod['volumes'][0]['configMap']['name'] = name
-    pod['containers'][0]['env'] += [{'name': 'KAM_LEASE_NAMESPACE', 'value': 'kam-system'}, {'name': 'KAM_LEASE_NAME', 'value': name}]
+    pod['containers'][0]['env'] += [{'name': 'KAM_LEASE_NAMESPACE', 'value': 'kam-system'}, {'name': 'KAM_LEASE_NAME', 'value': name},
+                                  {'name': 'KAM_POD_NAME', 'valueFrom': {'fieldRef': {'fieldPath': 'metadata.name'}}}]
     deployment['spec']['selector']['matchLabels']['app'] = name
     deployment['spec']['template']['metadata']['labels']['app'] = name
     pod['topologySpreadConstraints'][0]['labelSelector']['matchLabels']['app'] = name

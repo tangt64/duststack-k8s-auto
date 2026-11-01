@@ -15,6 +15,7 @@ APPROVED_SCREENSHOTS = {
     'docs/screenshots/' + name for name in (
         '01-lab-vms.jpg', '02-controller-ready.jpg', '03-source-validation.jpg',
         '04-cilium-connectivity.jpg', '05-nfs-pvc-io.jpg', '06-rook-pvc-io.jpg',
+        '07-gitea-actions.jpg', '08-ha-vip-failover.jpg', '09-kam-live-cluster.jpg',
     )
 }
 

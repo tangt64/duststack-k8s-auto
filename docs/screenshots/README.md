@@ -12,6 +12,7 @@
 | 04-cilium-connectivity.jpg | 2026-11-01 | bdc2c83의 실제 Cilium agent·교차 노드 HTTP·ClusterIP/DNS·정책 차단/허용 통과. Cilium/NFS 부분 실증 |
 | 05-nfs-pvc-io.jpg | 2026-11-01 | bdc2c83의 실제 NFS RWX·4 MiB 체크섬·교차 노드 재연결 입출력 통과. Rook은 이 부분 실행에 미포함 |
 | 06-rook-pvc-io.jpg | 2026-11-01 | dc49538의 실제 전체 12개 검사 PASS_WITH_WARNINGS. RBD 4 MiB 체크섬·worker2 재연결 입출력, CSI AES 2세대, MGR/OSD·서비스 티켓 AES256K 유지, 재부팅 전 NFS 데이터 보존 확인 |
+| 07-gitea-actions.jpg | 2026-11-01 | 6791495의 Gitea Actions 실행 2 재실행 성공. 공식 runner 5.2.0·rootless Podman에서 실제 API/CLI/차트 검증. VM의 HA 실증과 구분 |
 
 이전 RBD 실패 화면은 [당시 커밋](https://github.com/tangt64/duststack-k8s-auto/blob/dc49538c95b74142796ed1b4942c2a83cb0ca658/docs/screenshots/06-rook-pvc-io.jpg)에
 남아 있습니다. 현재 06번 사진은 승인한 키 호환 변경 후 실제 통과 화면입니다.
@@ -20,5 +21,5 @@
 [사용 안내](../TERMINAL-LAB-WALKTHROUGH.md)의 예시 코드 블록으로 표시합니다.
 실제 실증 결과가 나오는 단계부터 사진과 기록을 추가합니다.
 
-소스 검사는 지정한 여섯 파일 경로만 JPEG 크기·프레임 규격을 확인해 허용합니다.
+소스 검사는 `scripts/check_source_tree.py`에 명시한 파일 경로만 JPEG 크기·프레임 규격을 확인해 허용합니다.
 이미지 파일을 추가하거나 교체할 때 원본 화면과 문서의 설명을 함께 검토하세요.

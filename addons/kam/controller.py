@@ -152,7 +152,8 @@ def run():
     api = API()
     health_server = HTTPServer(('0.0.0.0', 8080), Health)
     threading.Thread(target=health_server.serve_forever, daemon=True).start()
-    identity = str(uuid.uuid4())
+    # Include the Pod name for incident diagnosis; a fresh UUID fences restarts.
+    identity = os.environ.get('KAM_POD_NAME', 'controller') + ':' + str(uuid.uuid4())
     path = '/apis/' + VERSION + '/namespaces/' + namespace + '/kamaccessgrants'
     while True:
         try:

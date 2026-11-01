@@ -49,6 +49,20 @@ control plane에 LB를 함께 배치하는 구성은 포트 충돌 때문에 이
 etcd 1개 장애 시 정족수 유지, watch 재연결, VIP 중복 보유 방지, 재부팅·재실행 확인.
 이번 변경의 로컬 회귀·렌더링은 해당 실제 HA 장애 실증을 대신하지 않습니다.
 
+전용 랩의 control plane에서 아래 도구를 실행할 수 있습니다. `--lb`는 실제 LB의 SSH
+주소로 바꾸고, 해당 랩에서 확인한 host key 파일과 제한된 임시 키를 공급하세요.
+선택한 kubeconfig API 주소가 VIP로 해석되는지 검사한 후 활성 LB의 HAProxy만 중지합니다.
+VIP 단일 소유권·이동 시간과 `/readyz` 응답을 기록하고 `finally`에서 HAProxy를 복구합니다.
+운영 환경에서는 실행하지 마세요. 이 검사는 VM 전원 장애·etcd 장애·watch 재연결 검사를
+대신하지 않습니다.
+
+```bash
+python scripts/test_live_ha.py --kubeconfig /etc/kubernetes/admin.conf \
+  --vip 10.10.10.250 --lb root@10.10.10.251 --lb root@10.10.10.252 \
+  --interface eth1 --identity-file /path/to/lab-key \
+  --known-hosts /path/to/lab-known-hosts --confirm-disposable-lab
+```
+
 ## Namespace KAM
 
 `addons/kam/`은 KAM의 논리 사용자·Group·ServiceAccount 권한 관리 개념을
@@ -122,6 +136,17 @@ Lease 경쟁, 실제 권한 부여·상승 거부·만료 회수를 검사합니
 실행하지 않으므로 Pod scheduling·native garbage collection·다중 VM 장애 전환은
 이 통합 테스트 범위에 포함하지 않습니다.
 
+전용 랩에 controller를 설치한 뒤 아래 명령으로 실제 두 노드 배치, 리더 Pod 삭제 후
+Lease 인수, namespace 권한·상승 거부, CR 삭제의 native GC와 만료 회수를 검사합니다.
+이 명령은 테스트 Grant를 생성하고 controller 리더 Pod 하나를 삭제하므로 운영 환경에서
+실행하지 마세요. 기존 사용자와 겹치지 않는 임의 subject를 사용하고 결과는 JSON으로 남깁니다.
+Lease holder는 Pod 이름과 프로세스별 UUID를 포함하므로 장애 대상과 인수를 대조할 수 있습니다.
+
+```bash
+python scripts/test_live_kam.py --kubeconfig /etc/kubernetes/admin.conf \
+  --namespace kam-e2e --confirm-disposable-lab
+```
+
 ```bash
 RUN_KAM_API_INTEGRATION=1 RUN_CHART_VALIDATION=1 bash scripts/validate.sh
 # Podman에 공식 haproxy:3.2 이미지를 미리 받은 경우 실제 설정 파서 검사
@@ -152,7 +177,7 @@ force/mirror push와 원격 이력 덮어쓰기는 하지 않습니다. 두 서�
 대안은 Gitea push mirror이며 인증 토큰·동기화 주기와 실패 알림을 별도 설정해야 합니다.
 Issue·PR·Actions 결과·Secret·브랜치 보호 설정은 Git push로 복제되지 않습니다.
 
-Gitea Actions와 `act_runner`는 별도로 활성화하고 Python 3.12 및 Node를 지원하는
+Gitea Actions와 runner는 별도로 활성화하고 Python 3.12 및 Node를 지원하는
 `ubuntu-latest` runner 이미지를 준비하세요. Gitea workflow는 GitHub action URL을
 명시합니다. 인터넷 차단 환경은 action·Python·Ansible·차트 미러가 추가로 필요합니다.
 두 서비스의 토큰·runner·Secret은 분리하고 외부 PR에 쓰기 자격을 제공하지 마세요.
@@ -162,11 +187,14 @@ SSH 접속은 사용하지 않습니다. 두 원격의 최종 commit SHA를 대�
 Gitea Actions는 별도의 runner가 온라인인 경우에만 실행됩니다. 비밀번호·토큰을
 인벤토리나 저장소에 기록하지 마세요.
 
-최초 구현 커밋 `2643d33`은 두 원격의 `master` SHA 일치를 확인했고
-[GitHub Actions](https://github.com/tangt64/duststack-k8s-auto/actions/runs/41271582036)가
-통과했습니다. [Gitea 실행](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions/runs/1)은
-workflow를 접수했지만 `No matching online runner with label: ubuntu-latest`로 대기합니다.
-Gitea CI 통과로 판정하지 않으며, 해당 라벨의 runner를 온라인으로 준비한 뒤 확인하세요.
+커밋 `6791495`는 두 원격에 반영됐으며
+[GitHub Actions](https://github.com/tangt64/duststack-k8s-auto/actions/runs/41271908122)와
+[Gitea Actions 재실행](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions/runs/2)이
+모두 통과했습니다. Gitea에서는 저장소 전용 공식 runner 5.2.0을 rootless Podman으로
+실행했습니다. WSL DNS 오류의 원인·제한과 재시작 방법은 [runner 운영 안내](GITEA-RUNNER.md)를
+참고하세요. 이 CI 결과는 실제 다중 VM의 VIP 장애 전환이나 Pod 배치를 증명하지 않습니다.
+
+![Gitea Actions 실제 통과 화면](screenshots/07-gitea-actions.jpg)
 
 [Gitea 호환성](https://docs.gitea.com/usage/actions/comparison/) ·
 [Kubernetes CRD](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)
