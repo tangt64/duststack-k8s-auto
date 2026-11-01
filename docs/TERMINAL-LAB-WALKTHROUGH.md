@@ -166,7 +166,7 @@ sudo python3.12 scripts/test_live_cluster.py --confirm-test-workloads
 다른 worker 간 HTTP·서비스/DNS·NetworkPolicy 차단/허용, NFS RWX 공유 쓰기,
 4 MiB 체크섬, NFS와 RBD의 교차 노드 재연결 후 읽기·쓰기를 확인합니다.
 
-**예상 출력 예시 — 아래 항목의 실제 통과 화면은 실증 후 추가합니다.**
+**예상 기본 출력 예시 — 실제 랩 결과와 호환성 경고는 아래 사진·원문 JSON에 별도 기록합니다.**
 
 ```text
 PASS cilium-agents-ready ...
@@ -177,6 +177,7 @@ PASS cilium-networkpolicy-allow ...
 PASS nfs-pvc-write ...
 PASS nfs-rwx-cross-node-read-write ...
 PASS nfs-pvc-cross-node-reattach-io ...
+PASS rook-csi-runtime ...
 PASS ceph-health-and-replication ...
 PASS rook-pvc-write ...
 PASS rook-pvc-cross-node-reattach-io ...
@@ -195,6 +196,14 @@ LIVE_CLUSTER_VALIDATION=PASS
 구버전 CSI 랩 프로필이면 `--allow-legacy-csi-lab`도 추가합니다. Ceph가 HEALTH_OK여도
 구버전 랩의 전체 결과를 경고 없는 PASS로 표시하지 않습니다.
 
+이번 전용 랩의 명시적 호환성 검증 명령은 다음과 같습니다. namespace를 지정하지 않으면
+매번 새 이름을 생성하므로 이전 결과를 재사용하지 않습니다.
+
+```bash
+sudo python3.12 scripts/test_live_cluster.py --confirm-test-workloads \
+  --allow-legacy-csi-lab --allow-ceph-legacy-client-key-warnings
+```
+
 ### 실제 선행 결과: Cilium·NFS
 
 2026-11-01 새 전용 랩에서 소스 `bdc2c83`의 Cilium 5개 검사와 NFS 3개 검사가
@@ -211,9 +220,29 @@ LIVE_CLUSTER_VALIDATION=PASS
 `d06b61d`의 전체 실행은 10개 검사를 통과했지만 RBD 커널 마운트에서 실패했습니다.
 PVC Bound와 CSI Pod Ready만으로 RBD I/O 통과를 선언할 수 없음을 보여주는 사례입니다.
 원문 결과와 무결성 정보는 [실행 기록](validation/README.md)에 있습니다.
-구형 커널용 CSI 키 호환 패치는 서버 dry-run만 수행했으며 적용 확인이 필요합니다.
+당시 [실패 화면](https://github.com/tangt64/duststack-k8s-auto/blob/dc49538c95b74142796ed1b4942c2a83cb0ca658/docs/screenshots/06-rook-pvc-io.jpg)과
+실패 JSON을 보존했습니다. 이후 승인한 CSI 클라이언트 키만 AES 2세대로 변경하고
+이전 키 1세대를 보존했습니다. 핵심 키와 서비스 티켓의 AES256K는 유지했습니다.
 
-![실제 RBD PVC Bound 이후 커널 마운트 실패 — I/O 미통과](screenshots/06-rook-pvc-io.jpg)
+### 실제 최종 결과: Cilium·NFS·RBD 전체 입출력
+
+2026-11-01 12:12 KST, `dc49538`의 새 전체 실행은 12개 검사를 모두 통과했습니다.
+RBD는 worker1에서 4 MiB를 쓴 뒤 worker2로 재연결해 체크섬과 추가 쓰기를 확인했습니다.
+실제 결과는 `PASS_WITH_WARNINGS`이며 구버전 CSI 조합·Ceph 경고를 그대로 남깁니다.
+[전체 원문·암호 비교·기존 데이터 보존 기록](validation/README.md)을 함께 확인하세요.
+
+![실제 RBD 입출력·교차 노드 재연결 통과와 핵심 AES256K 유지](screenshots/06-rook-pvc-io.jpg)
+
+VM을 다시 켠 직후에는 Node Ready 외에 다음 준비 상태도 확인합니다.
+
+```bash
+sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf -n kube-system rollout status ds/cilium --timeout=300s
+sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf -n rook-ceph wait --for=condition=Ready pod -l app=rook-ceph-mon --timeout=300s
+```
+
+기존 검증 Pod는 `restartPolicy: Never`라 재부팅 후 종료 상태일 수 있습니다.
+PVC 데이터 확인에는 기존 claim을 새 읽기 전용 비루트 Pod에 연결하세요. 이번 랩에서는
+이 방법으로 재부팅 전 NFS 파일의 체크섬과 공유 쓰기 내용을 다시 확인했습니다.
 
 ## 7. 결과 기록과 종료
 

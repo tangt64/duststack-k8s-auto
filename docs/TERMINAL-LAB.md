@@ -121,12 +121,13 @@ DNS 도메인이 `cluster.local`과 다를 때 지정합니다.
 NFS 또는 Rook만 선택한 실행은 `LIVE_CLUSTER_VALIDATION=PARTIAL_PASS`와
 `status: partial_passed`로 기록합니다. JSON의 `requested_providers`,
 `completed_providers`, `scope`를 함께 확인하세요. 전체 CNI·두 CSI 검증의 성공 표시는
-`LIVE_CLUSTER_VALIDATION=PASS`입니다. Pod 준비와 볼륨 재연결 대기는 짧은 메타데이터
+`LIVE_CLUSTER_VALIDATION=PASS`입니다. 명시적으로 승인한 구형 CSI·CephX 호환성
+실험은 모든 항목이 통과해도 `PASS_WITH_WARNINGS`로 구분합니다. Pod 준비와 볼륨 재연결 대기는 짧은 메타데이터
 조회와 요청 타임아웃을 분리해 이미지 다운로드·CSI attach 대기 시간을 확보합니다.
 
 결과는 `.tools/duststack-e2e-*.json`에 소스 커밋, 체크별 결과, PVC/PV와 노드,
 오류를 기록합니다. 실패 시 해당 namespace의 Pod/PVC/event 진단도 남깁니다.
-모든 검사를 통과한 경우에만 `LIVE_CLUSTER_VALIDATION=PASS`를 출력합니다.
+모든 검사를 통과하고 호환성 경고가 없는 경우에만 `LIVE_CLUSTER_VALIDATION=PASS`를 출력합니다.
 테스트 namespace·PVC·데이터를 자동 삭제하지 않으므로 결과와 Retain PV의 소유자를
 확인한 뒤 이 랩에서 만든 자원만 정리하세요. 스크립트의 로컬 회귀 테스트 통과는
 이 항목들이 실제 클러스터에서 통과했다는 뜻이 아닙니다.
@@ -143,3 +144,16 @@ Cilium/NFS/Rook 공식 차트 검증이 통과했고 종료 코드는 0입니다
 새 8 GiB 전용 control plane에서도 `b558839`의 단계 1을 수행했습니다.
 회귀 31개 통과·스키마 1개 생략, CLI 공급·공식 차트 검증이 통과했고 종료 코드는
 0입니다. 이 재검증 역시 실제 클러스터 설치와 PVC I/O를 포함하지 않습니다.
+
+2026-11-01 12:12 KST에는 전용 VM 4대의 기존 클러스터를 재시작하고, 소스
+`dc49538c95b74142796ed1b4942c2a83cb0ca658`의 전체 12개 검사를 통과했습니다.
+Cilium 통신·정책, NFS RWX·worker3 재연결, RBD worker1→worker2 재연결 후 체크섬과
+추가 쓰기를 확인했습니다. CSI 키만 AES 2세대로 변경했고 MGR·OSD와 실제 MON
+서비스 티켓은 AES256K로 유지했습니다. 이전 NFS PVC의 데이터도 새 읽기 전용 Pod에서
+확인했습니다. 새 클러스터 초기화나 HA 장애 복구를 수행한 기록은 아닙니다.
+
+CSI 3.16.3/Kubernetes 1.36.6은 공식 검증 범위 밖의 구형 CPU 전용 랩 실험입니다.
+`--allow-legacy-csi-lab --allow-ceph-legacy-client-key-warnings`를 명시한 실행이며,
+Ceph 인증 호환성 경고를 보존한 `passed_with_warnings` 결과입니다.
+[원문 JSON·암호 설정 비교](validation/README.md)와
+[실제 화면](TERMINAL-LAB-WALKTHROUGH.md)을 참고하세요.

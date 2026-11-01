@@ -230,6 +230,10 @@ RUN_CHART_VALIDATION=1 bash scripts/validate.sh
 실제 공식 차트의 SHA-256, Helm lint, values/schema와 렌더링 결과를 검사합니다.
 이 검증은 API 서버·스토리지에 접속하지 않으므로 실제 CNI 통신·PVC I/O 성공과 다릅니다.
 터미널랩 검증은 [TERMINAL-LAB.md](TERMINAL-LAB.md)를 참고하세요.
+2026-11-01 전용 랩에서는 Cilium 통신·정책과 NFS·RBD의 실제 교차 노드 재연결 I/O를
+포함한 12개 검사를 통과했습니다. 구형 CPU용 CSI와 AES 클라이언트 키의 경고를
+보존한 실험 결과이며, [원문과 암호 설정 전후 비교](validation/README.md)에서
+표준 운영 지원 범위와 구분해 확인할 수 있습니다.
 
 - [Cilium 호환성](https://docs.cilium.io/en/stable/network/kubernetes/compatibility/)
 - [Cilium Helm 설치](https://docs.cilium.io/en/stable/installation/k8s-install-helm/)

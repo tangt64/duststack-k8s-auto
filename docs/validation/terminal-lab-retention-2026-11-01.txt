@@ -1,0 +1,3 @@
+READ_ONLY_RETENTION_PROBE pod=nfs-retention-5329ba3a node=worker3 pvc=nfs-io
+payload.bin: OK
+PREVIOUS_NFS_DATA_PRESERVED

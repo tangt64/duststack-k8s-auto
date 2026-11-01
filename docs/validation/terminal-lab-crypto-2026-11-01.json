@@ -1,0 +1,38 @@
+{
+  "before": {
+    "core_daemons": {
+      "mgr": {
+        "keyType": "aes256k",
+        "keyGeneration": 1
+      },
+      "osd": {
+        "keyType": "aes256k",
+        "keyGeneration": 1
+      }
+    },
+    "service_ticket_cipher": "aes256k",
+    "csi_metadata": {
+      "keyGeneration": 1
+    }
+  },
+  "after": {
+    "core_daemons": {
+      "mgr": {
+        "keyType": "aes256k",
+        "keyGeneration": 1
+      },
+      "osd": {
+        "keyType": "aes256k",
+        "keyGeneration": 1
+      }
+    },
+    "service_ticket_cipher": "aes256k",
+    "csi_metadata": {
+      "keyType": "aes",
+      "keyGeneration": 2,
+      "priorKeyCount": 1
+    }
+  },
+  "core_crypto_unchanged": true,
+  "secret_values_read": false
+}

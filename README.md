@@ -193,8 +193,12 @@ CLI 통합 테스트는 로컬 HTTPS 서버와 임시 설치 경로로 다운로
 재실행, 잘못된 파일의 거부를 확인합니다. `openssl`, `tar`, `gzip`이 필요합니다.
 WSL의 Windows 공유 드라이브는 POSIX 권한과 원자적 rename 검증에 맞지 않을 수 있으므로
 `CLI_TEST_TEMP_DIR=/tmp RUN_CLI_INTEGRATION=1 bash scripts/validate.sh`를 사용하세요.
-CI에서도 소스·문법·회귀·CLI 통합 검증과 공식 차트 SHA-256·lint·렌더링을 실행합니다. 실제 다중 노드 설치, 재부팅,
-네트워크 정책, HA failover 검증은 별도 테스트 클러스터에서 수행해야 합니다.
+CI에서도 소스·문법·회귀·CLI 통합 검증과 공식 차트 SHA-256·lint·렌더링을 실행합니다.
+2026-11-01 전용 VM 4대에서는 Cilium 통신·NetworkPolicy, NFS RWX와 RBD의 교차 노드
+재연결 입출력까지 12개 검사를 통과했습니다. 구형 CPU용 CSI와 AES 클라이언트 키의
+호환성 경고를 보존한 `PASS_WITH_WARNINGS` 결과입니다.
+[실제 화면과 원문 결과](docs/validation/README.md)를 확인하세요. HA failover·백업 복구와
+표준 최신 CSI 조합의 실증은 별도로 필요합니다.
 
 ## 공식 참고
 

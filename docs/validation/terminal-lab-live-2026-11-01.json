@@ -1,0 +1,135 @@
+{
+  "status": "passed_with_warnings",
+  "namespace": "duststack-e2e-full-20261101-r3",
+  "started_at": "2026-11-01T03:11:25.716558+00:00",
+  "checks": [
+    {
+      "name": "cilium-agents-ready",
+      "status": "passed",
+      "agents": 4
+    },
+    {
+      "name": "cilium-cross-node-pod-http",
+      "status": "passed",
+      "server": "worker1",
+      "client": "worker2"
+    },
+    {
+      "name": "clusterip-and-coredns",
+      "status": "passed",
+      "service": "172.23.26.2"
+    },
+    {
+      "name": "cilium-networkpolicy-deny",
+      "status": "passed"
+    },
+    {
+      "name": "cilium-networkpolicy-allow",
+      "status": "passed"
+    },
+    {
+      "name": "nfs-pvc-write",
+      "status": "passed",
+      "pvc": "nfs-io",
+      "pv": "pvc-08c0a793-d822-4a83-add2-c33cb4661c69",
+      "node": "worker1"
+    },
+    {
+      "name": "nfs-rwx-cross-node-read-write",
+      "status": "passed",
+      "nodes": [
+        "worker1",
+        "worker2"
+      ]
+    },
+    {
+      "name": "nfs-pvc-cross-node-reattach-io",
+      "status": "passed",
+      "node": "worker3"
+    },
+    {
+      "name": "rook-csi-runtime",
+      "status": "passed",
+      "image": "quay.io/cephcsi/cephcsi:v3.16.3@sha256:7da399829e5eb7911fe4a319b9d92eea447f9dbfc2652913f03c0977a69a9fb4",
+      "kubernetes": "v1.36.6",
+      "warnings": [
+        "Legacy Ceph CSI v3.16.3 lab; upstream tested Kubernetes 1.32-1.34, actual v1.36.6"
+      ]
+    },
+    {
+      "name": "ceph-health-and-replication",
+      "status": "passed",
+      "ceph_health": "HEALTH_WARN",
+      "replicas": 3,
+      "compatibility_warnings": [
+        "AUTH_INSECURE_CLIENT_KEY_TYPE",
+        "AUTH_INSECURE_KEYS_ALLOWED",
+        "AUTH_INSECURE_KEYS_CREATABLE"
+      ]
+    },
+    {
+      "name": "rook-pvc-write",
+      "status": "passed",
+      "pvc": "rook-io",
+      "pv": "pvc-35d3cf44-b815-4d8d-88b5-ac75b46e077f",
+      "node": "worker1"
+    },
+    {
+      "name": "rook-pvc-cross-node-reattach-io",
+      "status": "passed",
+      "node": "worker2"
+    }
+  ],
+  "requested_providers": [
+    "nfs",
+    "rook"
+  ],
+  "completed_providers": [
+    "nfs",
+    "rook"
+  ],
+  "warnings": {
+    "AUTH_INSECURE_CLIENT_KEY_TYPE": {
+      "message": "4 auth client entities with insecure key types",
+      "severity": "HEALTH_WARN"
+    },
+    "AUTH_INSECURE_KEYS_ALLOWED": {
+      "message": "Monitors are configured to allow auth using insecure key types",
+      "severity": "HEALTH_WARN"
+    },
+    "AUTH_INSECURE_KEYS_CREATABLE": {
+      "message": "Monitors are configured to allow creation of insecure key types",
+      "severity": "HEALTH_WARN"
+    }
+  },
+  "compatibility_warnings": [
+    "Legacy Ceph CSI v3.16.3 lab; upstream tested Kubernetes 1.32-1.34, actual v1.36.6"
+  ],
+  "ceph_legacy_client_key_warnings_allowed": true,
+  "scope": "full",
+  "source_commit": "dc49538c95b74142796ed1b4942c2a83cb0ca658",
+  "workers": [
+    "worker1",
+    "worker2",
+    "worker3"
+  ],
+  "namespace_created": true,
+  "csi_runtime": {
+    "image": "quay.io/cephcsi/cephcsi:v3.16.3@sha256:7da399829e5eb7911fe4a319b9d92eea447f9dbfc2652913f03c0977a69a9fb4",
+    "kubernetes": "v1.36.6",
+    "warnings": [
+      "Legacy Ceph CSI v3.16.3 lab; upstream tested Kubernetes 1.32-1.34, actual v1.36.6"
+    ]
+  },
+  "ceph_csi_key_metadata": {
+    "keyType": "aes",
+    "keyGeneration": 2,
+    "priorKeyCount": 1
+  },
+  "ceph_daemon_key_types": {
+    "mgr": "aes256k",
+    "osd": "aes256k"
+  },
+  "ceph_auth_service_cipher": "aes256k",
+  "finished_at": "2026-11-01T03:12:40.827877+00:00"
+}

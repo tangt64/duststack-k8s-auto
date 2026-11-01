@@ -299,4 +299,20 @@ RBD PVC Bound 이후 Rocky 9 커널에서 `failed to add secret ... to kernel`�
 마운트가 실패했습니다. 새 클러스터에 CSI 키 타입을 명시하고, 기존 정책 변경에는
 증가한 세대·명시적 회전 확인을 요구하도록 보완했습니다. 핵심 daemon·서비스 티켓과
 허용 cipher 설정은 건드리지 않고 이전 CSI 키를 최대 2세대 유지합니다.
-호환성 패치는 실제 API server dry-run을 통과했으며, 전용 랩 적용은 별도 확인 대상입니다.
+호환성 패치는 실제 API server dry-run 후 사용자 승인 범위에서 전용 랩에 적용했습니다.
+CSI 키는 AES 2세대와 이전 1세대 보존으로 변경했고, MGR·OSD의 AES256K 1세대와
+MON admin socket에서 읽은 실제 AES256K 서비스 티켓은 전후 동일함을 확인했습니다.
+키 값은 수집하지 않았습니다.
+
+2026-11-01 12:12 KST에 `dc49538c95b74142796ed1b4942c2a83cb0ca658`의 전체
+12개 검사가 `passed_with_warnings`로 끝났습니다. NFS와 Rook 모두 완료했으며
+RBD 4 MiB 쓰기·체크섬과 worker1→worker2 재연결 후 추가 쓰기까지 통과했습니다.
+기존 전용 클러스터의 저장소 설정을 재적용한 실행이며 새 소스의 클러스터 신규 설치
+검증과는 구분합니다. VM 재시작 직후에는 Cilium과 MON 준비를 기다려야 했습니다.
+이전 `restartPolicy: Never` 검증 Pod는 Failed였지만 같은 NFS PVC를 새 읽기 전용
+Pod에 연결한 데이터 보존 검사는 통과했습니다.
+
+실제 결과·암호 설정 비교·SHA-256은 [검증 원문](validation/README.md), 화면은
+[사용 안내](TERMINAL-LAB-WALKTHROUGH.md)에 있습니다. Ceph의 세 인증 호환성 경고는
+그대로 보존했습니다. 운영 적용 전에는 x86-64-v3 이상에서 표준 최신 CSI를 검증하고,
+지원 범위에 맞춘 Kubernetes·커널 조합, HA 장애 전환과 백업 복구를 별도로 검증해야 합니다.

@@ -1,5 +1,49 @@
 # 터미널랩 실제 실행 기록
 
+## 최종 전체 실행: 12개 검사 통과, 호환성 경고 보존
+
+2026-11-01 12:12 KST에 소스 `dc49538c95b74142796ed1b4942c2a83cb0ca658`의
+전체 검증이 `passed_with_warnings`로 끝났습니다. namespace는
+`duststack-e2e-full-20261101-r3`, 완료 provider는 `nfs`, `rook` 모두입니다.
+기존 전용 VM 4대를 재시작하고 승인한 CSI 키 정책과 control plane의 저장소 역할을
+재적용한 뒤 검증했습니다. 새 소스로 클러스터를 초기화하거나 디스크를 지운 실행은 아닙니다.
+
+- Cilium agent 4개, 교차 노드 HTTP, ClusterIP/CoreDNS, 정책 차단·허용 통과
+- NFS 4 MiB 체크섬, worker1·worker2 RWX 공유 쓰기, worker3 재연결 입출력 통과
+- Ceph 복제 3, RBD 4 MiB 쓰기, worker1→worker2 재연결 후 체크섬·추가 쓰기 통과
+- 실제 재연결 Pod의 UID 1000과 체크섬을 화면 촬영 직전 다시 확인
+- 재부팅 전 NFS PVC도 새 읽기 전용 Pod에서 기존 체크섬과 쓰기 내용을 확인
+
+| 항목 | 변경 전 | 변경 후 |
+| --- | --- | --- |
+| CSI 클라이언트 키 | 1세대, 타입 메타데이터 미명시 | AES 2세대, 이전 1세대 보존 |
+| MGR 키 | AES256K 1세대 | AES256K 1세대 유지 |
+| OSD 키 | AES256K 1세대 | AES256K 1세대 유지 |
+| 실제 MON 서비스 티켓 cipher | AES256K | AES256K 유지 |
+
+원문 파일은 브라우저 터미널에서 읽은 뒤 각각 SHA-256을 확인해 보존했습니다.
+인증키 값은 내보내지 않고 메타데이터만 기록했습니다.
+
+| 파일 | SHA-256 |
+| --- | --- |
+| [전체 통과 JSON](terminal-lab-live-2026-11-01.json) | `791e22fdcdd87fbae726337b8d12821f5db3c87c2437f8332d200703ca3e3b6f` |
+| [암호 설정 전후 비교](terminal-lab-crypto-2026-11-01.json) | `1352adcc517c098d806cac2f1ce126360800912f40b95d685ab040d10945c051` |
+| [기존 NFS 데이터 보존 검사](terminal-lab-retention-2026-11-01.txt) | `1071c3e0b16970207463177b29f1f1e870d7d1bbc8a925d0ba16669942b815ac` |
+
+### 남아 있는 경고와 한계
+
+CSI 3.16.3의 공식 Kubernetes 검증 범위는 1.32~1.34입니다. 실제 1.36.6 조합은
+x86-64-v2 전용 랩의 실험이며 운영 지원 조합으로 판정하지 않습니다.
+Ceph도 `HEALTH_WARN`을 유지합니다. 다음 경고를 숨기거나 `HEALTH_OK`로 바꾸지 않았습니다.
+
+- `AUTH_INSECURE_CLIENT_KEY_TYPE`
+- `AUTH_INSECURE_KEYS_ALLOWED`
+- `AUTH_INSECURE_KEYS_CREATABLE`
+
+기존 `restartPolicy: Never` 검증 Pod는 VM 중지 후 Failed 상태였습니다. 해당 Pod에
+대한 후속 exec는 실패했으나, 같은 PVC를 새 읽기 전용 Pod에 연결한 별도 보존 검사는
+통과했습니다. Pod 수명과 PVC 데이터 보존을 구분합니다.
+
 ## 첫 전체 실행: RBD 커널 마운트 실패
 
 [실제 원문 JSON](terminal-lab-attempt-2026-11-01.json)은 control plane의 보고서를
