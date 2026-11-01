@@ -94,6 +94,15 @@ runner는 이 PC·WSL이 실행 중이어야 동작합니다. 재부팅 후 자�
 
 [Gitea KAM 최종 커밋 CI](https://git.vlab.dustbox.kr/dustbox/kiki-kam/actions/runs/3)와 [GitHub KAM Actions](https://github.com/tangt64/KAM/actions), [duststack Gitea](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions)·[GitHub Actions](https://github.com/tangt64/duststack-k8s-auto/actions)에서 각 커밋의 서버 검증 결과를 확인할 수 있습니다.
 
-아래는 kiki-kam 저장소 범위의 전용 runner 등록·온라인 상태를 촬영한 실제 화면입니다. 촬영 시 테스트 실행 중이며 검사 성공 화면과 구분합니다.
+아래는 kiki-kam 최종 기능 커밋 e383003의 Gitea Actions 전체 성공을 촬영한 실제 화면입니다. 전용 runner에서 Go race·controller 실제 API·비밀번호 실제 API 11개 검사가 모두 통과했습니다.
 
-![kiki-kam 저장소 전용 runner 실제 등록 화면](screenshots/14-kiki-kam-actions.jpg)
+![kiki-kam 최종 Gitea Actions 실제 성공 화면](screenshots/14-kiki-kam-actions.jpg)
+
+### 양쪽 서버의 기능 검증 완료
+
+2026-11-01 최종 기능 변경의 CI 네 개가 모두 통과했습니다. 이 기록 뒤의 화면·문서만 변경하는 커밋은 같은 workflow로 다시 검사합니다.
+
+| 대상 | 기능 검증 커밋 | GitHub | Gitea |
+| --- | --- | --- | --- |
+| KAM | e383003ded4a6a0d914b187d86e5cac62241d384 | [성공](https://github.com/tangt64/KAM/actions/runs/41310949683) | [성공](https://git.vlab.dustbox.kr/dustbox/kiki-kam/actions/runs/3) |
+| duststack | 5c76072fb8b468fcc56cc2834287e5352d5de19f | [성공](https://github.com/tangt64/duststack-k8s-auto/actions/runs/41311070791) | [성공](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions/runs/8) |
