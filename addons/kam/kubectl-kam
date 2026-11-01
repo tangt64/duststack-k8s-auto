@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""kubectl KAM plugin: delegates authentication and API validation to kubectl."""
+import argparse
+import hashlib
+import json
+import subprocess
+
+
+def main():
+    p = argparse.ArgumentParser(description='Namespace KAM access grants')
+    p.add_argument('action', choices=['grant', 'get', 'revoke'])
+    p.add_argument('name', nargs='?')
+    p.add_argument('-n', '--namespace', required=True)
+    p.add_argument('--context')
+    p.add_argument('--kubeconfig')
+    p.add_argument('--kind', choices=['User', 'Group', 'ServiceAccount'], default='User')
+    p.add_argument('--profile', choices=['view', 'edit', 'admin'], default='view')
+    p.add_argument('--expires-at')
+    p.add_argument('--dry-run', choices=['client', 'server'])
+    a = p.parse_args()
+    command = ['kubectl', '--namespace', a.namespace]
+    for flag in ('context', 'kubeconfig'):
+        if getattr(a, flag):
+            command += ['--' + flag, getattr(a, flag)]
+    if a.action == 'get':
+        command += ['get', 'kamaccessgrants'] + ([a.name] if a.name else [])
+        subprocess.run(command, check=True)
+        return
+    if not a.name:
+        p.error('grant/revoke require a subject name')
+    name = 'grant-' + hashlib.sha256((a.kind + '\0' + a.name + '\0' + a.profile).encode()).hexdigest()[:32]
+    if a.action == 'revoke':
+        command += ['delete', 'kamaccessgrant', name]
+        if a.dry_run:
+            command += ['--dry-run=' + a.dry_run]
+        subprocess.run(command, check=True)
+        return
+    spec = {'subject': {'kind': a.kind, 'name': a.name}, 'profile': a.profile}
+    if a.expires_at:
+        spec['expiresAt'] = a.expires_at
+    obj = {'apiVersion': 'access.kam.dustbox.kr/v1alpha1', 'kind': 'KamAccessGrant',
+           'metadata': {'name': name, 'namespace': a.namespace}, 'spec': spec}
+    command += ['apply', '-f', '-', '-o', 'yaml']
+    if a.dry_run:
+        command += ['--dry-run=' + a.dry_run]
+    subprocess.run(command, input=json.dumps(obj), text=True, check=True)
+
+
+if __name__ == '__main__':
+    main()

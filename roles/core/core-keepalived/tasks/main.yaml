@@ -12,8 +12,43 @@
     mode: '0700'
     content: |
       #!/bin/sh
-      exec /usr/bin/curl --fail --silent --max-time 2 --cacert /etc/kubernetes/pki/ca.crt https://{{ k8s_ip4.split('/')[0] }}:{{ k8s_endpoint_port }}/livez
+      {% if k8s_proxy_mode == 'haproxy_keepalived' %}
+      /usr/bin/systemctl is-active --quiet haproxy || exit 1
+      exec /usr/bin/curl --fail --silent --max-time 2 http://127.0.0.1:8404/health
+      {% else %}
+      exec /usr/bin/curl --fail --silent --max-time 2 --cacert /etc/kubernetes/pki/ca.crt https://{{ k8s_ip4.split('/')[0] }}:{{ k8s_endpoint_port }}/readyz
+      {% endif %}
   notify: Reload keepalived
+
+- name: Validate redundant LB identity and priorities
+  ansible.builtin.assert:
+    that:
+      - keepalived_pri | int >= 1 and keepalived_pri | int <= 254
+      - keepalived_node | lower in ['master', 'backup']
+      - k8s_vip_address != k8s_ip4.split('/')[0]
+      - k8s_vrrp_router_id | default(51) | int >= 1 and k8s_vrrp_router_id | default(51) | int <= 255
+      - groups['lb'] | map('extract', hostvars, 'keepalived_pri') | map('int') | unique | length == groups['lb'] | length
+  when: k8s_proxy_mode == 'haproxy_keepalived'
+
+- name: Validate VIP is on the LB network and does not reuse any node IP
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts['python']['executable'] }}"
+      - -c
+      - |
+        import ipaddress, sys
+        vip = ipaddress.ip_address(sys.argv[1])
+        nic = ipaddress.ip_interface(sys.argv[2])
+        nodes = [ipaddress.ip_interface(x).ip for x in sys.argv[3].split(',')]
+        assert vip in nic.network, 'VIP is outside the LB network'
+        assert vip not in (nic.network.network_address, nic.network.broadcast_address), 'VIP is not a host address'
+        assert vip not in nodes, 'VIP duplicates a node IP'
+      - "{{ k8s_vip_address }}"
+      - "{{ k8s_ip4 }}"
+      - "{{ (groups['lb'] + groups['k8s_master'] + groups.get('k8s_node', [])) | map('extract', hostvars, 'k8s_ip4') | join(',') }}"
+  changed_when: false
+  check_mode: false
+  when: k8s_proxy_mode == 'haproxy_keepalived'
 
 - name: Configure virtual API address
   ansible.builtin.template:

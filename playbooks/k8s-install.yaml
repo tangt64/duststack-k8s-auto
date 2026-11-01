@@ -21,7 +21,15 @@
   tags: [k8s-haproxy]
   roles:
     - role: core/core-haproxy
-      when: k8s_proxy_mode_enable and k8s_proxy_mode == 'haproxy'
+      when: k8s_proxy_mode_enable and k8s_proxy_mode in ['haproxy', 'haproxy_keepalived']
+
+- name: Configure redundant load balancer virtual IP
+  hosts: lb
+  any_errors_fatal: true
+  tags: [k8s-haproxy, k8s-keepalived]
+  roles:
+    - role: core/core-keepalived
+      when: k8s_proxy_mode_enable and k8s_proxy_mode == 'haproxy_keepalived'
 
 - name: Configure API virtual IP
   hosts: k8s_master
@@ -70,6 +78,46 @@
   tags: [k8s-post]
   roles:
     - role: kubernetes/k8s-post-config
+
+- name: Read API CA after control plane bootstrap
+  hosts: k8s_master[0]
+  tags: [k8s-haproxy]
+  tasks:
+    - name: Read public cluster trust anchor
+      ansible.builtin.slurp:
+        src: /etc/kubernetes/pki/ca.crt
+      register: api_lb_ca
+      when: k8s_proxy_mode_enable and k8s_proxy_mode == 'haproxy_keepalived' and not ansible_check_mode
+
+- name: Enable verified API readiness checks on redundant LBs
+  hosts: lb
+  tags: [k8s-haproxy]
+  tasks:
+    - name: Install public CA and switch from bootstrap TCP probes
+      when: k8s_proxy_mode_enable and k8s_proxy_mode == 'haproxy_keepalived' and not ansible_check_mode
+      block:
+        - name: Supply API public CA
+          ansible.builtin.copy:
+            content: "{{ hostvars[groups['k8s_master'][0]].api_lb_ca.content | b64decode }}"
+            dest: /etc/haproxy/kubernetes-ca.crt
+            owner: root
+            group: root
+            mode: '0644'
+        - name: Select readiness checks
+          ansible.builtin.set_fact:
+            k8s_lb_ready_checks: true
+        - name: Reconfigure validated HAProxy
+          ansible.builtin.template:
+            src: ../roles/core/core-haproxy/templates/haproxy.conf.j2
+            dest: /etc/haproxy/haproxy.cfg
+            mode: '0644'
+            validate: /usr/sbin/haproxy -c -f %s
+          register: ready_config
+        - name: Reload only changed configuration
+          ansible.builtin.systemd_service:
+            name: haproxy
+            state: reloaded
+          when: ready_config.changed
 
 - name: Install explicitly selected storage providers
   ansible.builtin.import_playbook: k8s-storage.yaml

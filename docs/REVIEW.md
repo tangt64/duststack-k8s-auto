@@ -5,6 +5,12 @@
 
 ## 반영한 수정
 
+2026-11-01 후속 변경으로 별도 LB의 `haproxy_keepalived` 조합과 namespace
+`KamAccessGrant` CRD/controller, `kubectl kam` 플러그인을 추가했습니다.
+controller 코드·ServiceAccount·Lease는 관리자 전용 `kam-system`에 분리하고
+대상 namespace의 승인한 프로필만 bind합니다. 실제 API 통합·검증 범위와
+GitHub/Gitea 운영 절차는 [HA·KAM 안내](HA-KAM-GIT.md)에 정리했습니다.
+
 | 문제 | 변경 |
 | --- | --- |
 | Kubernetes 1.28, kubeadm v1beta3, 폐기된 감사 정책 API | 1.37.2 / v1beta4 / audit.k8s.io/v1 적용 |

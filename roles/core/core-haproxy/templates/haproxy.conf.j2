@@ -15,9 +15,21 @@ frontend kubernetes
     bind *:{{ k8s_endpoint_port }}
     default_backend kubernetes-control-planes
 
+{% if k8s_proxy_mode == 'haproxy_keepalived' %}
+frontend local-health
+    bind 127.0.0.1:8404
+    mode http
+    monitor-uri /health
+{% endif %}
+
 backend kubernetes-control-planes
     balance roundrobin
+{% if k8s_lb_ready_checks | default(false) %}
+    option httpchk GET /readyz
+    http-check expect status 200
+{% else %}
     option tcp-check
+{% endif %}
 {% for host in groups['k8s_master'] %}
-    server control{{ loop.index }} {{ hostvars[host]['k8s_ip4'].split('/')[0] }}:{{ k8s_endpoint_port }} check inter 3s fall 3 rise 2
+    server control{{ loop.index }} {{ hostvars[host]['k8s_ip4'].split('/')[0] }}:{{ k8s_endpoint_port }} check inter 3s fall 3 rise 2{{ (' check-ssl verify required ca-file /etc/haproxy/kubernetes-ca.crt verifyhost ' ~ k8s_api_domain ~ ' check-sni ' ~ k8s_api_domain) if k8s_lb_ready_checks | default(false) else '' }}
 {% endfor %}

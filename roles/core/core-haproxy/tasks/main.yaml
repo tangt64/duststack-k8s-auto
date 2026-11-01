@@ -4,6 +4,15 @@
     name: haproxy
     state: present
 
+- name: Inspect previously installed API trust anchor
+  ansible.builtin.stat:
+    path: /etc/haproxy/kubernetes-ca.crt
+  register: lb_trust_anchor
+
+- name: Keep readiness checks enabled on subsequent runs
+  ansible.builtin.set_fact:
+    k8s_lb_ready_checks: "{{ lb_trust_anchor.stat.exists }}"
+
 - name: Validate and configure TCP API load balancing
   ansible.builtin.template:
     src: haproxy.conf.j2

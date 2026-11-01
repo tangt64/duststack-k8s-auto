@@ -15,7 +15,11 @@
       - k8s_network != 'cilium' or k8s_version.split('.')[1] | int <= 36 or cilium_allow_untested_kubernetes
       - k8s_network != 'cilium' or not cilium_kube_proxy_replacement
       - k8s_selinux_state in ['enforcing', 'permissive']
-      - k8s_proxy_mode in ['haproxy', 'keepalived']
+      - k8s_proxy_mode in ['haproxy', 'keepalived', 'haproxy_keepalived']
+      - k8s_proxy_mode != 'haproxy_keepalived' or groups.get('lb', []) | length >= 2
+      - k8s_proxy_mode != 'haproxy_keepalived' or groups.get('lb', []) | intersect(groups['k8s_master']) | length == 0
+      - k8s_proxy_mode != 'haproxy_keepalived' or groups['k8s_master'] | length >= 3
+      - k8s_proxy_mode != 'haproxy_keepalived' or groups['k8s_master'] | length % 2 == 1
       - groups.get('k8s_master', []) | length > 0
       - groups.get('k8s_master', []) | intersect(groups.get('k8s_node', [])) | length == 0
       - groups['k8s_master'] | length == 1 or k8s_proxy_mode_enable

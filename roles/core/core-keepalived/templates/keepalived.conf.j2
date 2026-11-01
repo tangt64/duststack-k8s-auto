@@ -9,15 +9,25 @@ vrrp_script check_api {
     interval 3
     fall 3
     rise 2
+{% if k8s_proxy_mode != 'haproxy_keepalived' %}
     weight -50
+{% endif %}
 }
 
 vrrp_instance VI_1 {
     state {{ keepalived_node | upper }}
     interface {{ k8s_interface }}
-    virtual_router_id 51
+    virtual_router_id {{ k8s_vrrp_router_id | default(51) }}
     priority {{ keepalived_pri }}
     advert_int 1
+{% if k8s_proxy_mode == 'haproxy_keepalived' %}
+    unicast_src_ip {{ k8s_ip4.split('/')[0] }}
+    unicast_peer {
+{% for peer in groups['lb'] if peer != inventory_hostname %}
+        {{ hostvars[peer]['k8s_ip4'].split('/')[0] }}
+{% endfor %}
+    }
+{% endif %}
     virtual_ipaddress {
         {{ k8s_vip_address }}
     }
