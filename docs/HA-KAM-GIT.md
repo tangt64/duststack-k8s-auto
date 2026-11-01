@@ -45,6 +45,21 @@ API의 비인증 health endpoint가 금지된 환경은 별도의 최소 권한 
 OpenStack은 VIP의 allowed-address-pairs/가상 포트 정책을 먼저 확인하세요.
 control plane에 LB를 함께 배치하는 구성은 포트 충돌 때문에 이 모드에서 거부합니다.
 
+OpenStack 포털에 포트의 allowed-address-pairs 메뉴가 없으면 관리자에게 해당 두 LB의
+전용망 포트만 설정하도록 요청합니다. 아래는 **관리자 실행 예시**이며 실증 통과 기록이 아닙니다.
+포트의 network/device_id/fixed_ips를 먼저 대조하고, DHCP/IPAM에서 예약한 VIP 하나만
+각 포트에 추가하세요. 기존 허용 주소는 보존하고 전체 포트 보안을 해제하지 않습니다.
+
+```bash
+openstack port list --network PRIVATE_NETWORK_ID --server LB_SERVER_ID --long
+openstack port show VERIFIED_LB_PORT_ID -c network_id -c device_id -c fixed_ips -c allowed_address_pairs
+openstack port set --allowed-address ip-address=RESERVED_VIP/32 VERIFIED_LB_PORT_ID
+openstack port show VERIFIED_LB_PORT_ID -c allowed_address_pairs -c port_security_enabled
+```
+
+`--allowed-address`는 기존 목록에 추가하며 `--no-allowed-address`를 함께 쓰면 덮어씁니다.
+자세한 동작은 [OpenStackClient 공식 포트 문서](https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/network/v2/index.html#port-set)를 참고하세요.
+
 실증 완료 조건: LB 프로세스/VM 장애 시 VIP 이동, API backend 장애 제외,
 etcd 1개 장애 시 정족수 유지, watch 재연결, VIP 중복 보유 방지, 재부팅·재실행 확인.
 이번 변경의 로컬 회귀·렌더링은 해당 실제 HA 장애 실증을 대신하지 않습니다.

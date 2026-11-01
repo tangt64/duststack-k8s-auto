@@ -114,6 +114,19 @@ def main():
             try:
                 remote(stopped, 'sudo', '-n', 'systemctl', 'start', 'haproxy')
                 remote(stopped, 'sudo', '-n', 'systemctl', 'is-active', 'haproxy')
+                deadline = time.monotonic() + 30
+                while time.monotonic() < deadline:
+                    current = owners()
+                    if len(current) > 1:
+                        raise RuntimeError('Duplicate VIP ownership after HAProxy restoration')
+                    api = subprocess.run(base + ['get', '--raw=/readyz'], text=True,
+                                         capture_output=True, timeout=10)
+                    if len(current) == 1 and api.returncode == 0 and api.stdout.strip() == 'ok':
+                        report['owner_recovered'] = current[0]
+                        break
+                    time.sleep(1)
+                else:
+                    raise RuntimeError('VIP/API failed to recover after HAProxy restoration')
                 report['haproxy_restored'] = True
             except Exception as error:
                 report['status'] = 'failed'
