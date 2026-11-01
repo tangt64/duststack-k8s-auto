@@ -5,6 +5,7 @@ export ANSIBLE_CONFIG="$PWD/ansible.cfg"
 mkdir -p .tools/ansible-tmp
 export ANSIBLE_LOCAL_TEMP="$PWD/.tools/ansible-tmp"
 python scripts/check_source_tree.py
+python scripts/prepare_kam_source.py
 bash -n deploy-k8s.sh remove-k8s.sh provin-k8s.sh setup-k8s.sh scripts/terminal-lab-check.sh
 bash -n scripts/push-remotes.sh
 ansible-playbook playbooks/k8s-install.yaml --syntax-check
@@ -13,6 +14,7 @@ ansible-playbook playbooks/k8s-kubevirt-install.yaml --syntax-check
 ansible-playbook playbooks/k8s-tools.yaml --syntax-check
 ansible-playbook playbooks/k8s-storage.yaml --syntax-check
 ansible-playbook playbooks/k8s-kam.yaml --syntax-check
+ansible-playbook playbooks/k8s-kam-auth.yaml --syntax-check
 ansible-playbook playbooks/k8s-storage-hosts.yaml --syntax-check
 ansible-playbook playbooks/k8s-serving-certs.yaml --syntax-check
 ansible-playbook playbooks/terminal-lab-nfs.yaml --syntax-check

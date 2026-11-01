@@ -11,6 +11,14 @@
           - kam_namespace | default('') not in ['default', 'kube-system', 'kam-system']
         fail_msg: Set kam_namespace and kam_confirm_admin=true after reviewing the scoped RBAC and protected kam-system namespace.
 
+    - name: Prepare independently pinned KAM source on the controller
+      ansible.builtin.command:
+        argv: ["{{ ansible_playbook_python }}", "{{ playbook_dir }}/../scripts/prepare_kam_source.py"]
+      delegate_to: localhost
+      become: false
+      changed_when: false
+      check_mode: false
+
     - name: Verify pre-existing protected and target namespaces
       ansible.builtin.command:
         argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, namespace, kam-system, "{{ kam_namespace }}"]

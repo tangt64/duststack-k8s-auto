@@ -115,6 +115,7 @@ containerd는 Docker CE의 서명된 RPM 저장소를 사용합니다. 선택한
 
 ## 검증과 설치
 
+[KIKI KAM ID·비밀번호 로그인 설치 안내](docs/KIKI-KAM.md)와
 [이중 LB HA·namespace KAM·GitHub/Gitea 운영 안내](docs/HA-KAM-GIT.md)를 제공합니다.
 KAM은 명시적으로 설치하는 CRD/controller와 `kubectl kam` 플러그인이며 기본 설치에
 관리자 권한 애드온을 자동 추가하지 않습니다.

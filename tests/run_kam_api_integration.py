@@ -89,7 +89,13 @@ def main():
             docs = renderer.manifests('dev', 'python@sha256:' + 'a' * 64, ['view'])
             for doc in docs:
                 kubectl('apply', '--server-side', '-f', '-', body=doc)
-                kubectl('diff', '--server-side', '-f', '-', body=doc)
+                if doc['kind'] == 'CustomResourceDefinition':
+                    kubectl('wait', '--for=condition=Established', 'crd/' + doc['metadata']['name'], '--timeout=30s')
+                try:
+                    kubectl('diff', '--server-side', '-f', '-', body=doc)
+                except subprocess.CalledProcessError as error:
+                    raise RuntimeError(doc['kind'] + '/' + doc['metadata']['name'] +
+                                       ' changed after server-side apply:\n' + error.stdout + error.stderr) from error
             kubectl('wait', '--for=condition=Established', 'crd/kamaccessgrants.access.kam.dustbox.kr', '--timeout=30s')
             config = {'apiVersion': 'v1', 'kind': 'Config', 'current-context': 'test',
                       'clusters': [{'name': 'test', 'cluster': {'server': base, 'certificate-authority': str(root / 'ca.crt')}}],

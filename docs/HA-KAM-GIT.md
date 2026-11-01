@@ -108,9 +108,10 @@ python scripts/test_live_ha.py --kubeconfig /etc/kubernetes/admin.conf \
 
 ## Namespace KAM
 
-`addons/kam/`은 KAM의 논리 사용자·Group·ServiceAccount 권한 관리 개념을
-CRD와 Python controller, `kubectl-kam` 플러그인으로 구현한 선택 설치 애드온입니다.
-원래 [KAM Go CLI](https://github.com/tangt64/KAM)는 수정하지 않았습니다.
+KAM은 기존 이력을 유지한 [독립 저장소](https://github.com/tangt64/KAM)로 분리했습니다.
+`addons/kam/`은 commit·SHA-256으로 검증한 CRD/controller의 호환 진입점입니다.
+ID·비밀번호 로그인과 사용자 관리, Go kubectl 플러그인은 [KIKI KAM 설치 안내](KIKI-KAM.md)를 따릅니다.
+아래는 기존 subject 기반 RBAC 전용 사용법입니다. 계정 로그인에는 새로운 Go CLI를 사용하세요.
 API group은 `access.kam.dustbox.kr`, kind는 `KamAccessGrant`, 약칭은 `kag`입니다.
 CRD 설치는 cluster 관리자, namespace별 controller 설치와 Grant 작성은 해당 권한을
 명시적으로 위임받은 관리자가 수행합니다. 일반 `edit` 역할에 CR 쓰기 권한을 자동
@@ -122,18 +123,17 @@ slim-bookworm Linux amd64 이미지를 digest로 고정합니다. 다른 아키�
 `--image 저장소:버전@sha256:실제64자리해시`로 검증한 이미지를 공급하세요.
 
 ```bash
+python scripts/prepare_kam_source.py
 python addons/kam/render.py --namespace dev > /tmp/kam-dev.yaml
 kubectl apply --server-side --dry-run=server -f /tmp/kam-dev.yaml
 kubectl apply --server-side -f /tmp/kam-dev.yaml
 kubectl wait --for=condition=Established crd/kamaccessgrants.access.kam.dustbox.kr
 kubectl -n kam-system rollout status deployment
-install -m 0755 addons/kam/kubectl-kam "$HOME/.local/bin/kubectl-kam"
-export PATH="$HOME/.local/bin:$PATH"
-kubectl kam grant alice@example.com -n dev --profile view --dry-run server
-kubectl kam grant alice@example.com -n dev --profile view
+python addons/kam/kubectl-kam grant alice@example.com -n dev --profile view --dry-run server
+python addons/kam/kubectl-kam grant alice@example.com -n dev --profile view
 kubectl get kamaccessgrants -n dev
 kubectl wait --for=condition=Ready kag --all -n dev --timeout=120s
-kubectl kam revoke alice@example.com -n dev --profile view
+python addons/kam/kubectl-kam revoke alice@example.com -n dev --profile view
 ```
 
 namespace `dev`와 관리자 전용 `kam-system`은 설치 전에 있어야 합니다.

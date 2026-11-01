@@ -1,0 +1,371 @@
+---
+- name: Prepare explicitly configured KAM password authentication
+  hosts: k8s_master[0]
+  any_errors_fatal: true
+  tasks:
+    - name: Require explicit authentication settings and administrator review
+      ansible.builtin.assert:
+        that:
+          - kam_confirm_admin | default(false) | bool
+          - kam_auth_image | default('') is match('^\\S+@sha256:[a-f0-9]{64}$')
+          - kam_auth_url | default('') is match('^https://[A-Za-z0-9.:-]+$')
+          - kam_auth_tls_dir | default('') | length > 0
+          - kam_namespace | default('') is match('^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$')
+          - kam_namespace | default('') not in ['default', 'kam-system']
+          - not (kam_namespace | default('')).startswith('kube-')
+          - kam_auth_node_port | default(0) | int == 0 or (kam_auth_node_port | int >= 30000 and kam_auth_node_port | int <= 32767)
+        fail_msg: Set kam_auth_image by digest, an already routed HTTPS kam_auth_url, controller-local kam_auth_tls_dir, kam_namespace and kam_confirm_admin=true.
+
+    - name: Prepare independently pinned KAM source
+      ansible.builtin.command:
+        argv: ["{{ ansible_playbook_python }}", "{{ playbook_dir }}/../scripts/prepare_kam_source.py"]
+      delegate_to: localhost
+      become: false
+      register: kam_auth_source
+      changed_when: false
+      check_mode: false
+
+    - name: Read current API server manifest without modifying authentication
+      ansible.builtin.slurp:
+        src: /etc/kubernetes/manifests/kube-apiserver.yaml
+      register: kam_api_manifest
+      no_log: true
+
+    - name: Validate existing native authentication and derive its audience
+      ansible.builtin.command:
+        argv: ["{{ ansible_playbook_python }}", "{{ playbook_dir }}/../scripts/configure_kam_webhook.py", --stdin-render]
+        stdin: "{{ kam_api_manifest.content | b64decode }}"
+      delegate_to: localhost
+      become: false
+      register: kam_api_inspection
+      changed_when: false
+      no_log: true
+
+    - name: Share only the existing API audience with later plays
+      ansible.builtin.set_fact:
+        kam_selected_audience: "{{ (kam_api_inspection.stdout | from_json).audience }}"
+
+    - name: Create controller CLI build directory
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/../.tools/kam-cli"
+        state: directory
+        mode: '0700'
+      delegate_to: localhost
+      become: false
+
+    - name: Build CLI from verified source and Go module checksums
+      ansible.builtin.command:
+        argv: [go, build, -buildvcs=false, -trimpath, '-ldflags=-s -w -buildid=', -o, "{{ playbook_dir }}/../.tools/kam-cli/kiki-kam", .]
+        chdir: "{{ kam_auth_source.stdout }}"
+      environment:
+        GOTOOLCHAIN: go1.26.10
+        CGO_ENABLED: '0'
+        GOOS: linux
+        GOARCH: "{{ 'arm64' if ansible_architecture | default('x86_64') == 'aarch64' else 'amd64' }}"
+      delegate_to: localhost
+      become: false
+      changed_when: true
+      when: not ansible_check_mode
+
+    - name: Install the reviewed standalone CLI on the first control plane
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../.tools/kam-cli/kiki-kam"
+        dest: /usr/local/bin/kiki-kam
+        mode: '0755'
+      when: not ansible_check_mode
+
+    - name: Ensure protected and selected namespaces already exist
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, get, namespace, kam-system, "{{ kam_namespace }}"]
+      changed_when: false
+
+    - name: Prepare reviewed TLS material on the first control plane
+      ansible.builtin.copy:
+        src: "{{ kam_auth_tls_dir }}/{{ item }}"
+        dest: "/etc/kubernetes/pki/{{ item }}"
+        mode: '0600'
+      loop: [kam-server.crt, kam-server.key, kam-ca.crt]
+      no_log: true
+      when: not ansible_check_mode
+
+    - name: Render authentication deployment without credential state
+      ansible.builtin.command:
+        argv: ["{{ ansible_playbook_python }}", "{{ kam_auth_source.stdout }}/deploy/render_auth.py", --image, "{{ kam_auth_image }}", --audience, "{{ kam_selected_audience }}"]
+      delegate_to: localhost
+      become: false
+      register: kam_auth_render
+      changed_when: false
+
+    - name: Validate authentication resources against the actual API
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, --server-side, --dry-run=server, -f, '-']
+        stdin: "{{ kam_auth_render.stdout }}"
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Apply authentication resources without overwriting account state
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, --server-side, -f, '-']
+        stdin: "{{ kam_auth_render.stdout }}"
+      changed_when: true
+      when: not ansible_check_mode
+
+    - name: Read account Secret or confirm its absence
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, -n, kam-system, get, secret, kiki-kam-identities, --ignore-not-found, -o, json]
+      register: kam_auth_state
+      changed_when: false
+      no_log: true
+
+    - name: Render initial state only for a missing Secret
+      ansible.builtin.command:
+        argv: ["{{ ansible_playbook_python }}", "{{ kam_auth_source.stdout }}/deploy/render_auth.py", --state-only]
+      delegate_to: localhost
+      become: false
+      register: kam_initial_state
+      changed_when: false
+      when: kam_auth_state.stdout | length == 0
+
+    - name: Create credential state once; never apply or reset it
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, create, -f, '-']
+        stdin: "{{ kam_initial_state.stdout }}"
+      when: kam_auth_state.stdout | length == 0 and not ansible_check_mode
+      no_log: true
+      changed_when: true
+
+    - name: Determine whether first administrator initialization is necessary
+      ansible.builtin.set_fact:
+        kam_bootstrap_needed: "{{ kam_auth_state.stdout | length == 0 or (((kam_auth_state.stdout | from_json).data['state.json'] | b64decode | from_json).users | length == 0) }}"
+      no_log: true
+
+    - name: Require a local private password file for first initialization only
+      ansible.builtin.assert:
+        that:
+          - kam_auth_bootstrap_password_file | default('') | length > 0
+          - kam_auth_bootstrap_username | default('') | length > 0
+        fail_msg: First installation requires kam_auth_bootstrap_username and a private controller-local kam_auth_bootstrap_password_file. No default password is supplied.
+      when: kam_bootstrap_needed | bool
+
+    - name: Initialize the first account using existing admin certificate access
+      ansible.builtin.command:
+        argv: [/usr/local/bin/kiki-kam, --kubeconfig, /etc/kubernetes/admin.conf, bootstrap, --username, "{{ kam_auth_bootstrap_username }}", --password-stdin]
+        stdin: "{{ lookup('ansible.builtin.file', kam_auth_bootstrap_password_file, rstrip=False) }}"
+        stdin_add_newline: false
+      no_log: true
+      changed_when: true
+      when: kam_bootstrap_needed | bool and not ansible_check_mode
+
+    - name: Create TLS Secret through kubectl's key/certificate validation
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, -n, kam-system, create, secret, tls, kiki-kam-tls, --cert=/etc/kubernetes/pki/kam-server.crt, --key=/etc/kubernetes/pki/kam-server.key, --dry-run=client, -o, json]
+      register: kam_tls_secret
+      no_log: true
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Apply reviewed TLS Secret
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, '-']
+        stdin: "{{ kam_tls_secret.stdout }}"
+      no_log: true
+      register: kam_tls_applied
+      changed_when: "'unchanged' not in kam_tls_applied.stdout"
+      when: not ansible_check_mode
+
+    - name: Render the public webhook client CA ConfigMap
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, -n, kam-system, create, configmap, kiki-kam-webhook-ca, --from-file=ca.crt=/etc/kubernetes/pki/kam-ca.crt, --dry-run=client, -o, json]
+      register: kam_client_ca
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Apply public client CA
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, apply, -f, '-']
+        stdin: "{{ kam_client_ca.stdout }}"
+      register: kam_ca_applied
+      changed_when: "'unchanged' not in kam_ca_applied.stdout"
+      when: not ansible_check_mode
+
+    - name: Restart authentication pods only when TLS material changes
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, -n, kam-system, rollout, restart, deployment/kiki-kam-auth]
+      changed_when: true
+      when: not ansible_check_mode and (kam_tls_applied.changed or kam_ca_applied.changed)
+
+    - name: Optionally expose a reviewed NodePort for a private lab endpoint
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, -n, kam-system, patch, service, kiki-kam-auth, --type=merge, -p, "{{ {'spec': {'type': 'NodePort', 'ports': [{'name': 'https', 'port': 443, 'targetPort': 8443, 'nodePort': kam_auth_node_port | int}]}} | to_json }}"]
+      changed_when: true
+      when: kam_auth_node_port | default(0) | int > 0 and not ansible_check_mode
+
+    - name: Wait for two authentication replicas after initialization
+      ansible.builtin.command:
+        argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, -n, kam-system, rollout, status, deployment/kiki-kam-auth, --timeout=180s]
+      changed_when: false
+      when: not ansible_check_mode
+
+- name: Preserve native access while enabling KAM on one control plane at a time
+  hosts: k8s_master
+  serial: 1
+  any_errors_fatal: true
+  tasks:
+    - name: Create a dedicated private webhook directory and backup directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0700'
+      loop: [/etc/kubernetes/kiki-kam, /etc/kubernetes/kiki-kam/backups]
+
+    - name: Copy dedicated webhook TLS material
+      ansible.builtin.copy:
+        src: "{{ kam_auth_tls_dir }}/{{ item.src }}"
+        dest: "/etc/kubernetes/kiki-kam/{{ item.dest }}"
+        mode: '0600'
+      loop:
+        - {src: kam-ca.crt, dest: ca.crt}
+        - {src: kam-apiserver.crt, dest: client.crt}
+        - {src: kam-apiserver.key, dest: client.key}
+      no_log: true
+
+    - name: Verify dedicated client CA differs from the Kubernetes client CA
+      ansible.builtin.command:
+        argv: [openssl, x509, -in, "{{ item }}", -noout, -fingerprint, -sha256]
+      loop: [/etc/kubernetes/kiki-kam/ca.crt, /etc/kubernetes/pki/ca.crt]
+      register: kam_ca_fingerprints
+      changed_when: false
+
+    - name: Reject reuse of the cluster client CA for the authentication webhook
+      ansible.builtin.assert:
+        that: kam_ca_fingerprints.results[0].stdout != kam_ca_fingerprints.results[1].stdout
+
+    - name: Check the reviewed authentication endpoint before changing API authentication
+      ansible.builtin.uri:
+        url: "{{ kam_auth_url }}/healthz"
+        ca_path: /etc/kubernetes/kiki-kam/ca.crt
+        validate_certs: true
+        status_code: 200
+      when: not ansible_check_mode
+
+    - name: Verify the dedicated mTLS webhook route before API server changes
+      ansible.builtin.uri:
+        url: "{{ kam_auth_url }}/authenticate"
+        method: POST
+        ca_path: /etc/kubernetes/kiki-kam/ca.crt
+        client_cert: /etc/kubernetes/kiki-kam/client.crt
+        client_key: /etc/kubernetes/kiki-kam/client.key
+        validate_certs: true
+        body_format: json
+        body:
+          apiVersion: authentication.k8s.io/v1
+          kind: TokenReview
+          spec: {token: non-kam-installation-probe}
+        status_code: 200
+      register: kam_mtls_probe
+      failed_when: kam_mtls_probe.json.kind | default('') != 'TokenReview' or kam_mtls_probe.json.status.authenticated | default(false) | bool
+      when: not ansible_check_mode
+
+    - name: Install mTLS TokenReview configuration
+      ansible.builtin.copy:
+        dest: /etc/kubernetes/kiki-kam/webhook.yaml
+        mode: '0600'
+        content: |
+          apiVersion: v1
+          kind: Config
+          current-context: kam
+          clusters:
+            - name: kam
+              cluster:
+                server: {{ kam_auth_url }}/authenticate
+                certificate-authority: /etc/kubernetes/kiki-kam/ca.crt
+          users:
+            - name: apiserver
+              user:
+                client-certificate: /etc/kubernetes/kiki-kam/client.crt
+                client-key: /etc/kubernetes/kiki-kam/client.key
+          contexts:
+            - name: kam
+              context: {cluster: kam, user: apiserver}
+
+    - name: Read existing static Pod
+      ansible.builtin.slurp:
+        src: /etc/kubernetes/manifests/kube-apiserver.yaml
+      register: kam_original_api
+      no_log: true
+
+    - name: Compute minimal additive authentication update on the controller
+      ansible.builtin.command:
+        argv: ["{{ ansible_playbook_python }}", "{{ playbook_dir }}/../scripts/configure_kam_webhook.py", --stdin-render]
+        stdin: "{{ kam_original_api.content | b64decode }}"
+      delegate_to: localhost
+      become: false
+      register: kam_api_update
+      changed_when: false
+      no_log: true
+
+    - name: Reject mismatched native audiences between control planes
+      ansible.builtin.assert:
+        that: (kam_api_update.stdout | from_json).audience == hostvars[groups['k8s_master'][0]].kam_selected_audience
+
+    - name: Save original manifest outside kubelet's watched directory
+      ansible.builtin.copy:
+        content: "{{ kam_original_api.content | b64decode }}"
+        dest: "/etc/kubernetes/kiki-kam/backups/{{ kam_original_api.content | hash('sha256') }}.yaml"
+        mode: '0600'
+        force: false
+      no_log: true
+      when: (kam_api_update.stdout | from_json).changed | bool
+
+    - name: Apply additive webhook update and verify native certificate recovery
+      when: (kam_api_update.stdout | from_json).changed | bool and not ansible_check_mode
+      block:
+        - name: Atomically update the API server static Pod
+          ansible.builtin.copy:
+            content: "{{ (kam_api_update.stdout | from_json).manifest }}"
+            dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+            mode: '0600'
+          no_log: true
+
+        - name: Observe the old API listener stop before considering recovery
+          ansible.builtin.wait_for:
+            host: "{{ k8s_ip4.split('/')[0] }}"
+            port: 6443
+            state: stopped
+            timeout: 90
+            sleep: 1
+
+        - name: Wait for local API readiness using existing admin certificate
+          ansible.builtin.command:
+            argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, "--server=https://{{ k8s_ip4.split('/')[0] }}:6443", --request-timeout=5s, get, --raw=/readyz]
+          register: kam_native_ready
+          until: kam_native_ready.rc == 0 and kam_native_ready.stdout == 'ok'
+          retries: 36
+          delay: 5
+          changed_when: false
+        - name: Confirm native administrator authorization still works
+          ansible.builtin.command:
+            argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, "--server=https://{{ k8s_ip4.split('/')[0] }}:6443", --request-timeout=5s, auth, can-i, get, nodes, --quiet]
+          changed_when: false
+      rescue:
+        - name: Restore only the manifest captured for this update
+          ansible.builtin.copy:
+            content: "{{ kam_original_api.content | b64decode }}"
+            dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+            mode: '0600'
+          no_log: true
+
+        - name: Confirm the captured native API configuration recovers
+          ansible.builtin.command:
+            argv: [kubectl, --kubeconfig=/etc/kubernetes/admin.conf, "--server=https://{{ k8s_ip4.split('/')[0] }}:6443", --request-timeout=5s, get, --raw=/readyz]
+          register: kam_restore_ready
+          until: kam_restore_ready.rc == 0 and kam_restore_ready.stdout == 'ok'
+          retries: 36
+          delay: 5
+          changed_when: false
+
+        - name: Stop before changing another control plane
+          ansible.builtin.fail:
+            msg: KAM webhook update did not recover; the captured API manifest was restored. Verify native API readiness before resuming.
+
+- import_playbook: k8s-kam.yaml
