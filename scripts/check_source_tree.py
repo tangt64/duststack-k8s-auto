@@ -17,7 +17,7 @@ APPROVED_SCREENSHOTS = {
         '04-cilium-connectivity.jpg', '05-nfs-pvc-io.jpg', '06-rook-pvc-io.jpg',
         '07-gitea-actions.jpg', '08-ha-vip-failover.jpg', '09-kam-live-cluster.jpg',
         '10-ha-vm-power-loss.jpg', '11-etcd-quorum.jpg', '12-kam-fast-handover.jpg',
-        '13-kiki-kam-repository.jpg',
+        '13-kiki-kam-repository.jpg', '14-kiki-kam-actions.jpg',
     )
 }
 

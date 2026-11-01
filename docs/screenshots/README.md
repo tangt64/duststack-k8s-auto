@@ -19,6 +19,7 @@
 | 11-etcd-quorum.jpg | 2026-11-01 | 실제 양쪽 peer TCP 불가·etcd health/쓰기 실패 표본, 복구 후 sentinel·3-member 유지와 노드 Ready |
 | 12-kam-fast-handover.jpg | 2026-11-01 | 리더 Pod 삭제 3회 인수 2.60·2.66·2.70초, 두 worker Ready, namespace·상승 거부·삭제/만료 회수 통과, 남은 Grant 없음 |
 | 13-kiki-kam-repository.jpg | 2026-11-01 | 기존 3개 커밋과 새 c2b708e를 유지한 Gitea kiki-kam 저장소. CI 노란 표시는 runner 대기 상태이며 성공 증거가 아님 |
+| 14-kiki-kam-actions.jpg | 2026-11-01 | kiki-kam 저장소 범위 runner ID 2, kiki-kam-wsl v5.2.0 온라인·사용 상태. 촬영 당시 CI 실행 중이며 성공 화면이 아님 |
 
 이전 RBD 실패 화면은 [당시 커밋](https://github.com/tangt64/duststack-k8s-auto/blob/dc49538c95b74142796ed1b4942c2a83cb0ca658/docs/screenshots/06-rook-pvc-io.jpg)에
 남아 있습니다. 현재 06번 사진은 승인한 키 호환 변경 후 실제 통과 화면입니다.

@@ -81,3 +81,19 @@ CRD에는 비밀번호나 세션을 저장하지 않습니다. 불변 사용자 
 ![Gitea kiki-kam 실제 저장소 화면](screenshots/13-kiki-kam-repository.jpg)
 
 최종 로컬 전체 검증은 `RUN_CLI_INTEGRATION=1 RUN_CHART_VALIDATION=1 RUN_KAM_API_INTEGRATION=1 bash scripts/validate.sh`로 실행했습니다. 회귀 **77개 전부 통과**(kubeadm 스키마 포함), 실제 API/CLI 통합과 공식 차트 4개 렌더링을 확인했습니다. 인증 컨테이너도 rootless Podman에서 빌드하고 비루트 `kam version 0.2.0` 실행을 확인했습니다. registry push·실제 Pod rollout은 이 결과에 포함하지 않습니다.
+
+## 저장소 전용 Gitea runner
+
+사용자 승인 후 현재 PC의 WSL `tang` 사용자에 공식 runner 5.2.0 `kiki-kam-wsl`을 저장소 범위로 등록했습니다. 상태·등록 파일·로그는 `~/.local/share/kiki-kam-gitea-runner/`(0700, 등록/설정 파일 0600)에 있으며 기존 duststack runner와 분리했습니다. 등록 토큰 임시 파일은 사용 후 제거했습니다.
+
+rootless Podman의 별도 socket과 `kiki-kam-runner-ci` bridge를 사용합니다. WSL user bus가 없어 내부 서비스 DNS 초기화가 실패한 문제는, 서비스 컨테이너 이름 해석을 사용하지 않는 이 workflow에 전용 DNS 비활성 bridge를 지정해 해결했습니다. host 네트워크·privileged·작업 컨테이너의 호스트 socket mount는 사용하지 않습니다. 워크플로에는 외부 DNS와 HTTPS 다운로드가 필요합니다. service container DNS를 사용하는 workflow를 추가하려면 네트워크 구성을 다시 검토하세요.
+
+runner는 이 PC·WSL이 실행 중이어야 동작합니다. 재부팅 후 자동 시작 서비스는 등록하지 않았습니다. 재개할 때 공식 runner 바이너리의 SHA-256을 다시 확인한 후, 동일 사용자의 Podman 서비스(`--cgroup-manager=cgroupfs`, 전용 socket)와 `daemon --config ~/.local/share/kiki-kam-gitea-runner/config.yaml`을 사용합니다. 기존 PID와 socket이 살아 있는 경우 중복 실행하지 마세요. `.runner` 내용을 출력·공유하거나 저장소에 넣지 않습니다.
+
+실제 API 11개 조건의 최신 원문은 [KAM 검증 기록](https://github.com/tangt64/KAM/blob/e383003ded4a6a0d914b187d86e5cac62241d384/docs/auth-api-result.json)에 보관했습니다. 비밀번호 초기화 9.243초·로그아웃 10.140초·비활성화 10.349초 후 실제 API가 기존 토큰을 거부했고, 명시적 context 변경 시 다른 current-context를 보존했습니다.
+
+[Gitea KAM 최종 커밋 CI](https://git.vlab.dustbox.kr/dustbox/kiki-kam/actions/runs/3)와 [GitHub KAM Actions](https://github.com/tangt64/KAM/actions), [duststack Gitea](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions)·[GitHub Actions](https://github.com/tangt64/duststack-k8s-auto/actions)에서 각 커밋의 서버 검증 결과를 확인할 수 있습니다.
+
+아래는 kiki-kam 저장소 범위의 전용 runner 등록·온라인 상태를 촬영한 실제 화면입니다. 촬영 시 테스트 실행 중이며 검사 성공 화면과 구분합니다.
+
+![kiki-kam 저장소 전용 runner 실제 등록 화면](screenshots/14-kiki-kam-actions.jpg)
