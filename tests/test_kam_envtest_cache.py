@@ -1,7 +1,9 @@
 """A cache refresh must not truncate an executable used by another API test."""
 import importlib.util
 import io
+import os
 from pathlib import Path
+import signal
 import subprocess
 import tarfile
 import tempfile
@@ -13,10 +15,10 @@ cache = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cache)
 
 
-@unittest.skipUnless(Path('/bin/sleep').is_file(), 'Linux executable cache regression')
+@unittest.skipUnless(Path('/bin/sh').is_file(), 'Linux executable cache regression')
 class EnvtestCacheTests(unittest.TestCase):
     def test_refresh_during_execution_and_corrupt_file_repair(self):
-        binary = Path('/bin/sleep').read_bytes()
+        binary = Path('/bin/sh').read_bytes()
         archive = io.BytesIO()
         with tarfile.open(fileobj=archive, mode='w') as bundle:
             for name in ['etcd', 'kube-apiserver', 'kubectl']:
@@ -29,14 +31,16 @@ class EnvtestCacheTests(unittest.TestCase):
                 with tarfile.open(fileobj=io.BytesIO(archive.getvalue())) as bundle:
                     cache.extract_verified(bundle, directory)
             refresh()
-            # Ubuntu's multi-call coreutils selects its applet using argv[0].
-            # Keep that name while executing the copied, actively locked inode.
-            running = subprocess.Popen(['sleep', '30'], executable=str(directory / 'controller-tools/envtest/etcd'))
+            # Multi-call coreutils can inspect /proc/self/exe, ignoring argv[0].
+            # A shell remains running at the renamed inode while waiting for sleep.
+            executable = directory / 'controller-tools/envtest/etcd'
+            running = subprocess.Popen([str(executable), '-c', 'sleep 30; :'], start_new_session=True)
             try:
+                self.assertEqual(Path(f'/proc/{running.pid}/exe').resolve(), executable.resolve())
                 (directory / 'controller-tools/envtest/kubectl').write_bytes(b'tampered')
                 refresh()
                 self.assertIsNone(running.poll())
                 self.assertEqual((directory / 'controller-tools/envtest/kubectl').read_bytes(), binary)
             finally:
-                running.terminate()
+                os.killpg(running.pid, signal.SIGTERM)
                 running.wait(timeout=5)

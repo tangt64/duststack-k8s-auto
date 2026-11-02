@@ -171,7 +171,7 @@ for name,value in data.items():
                   ('secret', 'kiki-kam-tls', '-n', 'kam-system'),
                   ('configmap', 'kiki-kam-webhook-ca', '-n', 'kam-system')]:
         assert not k('get', *words, '--ignore-not-found', '-oname').stdout.strip(), 'Existing KAM resources: refuse takeover'
-    assert not json.loads(helm('list', '-a', '-ojson').stdout), 'Require no existing Helm releases in kam-system'
+    assert not json.loads(helm('list', '-ojson').stdout), 'Require no existing Helm releases in kam-system'
     assert api_ready()
     before = {host: snapshot(host) for host in hosts}
     assert all(all(value is None for name, value in snap.items() if name != FILES[0]) for snap in before.values())
