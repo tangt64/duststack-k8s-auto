@@ -50,12 +50,17 @@ def main():
 
     def run(argv, *, body=None, required=True, timeout=360):
         r = subprocess.run([str(x) for x in argv], input=body, text=True, capture_output=True, env=env, timeout=timeout)
+        if r.returncode:
+            private_log = output.parent/'kam-private-command-error.log'
+            private_log.write_text(r.stdout + r.stderr)
+            private_log.chmod(0o600)
         if required and r.returncode:
             raise RuntimeError(f'{Path(str(argv[0])).name} exited {r.returncode}; private log retained')
         return r
 
     def k(*words, body=None, required=True):
-        return run(['kubectl', '--kubeconfig', a.kubeconfig, '--request-timeout=10s', *words],
+        request_timeout = '200s' if 'rollout' in words or 'delete' in words else '10s'
+        return run(['kubectl', '--kubeconfig', a.kubeconfig, '--request-timeout=' + request_timeout, *words],
                    body=json.dumps(body) if body is not None else None, required=required)
 
     def get(*words):
@@ -65,6 +70,7 @@ def main():
         output.write_text(json.dumps(report, indent=2) + '\n')
 
     def passed(name, value=True):
+        assert value, 'False check cannot be recorded as passed: ' + name
         report['checks'][name] = value
         save()
         print('PASS', name, flush=True)
@@ -192,6 +198,10 @@ for name,value in data.items():
         def real_access():
             return run(['kubectl', '--kubeconfig', user_login, '--request-timeout=10s', '-n', ns, 'get', 'pods'], required=False).returncode == 0
 
+        def access_revoked():
+            result = run(['kubectl', '--kubeconfig', user_login, '--request-timeout=10s', '-n', ns, 'get', 'pods'], required=False)
+            return result.returncode != 0 and 'forbidden' in result.stderr.lower() and api_ready()
+
         try:
             run([os.sys.executable, source/'deploy/make_tls.py', '--out', tls, '--hostname', a.auth_url.split('://')[1].split(':')[0]])
             k('create', 'namespace', ns); created_namespace = True
@@ -228,7 +238,8 @@ for name,value in data.items():
             cli(admin_login, '-n', ns, 'grant', 'helm-lab-user')
             login(user_login, 'helm-lab-user', user_password)
             eventually(real_access)
-            assert run(['kubectl', '--kubeconfig', user_login, '-n', ns, 'get', 'secrets'], required=False).returncode != 0
+            denied = run(['kubectl', '--kubeconfig', user_login, '--request-timeout=10s', '-n', ns, 'get', 'secrets'], required=False)
+            assert denied.returncode != 0 and 'forbidden' in denied.stderr.lower()
             passed('password_login_namespace_rbac_without_impersonation')
 
             first_mirrors = mirrors()
@@ -277,7 +288,7 @@ for name,value in data.items():
             assert real_access()
             passed('failed_helm_upgrade_rolls_back_ready_pods_and_preserves_accounts', {'revision': helm_state['version'], 'status': helm_state['info']['status']})
             cli(admin_login, '-n', ns, 'revoke', 'helm-lab-user')
-            eventually(lambda: not real_access())
+            eventually(access_revoked)
             passed('revoke_removes_real_user_pod_access')
             cli(admin_login, 'user', 'delete', 'helm-lab-user')
             cli(admin_login, 'logout')

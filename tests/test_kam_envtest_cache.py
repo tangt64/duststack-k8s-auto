@@ -29,7 +29,9 @@ class EnvtestCacheTests(unittest.TestCase):
                 with tarfile.open(fileobj=io.BytesIO(archive.getvalue())) as bundle:
                     cache.extract_verified(bundle, directory)
             refresh()
-            running = subprocess.Popen([str(directory / 'controller-tools/envtest/etcd'), '30'])
+            # Ubuntu's multi-call coreutils selects its applet using argv[0].
+            # Keep that name while executing the copied, actively locked inode.
+            running = subprocess.Popen(['sleep', '30'], executable=str(directory / 'controller-tools/envtest/etcd'))
             try:
                 (directory / 'controller-tools/envtest/kubectl').write_bytes(b'tampered')
                 refresh()
