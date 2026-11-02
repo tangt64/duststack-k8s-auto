@@ -1,0 +1,127 @@
+{
+  "checked_at": "2026-11-02T11:57:40.290808+00:00",
+  "temporary_keys_removed": true,
+  "native_api_readyz": {
+    "172.30.62.250": "ok",
+    "172.30.62.128": "ok",
+    "172.30.62.158": "ok",
+    "172.30.62.170": "ok"
+  },
+  "nodes": [
+    {
+      "name": "ha-cp01.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-cp02.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-cp03.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-worker01.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "ha-worker02.lab.dustbox.kr",
+      "ready": true
+    }
+  ],
+  "preserved_existing_controller_pods": [
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-bhjmm",
+      "node": "ha-worker01.lab.dustbox.kr",
+      "ready": true
+    },
+    {
+      "name": "kam-467237b227cc2f05-7656d7586f-hvdcv",
+      "node": "ha-worker02.lab.dustbox.kr",
+      "ready": true
+    }
+  ],
+  "test_resources_absent": true,
+  "temporary_pki_absent": true,
+  "control_plane_native_files": {
+    "172.30.62.128": {
+      "native_manifest_sha256": "d2b3306cd0163d84f27dd14202d220a4da3f57a26ecdc6dfbc075f876363184f",
+      "bundle_absent": true
+    },
+    "172.30.62.158": {
+      "native_manifest_sha256": "cc57ad50da6b0f98428fa698e043d5d8867a7d66fbafc10463a3f52f0652c50c",
+      "bundle_absent": true
+    },
+    "172.30.62.170": {
+      "native_manifest_sha256": "87e836eb2970aa5e18f2b9368e146707f7549625f964356287663e6838cee4fb",
+      "bundle_absent": true
+    }
+  },
+  "ssh_key_cleanup": [
+    {
+      "ip": "172.30.62.158",
+      "key_lines_removed": 1,
+      "remaining_matching": 0,
+      "new_publickey_auth_denied": true
+    },
+    {
+      "ip": "172.30.62.170",
+      "key_lines_removed": 1,
+      "remaining_matching": 0,
+      "new_publickey_auth_denied": true
+    },
+    {
+      "ip": "172.30.62.108",
+      "key_lines_removed": 1,
+      "remaining_matching": 0,
+      "new_publickey_auth_denied": true
+    },
+    {
+      "ip": "172.30.62.86",
+      "key_lines_removed": 1,
+      "remaining_matching": 0,
+      "new_publickey_auth_denied": true
+    }
+  ],
+  "cp01_key_pair_absent": true,
+  "vm_stop_checked_at": "2026-11-02T12:09:22.431645+00:00",
+  "servers": [
+    {
+      "id": "e07ce3d6-755b-484a-acd9-e1c6dfe4bb10",
+      "name": "duststack-ha-20261101-cp-01",
+      "status": "SHUTOFF"
+    },
+    {
+      "id": "c6aff28a-29f0-4dda-bd57-aa65773865f7",
+      "name": "duststack-ha-20261101-cp-02",
+      "status": "SHUTOFF"
+    },
+    {
+      "id": "dc5df408-6e05-4a41-ab7b-d22b1f8a8785",
+      "name": "duststack-ha-20261101-cp-03",
+      "status": "SHUTOFF"
+    },
+    {
+      "id": "0b062c5c-8f23-44d1-990c-600b4dac08c1",
+      "name": "duststack-ha-20261101-worker-01",
+      "status": "SHUTOFF"
+    },
+    {
+      "id": "f17c9f6b-3834-4448-9010-1406857d126c",
+      "name": "duststack-ha-20261101-worker-02",
+      "status": "SHUTOFF"
+    },
+    {
+      "id": "ec88d1d6-9340-4d63-b4b7-edbf592f86e6",
+      "name": "duststack-ha-20261101-lb-01",
+      "status": "SHUTOFF"
+    },
+    {
+      "id": "76652ba3-dfc5-4d08-a0d6-7d5f519b6994",
+      "name": "duststack-ha-20261101-lb-02",
+      "status": "SHUTOFF"
+    }
+  ],
+  "volumes_retained": true,
+  "network_and_security_group_retained": true
+}

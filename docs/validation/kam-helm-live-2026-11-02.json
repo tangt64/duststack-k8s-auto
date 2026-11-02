@@ -1,0 +1,111 @@
+{
+  "started_at": "2026-11-02T11:28:26.096085+00:00",
+  "status": "passed",
+  "checks": {
+    "helm_wait_real_pods_two_workers": {
+      "kiki-kam-auth": [
+        {
+          "name": "kiki-kam-auth-67796cd689-mrmlp",
+          "node": "ha-worker02.lab.dustbox.kr",
+          "image_ids": [
+            "localhost/kiki-kam-auth@sha256:e533a73bcab6a336107164a27bd36e2745ec4bc0905aa76749d2cd2248a4dd37"
+          ]
+        },
+        {
+          "name": "kiki-kam-auth-67796cd689-nq7wr",
+          "node": "ha-worker01.lab.dustbox.kr",
+          "image_ids": [
+            "localhost/kiki-kam-auth@sha256:e533a73bcab6a336107164a27bd36e2745ec4bc0905aa76749d2cd2248a4dd37"
+          ]
+        }
+      ],
+      "kam-c86f1691e6d9cf90": [
+        {
+          "name": "kam-c86f1691e6d9cf90-6c6fd6d555-jcvt6",
+          "node": "ha-worker02.lab.dustbox.kr",
+          "image_ids": [
+            "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487"
+          ]
+        },
+        {
+          "name": "kam-c86f1691e6d9cf90-6c6fd6d555-z4zwl",
+          "node": "ha-worker01.lab.dustbox.kr",
+          "image_ids": [
+            "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487"
+          ]
+        }
+      ]
+    },
+    "initial_webhook_three_control_planes": {
+      "ha-cp01.lab.dustbox.kr": {
+        "uid": "aaa7bcc1-c585-401b-bd2a-59480a69654e",
+        "bundle": "e7298bd6538be13e3e1ed8d2806cdeb055b1b172d352dd8568ddce8ef177fe2b",
+        "ready": true
+      },
+      "ha-cp02.lab.dustbox.kr": {
+        "uid": "0e330159-6c5f-43c3-b4f5-05c0ed0037d4",
+        "bundle": "e7298bd6538be13e3e1ed8d2806cdeb055b1b172d352dd8568ddce8ef177fe2b",
+        "ready": true
+      },
+      "ha-cp03.lab.dustbox.kr": {
+        "uid": "ed260432-87ab-4d51-b572-604360925d81",
+        "bundle": "e7298bd6538be13e3e1ed8d2806cdeb055b1b172d352dd8568ddce8ef177fe2b",
+        "ready": true
+      }
+    },
+    "password_login_namespace_rbac_without_impersonation": true,
+    "same_ca_leaf_renewal_real_rollouts_and_login": {
+      "old_server_serial": "serial=2E6E1437C9D793C26F9D4BB402D0A3AB613B28C2",
+      "new_server_serial": "serial=4A17027DEA4AE65084660ED73ADDF8712AEBCB22",
+      "ca_sha256_unchanged": "12ffc88508675c0163c00b9791e99f3ddc50e8ca6d5ec847b6a35c54e1847d7b",
+      "api_mirrors": {
+        "ha-cp01.lab.dustbox.kr": {
+          "uid": "e81de933-4b7b-431d-b610-a7986fff6b76",
+          "bundle": "ecd11810145ae1bc52129fcc0c7476a58d9efe1b118dea342d2f137ee2df30d9",
+          "ready": true
+        },
+        "ha-cp02.lab.dustbox.kr": {
+          "uid": "4d465421-68ab-490b-83bc-878b94c8a815",
+          "bundle": "ecd11810145ae1bc52129fcc0c7476a58d9efe1b118dea342d2f137ee2df30d9",
+          "ready": true
+        },
+        "ha-cp03.lab.dustbox.kr": {
+          "uid": "4d63b010-ea7f-4d97-9c8b-53944f09ecf9",
+          "bundle": "ecd11810145ae1bc52129fcc0c7476a58d9efe1b118dea342d2f137ee2df30d9",
+          "ready": true
+        }
+      },
+      "old_served_leaf_sha256": "adcb8778096eb31ace9551329c72e37241b71cae262f51ba5ab19b1e8d73f274",
+      "new_served_leaf_sha256": "e9b5ef282ea83104112223e9038670d6d3a4c069934aa3ebdf691848dd67f5c4"
+    },
+    "mismatched_tls_key_rejected_before_writing_any_control_plane": true,
+    "real_cp02_startup_failure_restores_manifest_tls_bundle_stops_before_cp03": {
+      "cp02_before_after_sha256": {
+        "/etc/kubernetes/manifests/kube-apiserver.yaml": "f42be385f0f24ff68a2b44e8be9bb450c37c916675b2edd349cb3d420892c991",
+        "/etc/kubernetes/kiki-kam/ca.crt": "12ffc88508675c0163c00b9791e99f3ddc50e8ca6d5ec847b6a35c54e1847d7b",
+        "/etc/kubernetes/kiki-kam/client.crt": "91f2fea9a76c71b3af82a316ef129e4a5cd63fbaebb3e7ae8284bb13573ed1ca",
+        "/etc/kubernetes/kiki-kam/client.key": "068144f08c409039378e79b75ba5fdb7fc0120a0e2544d611d3085af2b0edc95",
+        "/etc/kubernetes/kiki-kam/webhook.yaml": "5165f4fa487eb7c3e8e0b6e33ac177d7a954c9d4eacfbe3ce4aea38fe5e03854"
+      },
+      "cp03_untouched": true,
+      "cp01_updated_first": true,
+      "all_native_apis_ready": true,
+      "native_probe_connection_refused_observed": true
+    },
+    "resume_after_rollback_three_native_apis_and_user_access": true,
+    "failed_helm_upgrade_rolls_back_ready_pods_and_preserves_accounts": {
+      "revision": 3,
+      "status": "deployed"
+    },
+    "revoke_removes_real_user_pod_access": true,
+    "helm_uninstall_preserves_external_account_state_and_crd": true
+  },
+  "environment": "Terminal Lab: real kubelet, scheduler, CRI-O and three control planes",
+  "impersonation_used": false,
+  "namespace": "kam-helm-e2e",
+  "duststack_revision": "d6ef7e1046c9f540f121f7566a40294060f1719a",
+  "kam_source_revision": "07f4f03ef2f0005abd995fc415efeb61f2e6662e",
+  "helm_version": "v4.3.1+gc0d08d0",
+  "native_api_restored": true,
+  "finished_at": "2026-11-02T11:52:43.869193+00:00"
+}
