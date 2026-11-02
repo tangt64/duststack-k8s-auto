@@ -16,7 +16,7 @@
 | 설치 대상 | `kam-system` · 테스트 namespace `kam-helm-e2e` |
 | 이미지 공급 | 고정 소스로 랩에서 빌드한 `localhost/kiki-kam-auth:lab`를 두 worker의 CRI-O 저장소에 공급 · `Never` pull |
 
-실행 후 문서만 갱신한 KAM commit으로 duststack 소스 고정값을 갱신할 수 있습니다. 실행 소스와 최종 고정 소스의 runtime·차트 파일 동일성은 파일별 SHA-256으로 확인합니다. 운영용 인증 이미지는 검토한 registry의 실제 digest를 사용해야 합니다. 테스트용 로컬 태그 허용은 명시적 선택입니다.
+최종 고정 KAM은 `860a6b0d6fdc0d2e67725268646fa50970e4c255`입니다. 실증한 `07f4f03` 이후 README·문서만 갱신했으며, 실행 코드·차트·manifest·빌드·테스트를 포함한 문서 외 62개 파일의 Git blob bytes와 SHA-256이 동일함을 [비교 원문](validation/kam-source-equivalence-2026-11-02.json)에 기록했습니다. `config/kam-source.json`에는 새 commit의 아카이브·전체 파일 SHA-256을 고정했습니다. 운영용 인증 이미지는 검토한 registry의 실제 digest를 사용해야 합니다. 테스트용 로컬 태그 허용은 명시적 선택입니다.
 
 ## 확인한 동작
 
