@@ -12,6 +12,8 @@ import json
 import os
 from pathlib import Path
 import secrets
+import socket
+import ssl
 import subprocess
 import tempfile
 import time
@@ -131,6 +133,14 @@ for name,value in data.items():
     def helm(*words, required=True):
         return run([a.helm, '--kubeconfig', a.kubeconfig, '-n', 'kam-system', *words], required=required, timeout=600)
 
+    def served_certificate_sha256():
+        from urllib.parse import urlsplit
+        endpoint = urlsplit(a.auth_url)
+        context = ssl.create_default_context(cafile=str(Path(a.tls_dir)/'kam-ca.crt'))
+        with socket.create_connection((endpoint.hostname, endpoint.port or 443), timeout=5) as stream:
+            with context.wrap_socket(stream, server_hostname=endpoint.hostname) as secure:
+                return hashlib.sha256(secure.getpeercert(binary_form=True)).hexdigest()
+
     def operation(fault=False):
         playbook = ROOT/'playbooks/k8s-kam-webhook.yaml'
         temp_playbook = ROOT/'playbooks/.kam-disposable-fault.yaml'
@@ -173,6 +183,9 @@ for name,value in data.items():
         assert not k('get', *words, '--ignore-not-found', '-oname').stdout.strip(), 'Existing KAM resources: refuse takeover'
     assert not json.loads(helm('list', '-ojson').stdout), 'Require no existing Helm releases in kam-system'
     assert api_ready()
+    report['duststack_revision'] = run(['git', '-C', ROOT, 'rev-parse', 'HEAD']).stdout.strip()
+    report['kam_source_revision'] = source.name
+    report['helm_version'] = helm('version', '--short').stdout.strip()
     before = {host: snapshot(host) for host in hosts}
     assert all(all(value is None for name, value in snap.items() if name != FILES[0]) for snap in before.values())
     for snap in before.values():
@@ -180,7 +193,7 @@ for name,value in data.items():
     recovery = output.parent/'kam-native-recovery.json'
     recovery.write_text(json.dumps(before)); recovery.chmod(0o600)
     tls = Path(a.tls_dir).resolve()
-    created_namespace, created_external, release_started = False, False, False
+    created_namespace, created_external, release_started, created_tls = False, False, False, False
     with tempfile.TemporaryDirectory(prefix='kam-live-private-') as private:
         private = Path(private)
         env.update(HOME=str(private), XDG_CONFIG_HOME=str(private/'config'), XDG_CACHE_HOME=str(private/'cache'))
@@ -204,6 +217,7 @@ for name,value in data.items():
 
         try:
             run([os.sys.executable, source/'deploy/make_tls.py', '--out', tls, '--hostname', a.auth_url.split('://')[1].split(':')[0]])
+            created_tls = True
             k('create', 'namespace', ns); created_namespace = True
             k('create', '-f', source/'deploy/bootstrap/identity-state.yaml'); created_external = True
             for kind, name, flags in [('secret', 'kiki-kam-tls', ['tls', '--cert=' + str(tls/'kam-server.crt'), '--key=' + str(tls/'kam-server.key')]),
@@ -243,6 +257,7 @@ for name,value in data.items():
             passed('password_login_namespace_rbac_without_impersonation')
 
             first_mirrors = mirrors()
+            first_served = served_certificate_sha256()
             old_serial = run(['openssl', 'x509', '-in', tls/'kam-server.crt', '-noout', '-serial']).stdout.strip()
             ca_hash = hashlib.sha256((tls/'kam-ca.crt').read_bytes()).hexdigest()
             run([os.sys.executable, source/'deploy/make_tls.py', '--out', tls, '--hostname', a.auth_url.split('://')[1].split(':')[0], '--renew'])
@@ -252,6 +267,9 @@ for name,value in data.items():
             k('apply', '-f', '-', body=secret)
             k('-n', 'kam-system', 'rollout', 'restart', 'deployment/kiki-kam-auth')
             k('-n', 'kam-system', 'rollout', 'status', 'deployment/kiki-kam-auth', '--timeout=3m')
+            expected_served = hashlib.sha256(ssl.PEM_cert_to_DER_cert((tls/'kam-server.crt').read_text())).hexdigest()
+            eventually(lambda: all(served_certificate_sha256() == expected_served for _ in range(4)), seconds=45)
+            assert expected_served != first_served
             assert operation().returncode == 0
             renewed_mirrors = mirrors()
             assert len(renewed_mirrors) == 3 and all(renewed_mirrors[n]['uid'] != first_mirrors[n]['uid'] and renewed_mirrors[n]['ready'] for n in first_mirrors)
@@ -259,7 +277,8 @@ for name,value in data.items():
             new_serial = run(['openssl', 'x509', '-in', tls/'kam-server.crt', '-noout', '-serial']).stdout.strip()
             assert old_serial != new_serial
             passed('same_ca_leaf_renewal_real_rollouts_and_login', {'old_server_serial': old_serial, 'new_server_serial': new_serial,
-                   'ca_sha256_unchanged': ca_hash, 'api_mirrors': renewed_mirrors})
+                   'ca_sha256_unchanged': ca_hash, 'api_mirrors': renewed_mirrors,
+                   'old_served_leaf_sha256': first_served, 'new_served_leaf_sha256': expected_served})
 
             installed = {host: snapshot(host) for host in hosts}
             run([os.sys.executable, source/'deploy/make_tls.py', '--out', tls, '--hostname', a.auth_url.split('://')[1].split(':')[0], '--renew'])
@@ -319,6 +338,10 @@ for name,value in data.items():
                     k('-n', 'kam-system', 'delete', 'secret', 'kiki-kam-identities', 'kiki-kam-tls', '--ignore-not-found')
                     k('-n', 'kam-system', 'delete', 'configmap', 'kiki-kam-webhook-ca', '--ignore-not-found')
                 recovery.unlink(missing_ok=True)
+                if created_tls:
+                    for name in ['kam-ca.crt', 'kam-ca.key', 'kam-server.crt', 'kam-server.key', 'kam-apiserver.crt', 'kam-apiserver.key']:
+                        (tls/name).unlink(missing_ok=True)
+                    tls.rmdir()
             else:
                 report['status'] = 'failed'
             report['finished_at'] = datetime.now(timezone.utc).isoformat()
