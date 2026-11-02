@@ -1,0 +1,48 @@
+{
+  "started_at": "2026-11-02T12:33:39.886705+00:00",
+  "checks": {
+    "helm_install_accepted_by_real_api": true,
+    "anonymous_wrong_password_unknown_user_forged_session_denied": {
+      "anonymous_whoami": 401,
+      "anonymous_user_list": 401,
+      "anonymous_user_create": 401,
+      "anonymous_namespace_pods": 403,
+      "anonymous_state_secret": 403,
+      "wrong_password": 401,
+      "unknown_user": 401,
+      "forged_session_whoami": 401,
+      "forged_session_namespace_pods": 401,
+      "disabled_user_login": 401
+    },
+    "random_user_login_then_explicit_namespace_rbac": {
+      "username": "probe-f711ab46",
+      "whoami_matches_created_uid": true,
+      "pods_forbidden_before_grant": true,
+      "pods_allowed_after_grant": true,
+      "user_administration_denied": true,
+      "failed_login_wrote_no_kubeconfig": true
+    },
+    "explicit_context_preserves_unrelated_current_namespace": true,
+    "real_password_login_uid_namespace_rbac_no_impersonation": true,
+    "exec_credential_and_private_cache": true,
+    "two_auth_replicas_share_cas_secret_state": true,
+    "auth_service_sa_is_limited_to_one_secret": true,
+    "password_reset_and_logout_revoke_sessions": true,
+    "disable_enable_delete_recreate_do_not_restore_old_access": true,
+    "grant_expiry_revokes_actual_user_access": true,
+    "reinstall_preserves_accounts_and_state_secret_is_private": true,
+    "webhook_requires_dedicated_mtls_client": true,
+    "last_administrator_preserved": true,
+    "helm_upgrade_uninstall_preserve_state_crd_namespaces": true
+  },
+  "status": "passed",
+  "environment": "loopback envtest Kubernetes 1.37.0 + etcd; no kubelet/scheduler/GC",
+  "impersonation_used": false,
+  "helm_version": "v4.3.1+gc0d08d0",
+  "revocation_seconds": {
+    "password_reset": 10.019,
+    "logout": 10.099,
+    "account_disable": 10.182
+  },
+  "finished_at": "2026-11-02T12:35:42.825223+00:00"
+}

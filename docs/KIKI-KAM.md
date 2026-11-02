@@ -110,3 +110,5 @@ runner는 이 PC·WSL이 실행 중이어야 동작합니다. 재부팅 후 자�
 ## 2026-11-02 로컬 YAML·Helm 추가
 
 소스 차트·YAML 생성기·webhook 전용 설치를 양쪽 저장소에 게시하고 commit·아카이브·파일 해시 고정값을 갱신했습니다. [설치·플레이북 검토](KAM-LOCAL-REVIEW.md), [실제 Helm Pod·TLS 갱신·rollback 결과와 화면](KAM-HELM-LIVE.md)을 확인하세요. Helm 애플리케이션 설치와 `kam-webhook` API 연결을 분리하며 외부 계정 Secret은 재설치·Helm 제거 시 보존합니다.
+
+추가 [임의 사용자 로그인·미인증 접근 차단 실증](KAM-LOGIN-VERIFICATION.md)에서 로그인 전후·잘못된 비밀번호·위조 토큰·RBAC를 별도로 확인했습니다.
