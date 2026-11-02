@@ -19,6 +19,7 @@ case "$operation" in
   storage) exec ansible-playbook playbooks/k8s-storage.yaml "$@" ;;
   kam) exec ansible-playbook playbooks/k8s-kam.yaml "$@" ;;
   kam-auth) exec ansible-playbook playbooks/k8s-kam-auth.yaml "$@" ;;
+  kam-webhook) exec ansible-playbook playbooks/k8s-kam-webhook.yaml "$@" ;;
   tools) exec ansible-playbook playbooks/k8s-tools.yaml "$@" ;;
   *)
     printf '%s\n' '사용법: bash setup-k8s.sh {deps|configure|check|plan|install|storage|kam|kam-auth|kam-webhook|tools} [옵션]'       'configure --help: 설치 인벤토리 생성 안내'       'plan/install/storage/kam/kam-auth/kam-webhook/tools: -i 인벤토리 및 Ansible 옵션 전달'

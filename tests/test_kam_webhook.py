@@ -15,6 +15,20 @@ spec.loader.exec_module(webhook)
 
 
 class WebhookTests(unittest.TestCase):
+    def test_webhook_entrypoint_executes_playbook_and_propagates_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            (folder / 'setup-k8s.sh').write_text((ROOT / 'setup-k8s.sh').read_text(), encoding='utf-8')
+            runner = folder / 'ansible-playbook'
+            runner.write_text('#!/bin/sh\nprintf "%s\\n" "$@"\nexit 73\n', encoding='utf-8')
+            runner.chmod(0o755)
+            import os
+            result = subprocess.run(['bash', str(folder / 'setup-k8s.sh'), 'kam-webhook', '-i', 'reviewed.yaml'],
+                                    env=dict(os.environ, PATH=str(folder) + os.pathsep + os.environ['PATH']),
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 73, result.stdout + result.stderr)
+            self.assertEqual(result.stdout.splitlines(), ['playbooks/k8s-kam-webhook.yaml', '-i', 'reviewed.yaml'])
+
     def pod(self):
         return {'kind': 'Pod', 'spec': {'containers': [{'name': 'kube-apiserver', 'command': [
             'kube-apiserver', '--client-ca-file=/etc/kubernetes/pki/ca.crt',
