@@ -1,0 +1,252 @@
+---
+- import_playbook: kam-auth-preflight.yaml
+- name: Preserve native access while enabling KAM on one control plane at a time
+  hosts: k8s_master
+  serial: 1
+  any_errors_fatal: true
+  tasks:
+  - name: Create a dedicated private webhook directory and backup directory
+    ansible.builtin.file:
+      path: '{{ item }}'
+      state: directory
+      mode: '0700'
+    loop:
+    - /etc/kubernetes/kiki-kam
+    - /etc/kubernetes/kiki-kam/backups
+  - name: Read existing static Pod
+    ansible.builtin.slurp:
+      src: /etc/kubernetes/manifests/kube-apiserver.yaml
+    register: kam_original_api
+    no_log: true
+  - name: Snapshot which dedicated webhook files already exist
+    ansible.builtin.stat:
+      path: '{{ item }}'
+      follow: false
+    loop:
+    - /etc/kubernetes/kiki-kam/ca.crt
+    - /etc/kubernetes/kiki-kam/client.crt
+    - /etc/kubernetes/kiki-kam/client.key
+    - /etc/kubernetes/kiki-kam/webhook.yaml
+    register: kam_bundle_before_stats
+    no_log: true
+  - name: Snapshot existing dedicated webhook bytes before changes
+    ansible.builtin.slurp:
+      src: '{{ item.item }}'
+    loop: '{{ kam_bundle_before_stats.results }}'
+    when: item.stat.exists
+    register: kam_bundle_before
+    no_log: true
+  - name: Update the dedicated bundle and static Pod as one recoverable transaction
+    block:
+    - name: Copy dedicated webhook TLS material
+      ansible.builtin.copy:
+        src: '{{ kam_auth_tls_dir }}/{{ item.src }}'
+        dest: /etc/kubernetes/kiki-kam/{{ item.dest }}
+        mode: '0600'
+      loop:
+      - src: kam-ca.crt
+        dest: ca.crt
+      - src: kam-apiserver.crt
+        dest: client.crt
+      - src: kam-apiserver.key
+        dest: client.key
+      no_log: true
+    - name: Verify dedicated client CA differs from the Kubernetes client CA
+      ansible.builtin.command:
+        argv:
+        - openssl
+        - x509
+        - -in
+        - '{{ item }}'
+        - -noout
+        - -fingerprint
+        - -sha256
+      loop:
+      - /etc/kubernetes/kiki-kam/ca.crt
+      - /etc/kubernetes/pki/ca.crt
+      register: kam_ca_fingerprints
+      changed_when: false
+    - name: Reject reuse of the cluster client CA for the authentication webhook
+      ansible.builtin.assert:
+        that: kam_ca_fingerprints.results[0].stdout != kam_ca_fingerprints.results[1].stdout
+    - name: Check the reviewed authentication endpoint before changing API authentication
+      ansible.builtin.uri:
+        url: '{{ kam_auth_url }}/healthz'
+        ca_path: /etc/kubernetes/kiki-kam/ca.crt
+        validate_certs: true
+        status_code: 200
+      when: not ansible_check_mode
+    - name: Verify the dedicated mTLS webhook route before API server changes
+      ansible.builtin.uri:
+        url: '{{ kam_auth_url }}/authenticate'
+        method: POST
+        ca_path: /etc/kubernetes/kiki-kam/ca.crt
+        client_cert: /etc/kubernetes/kiki-kam/client.crt
+        client_key: /etc/kubernetes/kiki-kam/client.key
+        validate_certs: true
+        body_format: json
+        body:
+          apiVersion: authentication.k8s.io/v1
+          kind: TokenReview
+          spec:
+            token: non-kam-installation-probe
+        status_code: 200
+      register: kam_mtls_probe
+      failed_when: kam_mtls_probe.json.kind | default('') != 'TokenReview' or kam_mtls_probe.json.status.authenticated | default(false) | bool
+      when: not ansible_check_mode
+    - name: Install mTLS TokenReview configuration
+      ansible.builtin.copy:
+        dest: /etc/kubernetes/kiki-kam/webhook.yaml
+        mode: '0600'
+        content: "apiVersion: v1\nkind: Config\ncurrent-context: kam\nclusters:\n  - name: kam\n    cluster:\n      server: {{ kam_auth_url }}/authenticate\n\
+          \      certificate-authority: /etc/kubernetes/kiki-kam/ca.crt\nusers:\n  - name: apiserver\n    user:\n      client-certificate: /etc/kubernetes/kiki-kam/client.crt\n\
+          \      client-key: /etc/kubernetes/kiki-kam/client.key\ncontexts:\n  - name: kam\n    context: {cluster: kam, user: apiserver}\n"
+    - name: Hash the installed dedicated webhook bundle
+      ansible.builtin.stat:
+        path: '{{ item }}'
+        checksum_algorithm: sha256
+        get_checksum: true
+      loop:
+      - /etc/kubernetes/kiki-kam/ca.crt
+      - /etc/kubernetes/kiki-kam/client.crt
+      - /etc/kubernetes/kiki-kam/client.key
+      - /etc/kubernetes/kiki-kam/webhook.yaml
+      register: kam_new_bundle
+      no_log: true
+    - name: Identify the desired webhook bundle without exposing key data
+      ansible.builtin.set_fact:
+        kam_bundle_sha256: '{{ kam_new_bundle.results | map(attribute=''stat.checksum'') | join('''') | hash(''sha256'') }}'
+      no_log: true
+    - name: Compute minimal additive authentication update on the controller
+      ansible.builtin.command:
+        argv:
+        - '{{ ansible_playbook_python }}'
+        - '{{ playbook_dir }}/../scripts/configure_kam_webhook.py'
+        - --stdin-render
+        - --bundle-sha256
+        - '{{ kam_bundle_sha256 }}'
+        stdin: '{{ kam_original_api.content | b64decode }}'
+      delegate_to: localhost
+      become: false
+      register: kam_api_update
+      changed_when: false
+      no_log: true
+    - name: Reject mismatched native audiences between control planes
+      ansible.builtin.assert:
+        that: (kam_api_update.stdout | from_json).audience == hostvars[groups['k8s_master'][0]].kam_selected_audience
+    - name: Save original manifest outside kubelet's watched directory
+      ansible.builtin.copy:
+        content: '{{ kam_original_api.content | b64decode }}'
+        dest: /etc/kubernetes/kiki-kam/backups/{{ kam_original_api.content | hash('sha256') }}.yaml
+        mode: '0600'
+        force: false
+      no_log: true
+      when: (kam_api_update.stdout | from_json).changed | bool
+    - name: Capture the local API mirror Pod identity before restart
+      ansible.builtin.command:
+        argv: &id001
+        - kubectl
+        - --kubeconfig=/etc/kubernetes/admin.conf
+        - --server=https://{{ k8s_ip4.split('/')[0] }}:6443
+        - --request-timeout=5s
+        - -n
+        - kube-system
+        - get
+        - pods
+        - --field-selector
+        - spec.nodeName={{ nodename | default(ansible_nodename) }}
+        - -l
+        - component=kube-apiserver
+        - -o
+        - json
+      register: kam_old_mirror
+      changed_when: false
+      failed_when: kam_old_mirror.rc != 0 or (kam_old_mirror.stdout | from_json)['items'] | length != 1
+      when: (kam_api_update.stdout | from_json).changed | bool
+    - name: Atomically update the API server static Pod
+      ansible.builtin.copy:
+        content: '{{ (kam_api_update.stdout | from_json).manifest }}'
+        dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+        mode: '0600'
+      no_log: true
+      when: (kam_api_update.stdout | from_json).changed | bool
+    - name: Wait for local API readiness using existing admin certificate
+      ansible.builtin.command:
+        argv:
+        - kubectl
+        - --kubeconfig=/etc/kubernetes/admin.conf
+        - --server=https://{{ k8s_ip4.split('/')[0] }}:6443
+        - --request-timeout=5s
+        - get
+        - --raw=/readyz
+      register: kam_native_ready
+      until: kam_native_ready.rc == 0 and kam_native_ready.stdout == 'ok'
+      retries: 36
+      delay: 5
+      changed_when: false
+    - name: Observe the new API mirror Pod and expected bundle after readiness
+      ansible.builtin.command:
+        argv: *id001
+      register: kam_new_mirror
+      until: kam_new_mirror.rc == 0 and (kam_new_mirror.stdout | from_json)['items'] | length == 1 and ((kam_new_mirror.stdout | from_json)['items']
+        | first).metadata.uid != ((kam_old_mirror.stdout | from_json)['items'] | first).metadata.uid and ((kam_new_mirror.stdout | from_json)['items']
+        | first).metadata.get('annotations', {}).get('access.kam.dustbox.kr/webhook-bundle-sha256', '') == kam_bundle_sha256 and (((kam_new_mirror.stdout
+        | from_json)['items'] | first).get('status', {}).get('conditions', []) | selectattr('type', 'equalto', 'Ready') | selectattr('status',
+        'equalto', 'True') | list | length) > 0
+      retries: 36
+      delay: 5
+      changed_when: false
+      when: (kam_api_update.stdout | from_json).changed | bool
+    - name: Confirm native administrator authorization still works
+      ansible.builtin.command:
+        argv:
+        - kubectl
+        - --kubeconfig=/etc/kubernetes/admin.conf
+        - --server=https://{{ k8s_ip4.split('/')[0] }}:6443
+        - --request-timeout=5s
+        - auth
+        - can-i
+        - get
+        - nodes
+        - --quiet
+      changed_when: false
+    rescue:
+    - name: Restore the captured dedicated webhook files
+      ansible.builtin.copy:
+        dest: '{{ item.item.item }}'
+        content: '{{ item.content | b64decode }}'
+        mode: '0600'
+      loop: '{{ kam_bundle_before.results }}'
+      when: item.content is defined
+      no_log: true
+    - name: Remove only new webhook files absent before this transaction
+      ansible.builtin.file:
+        path: '{{ item.item }}'
+        state: absent
+      loop: '{{ kam_bundle_before_stats.results }}'
+      when: not item.stat.exists
+      no_log: true
+    - name: Restore only the manifest captured for this update
+      ansible.builtin.copy:
+        content: '{{ kam_original_api.content | b64decode }}'
+        dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+        mode: '0600'
+      no_log: true
+    - name: Confirm the captured native API configuration recovers
+      ansible.builtin.command:
+        argv:
+        - kubectl
+        - --kubeconfig=/etc/kubernetes/admin.conf
+        - --server=https://{{ k8s_ip4.split('/')[0] }}:6443
+        - --request-timeout=5s
+        - get
+        - --raw=/readyz
+      register: kam_restore_ready
+      until: kam_restore_ready.rc == 0 and kam_restore_ready.stdout == 'ok'
+      retries: 36
+      delay: 5
+      changed_when: false
+    - name: Stop before changing another control plane
+      ansible.builtin.fail:
+        msg: Webhook update failed; captured manifest and dedicated TLS/config files were restored. Native API readiness was checked; no later
+          control plane was changed.

@@ -5,7 +5,8 @@ export ANSIBLE_CONFIG="$PWD/ansible.cfg"
 mkdir -p .tools/ansible-tmp
 export ANSIBLE_LOCAL_TEMP="$PWD/.tools/ansible-tmp"
 python scripts/check_source_tree.py
-python scripts/prepare_kam_source.py
+kam_source_path="$(python scripts/prepare_kam_source.py)"
+printf '%s\n' "$kam_source_path"
 bash -n deploy-k8s.sh remove-k8s.sh provin-k8s.sh setup-k8s.sh scripts/terminal-lab-check.sh
 bash -n scripts/push-remotes.sh
 ansible-playbook playbooks/k8s-install.yaml --syntax-check
@@ -15,6 +16,7 @@ ansible-playbook playbooks/k8s-tools.yaml --syntax-check
 ansible-playbook playbooks/k8s-storage.yaml --syntax-check
 ansible-playbook playbooks/k8s-kam.yaml --syntax-check
 ansible-playbook playbooks/k8s-kam-auth.yaml --syntax-check
+ansible-playbook playbooks/k8s-kam-webhook.yaml --syntax-check
 ansible-playbook playbooks/k8s-storage-hosts.yaml --syntax-check
 ansible-playbook playbooks/k8s-serving-certs.yaml --syntax-check
 ansible-playbook playbooks/terminal-lab-nfs.yaml --syntax-check
@@ -32,4 +34,8 @@ if [[ "${RUN_CLI_INTEGRATION:-0}" == "1" ]]; then
 fi
 if [[ "${RUN_CHART_VALIDATION:-0}" == "1" ]]; then
   python scripts/validate_charts.py
+  if [[ -f "$kam_source_path/tests/validate_local_chart.py" ]]; then
+    export HELM_BINARY="${HELM_BINARY:-$(python "$kam_source_path/tests/prepare_helm.py")}"
+    python "$kam_source_path/tests/validate_local_chart.py"
+  fi
 fi

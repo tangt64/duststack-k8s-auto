@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-02",
+  "scope": "local working trees; not committed or pushed",
+  "helm": "v4.3.1+gc0d08d0",
+  "actual_api_checks": 13,
+  "chart_render_profiles": [
+    {
+      "name": "ha",
+      "resources": 19
+    },
+    {
+      "name": "single-node-local",
+      "resources": 19
+    },
+    {
+      "name": "multi-namespace",
+      "resources": 27
+    },
+    {
+      "name": "private-registry-nodeport",
+      "resources": 19
+    },
+    {
+      "name": "controller-only",
+      "resources": 9
+    }
+  ],
+  "unsafe_chart_values_rejected": 12,
+  "final_unit_tests": 83,
+  "full_installer_validation": "passed (81 tests before the final two regression additions; final unittest run passed all 83)",
+  "official_charts_rendered": 4,
+  "cli_integration": "passed",
+  "controller_real_api_integration": "passed",
+  "check_mode_preflight": "rejected before mutation",
+  "vm_pod_rollout_and_bundle_rollback": "not tested on live VMs",
+  "api_result": {
+    "started_at": "2026-11-02T03:11:09.359439+00:00",
+    "checks": {
+      "helm_install_accepted_by_real_api": true,
+      "explicit_context_preserves_unrelated_current_namespace": true,
+      "real_password_login_uid_namespace_rbac_no_impersonation": true,
+      "exec_credential_and_private_cache": true,
+      "two_auth_replicas_share_cas_secret_state": true,
+      "auth_service_sa_is_limited_to_one_secret": true,
+      "password_reset_and_logout_revoke_sessions": true,
+      "disable_enable_delete_recreate_do_not_restore_old_access": true,
+      "grant_expiry_revokes_actual_user_access": true,
+      "reinstall_preserves_accounts_and_state_secret_is_private": true,
+      "webhook_requires_dedicated_mtls_client": true,
+      "last_administrator_preserved": true,
+      "helm_upgrade_uninstall_preserve_state_crd_namespaces": true
+    },
+    "status": "passed",
+    "environment": "loopback envtest Kubernetes 1.37.0 + etcd; no kubelet/scheduler/GC",
+    "impersonation_used": false,
+    "helm_version": "v4.3.1+gc0d08d0",
+    "revocation_seconds": {
+      "password_reset": 9.126,
+      "logout": 10.106,
+      "account_disable": 10.075
+    },
+    "finished_at": "2026-11-02T03:13:17.847145+00:00"
+  }
+}

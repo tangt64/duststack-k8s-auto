@@ -1,0 +1,113 @@
+---
+- name: Validate every control plane and dedicated TLS before KAM mutations
+  hosts: k8s_master
+  gather_facts: false
+  strategy: linear
+  any_errors_fatal: true
+  tasks:
+  - name: Require reviewed full-control-plane installation outside check mode
+    ansible.builtin.assert:
+      that:
+      - kam_confirm_admin | default(false) | bool
+      - not ansible_check_mode
+      - ansible_play_hosts_all | sort == groups['k8s_master'] | sort
+      - kam_auth_url | default('') is match('^https://[A-Za-z0-9.:-]+$')
+      - kam_auth_tls_dir | default('') | length > 0
+      - k8s_ip4 | default('') | length > 0
+      fail_msg: Review all control planes together; --check and partial --limit are unsupported. Use --syntax-check and local render instead.
+  - name: Validate TLS validity, hostname, client CN, key pairs and private permissions locally
+    ansible.builtin.command:
+      argv:
+      - '{{ ansible_playbook_python }}'
+      - '{{ playbook_dir }}/../scripts/check_kam_tls.py'
+      - --directory
+      - '{{ kam_auth_tls_dir }}'
+      - --url
+      - '{{ kam_auth_url }}'
+    delegate_to: localhost
+    become: false
+    run_once: true
+    register: kam_tls_check
+    changed_when: false
+  - name: Read current API manifest before touching authentication resources
+    ansible.builtin.slurp:
+      src: /etc/kubernetes/manifests/kube-apiserver.yaml
+    register: kam_preflight_api
+    no_log: true
+  - name: Inspect native auth, existing webhook and audience locally
+    ansible.builtin.command:
+      argv:
+      - '{{ ansible_playbook_python }}'
+      - '{{ playbook_dir }}/../scripts/configure_kam_webhook.py'
+      - --stdin-render
+      stdin: '{{ kam_preflight_api.content | b64decode }}'
+    delegate_to: localhost
+    become: false
+    register: kam_preflight_render
+    changed_when: false
+    no_log: true
+  - name: Record each existing API audience
+    ansible.builtin.set_fact:
+      kam_selected_audience: '{{ (kam_preflight_render.stdout | from_json).audience }}'
+  - name: Reject different native audiences across control planes
+    ansible.builtin.assert:
+      that: kam_selected_audience == hostvars[groups['k8s_master'][0]].kam_selected_audience
+  - name: Inspect previous dedicated CA and webhook configuration
+    ansible.builtin.stat:
+      path: '{{ item }}'
+      follow: false
+    loop:
+    - /etc/kubernetes/kiki-kam/ca.crt
+    - /etc/kubernetes/kiki-kam/webhook.yaml
+    register: kam_previous_config_stats
+  - name: Reject symlink authentication configuration
+    ansible.builtin.assert:
+      that: not (item.stat.islnk | default(false))
+    loop: '{{ kam_previous_config_stats.results }}'
+    loop_control:
+      label: '{{ item.item }}'
+  - name: Read current dedicated CA fingerprint if present
+    ansible.builtin.command:
+      argv:
+      - openssl
+      - x509
+      - -in
+      - /etc/kubernetes/kiki-kam/ca.crt
+      - -noout
+      - -fingerprint
+      - -sha256
+    register: kam_previous_ca_fingerprint
+    changed_when: false
+    when: kam_previous_config_stats.results[0].stat.exists
+  - name: Reject implicit dedicated CA replacement before changing auth pods
+    ansible.builtin.assert:
+      that: kam_previous_ca_fingerprint.stdout.split('=')[1] | replace(':', '') | lower == (kam_tls_check.stdout | from_json).ca_fingerprint
+      fail_msg: Dedicated CA rotation requires a separate trust migration plan; leaf renewal with the same CA is supported.
+    when: kam_previous_config_stats.results[0].stat.exists
+  - name: Verify the dedicated CA differs from the native cluster CA before mutation
+    ansible.builtin.command:
+      argv:
+      - openssl
+      - x509
+      - -in
+      - /etc/kubernetes/pki/ca.crt
+      - -noout
+      - -fingerprint
+      - -sha256
+    register: kam_native_ca_fingerprint
+    changed_when: false
+  - name: Refuse the native Kubernetes client CA as the KAM webhook trust root
+    ansible.builtin.assert:
+      that: kam_native_ca_fingerprint.stdout.split('=')[1] | replace(':', '') | lower != (kam_tls_check.stdout | from_json).ca_fingerprint
+  - name: Read the previous webhook endpoint if configured
+    ansible.builtin.slurp:
+      src: /etc/kubernetes/kiki-kam/webhook.yaml
+    register: kam_previous_webhook
+    no_log: true
+    when: kam_previous_config_stats.results[1].stat.exists
+  - name: Reject an implicit live webhook endpoint migration
+    ansible.builtin.assert:
+      that: ((kam_previous_webhook.content | b64decode | from_yaml).clusters | first).cluster.server == kam_auth_url + '/authenticate'
+      fail_msg: Endpoint migration requires a reviewed staged change; this playbook preserves the installed endpoint.
+    when: kam_previous_config_stats.results[1].stat.exists
+    no_log: true

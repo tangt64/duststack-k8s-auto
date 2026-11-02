@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 import tempfile
@@ -31,7 +32,7 @@ def inspect(document):
     return api, flags, audience
 
 
-def configure(document, cache_ttl='5s'):
+def configure(document, cache_ttl='5s', bundle_sha256=None):
     api, flags, audience = inspect(document)
     existing = flags.get('authentication-token-webhook-config-file')
     if any(word in ('--authentication-token-webhook-config-file', '--authentication-token-webhook-version',
@@ -61,6 +62,10 @@ def configure(document, cache_ttl='5s'):
         volumes.append({'name': 'kiki-kam-webhook', 'hostPath': {'path': DIRECTORY, 'type': 'Directory'}})
     if not any(v['name'] == 'kiki-kam-webhook' for v in mounts):
         mounts.append({'name': 'kiki-kam-webhook', 'mountPath': DIRECTORY, 'readOnly': True})
+    if bundle_sha256 is not None:
+        if not re.fullmatch('[a-f0-9]{64}', bundle_sha256):
+            raise ValueError('Invalid webhook bundle SHA-256')
+        document.setdefault('metadata', {}).setdefault('annotations', {})['access.kam.dustbox.kr/webhook-bundle-sha256'] = bundle_sha256
     return document, audience
 
 
@@ -70,6 +75,7 @@ def main():
     p.add_argument('--inspect', action='store_true')
     p.add_argument('--stdin-render', action='store_true')
     p.add_argument('--cache-ttl', default='5s')
+    p.add_argument('--bundle-sha256')
     args = p.parse_args()
     path = Path(args.manifest)
     before = sys.stdin.buffer.read() if args.stdin_render else path.read_bytes()
@@ -78,7 +84,7 @@ def main():
     if args.inspect:
         print(json.dumps({'audience': audience}))
         return
-    configured, _ = configure(document, args.cache_ttl)
+    configured, _ = configure(document, args.cache_ttl, args.bundle_sha256)
     if args.stdin_render:
         print(json.dumps({'changed': configured != yaml.safe_load(before), 'audience': audience,
                           'manifest': yaml.safe_dump(configured, sort_keys=False)}))

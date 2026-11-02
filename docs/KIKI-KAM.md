@@ -106,3 +106,7 @@ runner는 이 PC·WSL이 실행 중이어야 동작합니다. 재부팅 후 자�
 | --- | --- | --- | --- |
 | KAM | e383003ded4a6a0d914b187d86e5cac62241d384 | [성공](https://github.com/tangt64/KAM/actions/runs/41310949683) | [성공](https://git.vlab.dustbox.kr/dustbox/kiki-kam/actions/runs/3) |
 | duststack | 5c76072fb8b468fcc56cc2834287e5352d5de19f | [성공](https://github.com/tangt64/duststack-k8s-auto/actions/runs/41311070791) | [성공](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions/runs/8) |
+
+## 2026-11-02 로컬 YAML·Helm 추가
+
+새 로컬 패키지와 webhook 전용 설치, 플레이북 검토 내용은 [로컬 설치·검토 기록](KAM-LOCAL-REVIEW.md)에 정리했습니다. 이번 작업본은 아직 커밋·푸시되지 않았으며 기존 고정 소스는 유지합니다.

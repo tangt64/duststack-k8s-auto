@@ -9,6 +9,7 @@
           - kam_confirm_admin | default(false) | bool
           - kam_namespace | default('') is match('^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$')
           - kam_namespace | default('') not in ['default', 'kube-system', 'kam-system']
+          - not (kam_namespace | default('')).startswith('kube-')
         fail_msg: Set kam_namespace and kam_confirm_admin=true after reviewing the scoped RBAC and protected kam-system namespace.
 
     - name: Prepare independently pinned KAM source on the controller
