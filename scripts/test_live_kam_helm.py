@@ -141,7 +141,7 @@ for name,value in data.items():
             with context.wrap_socket(stream, server_hostname=endpoint.hostname) as secure:
                 return hashlib.sha256(secure.getpeercert(binary_form=True)).hexdigest()
 
-    def operation(fault=False):
+    def operation(fault=False, tls_directory=None):
         playbook = ROOT/'playbooks/k8s-kam-webhook.yaml'
         temp_playbook = ROOT/'playbooks/.kam-disposable-fault.yaml'
         if fault:
@@ -167,9 +167,10 @@ for name,value in data.items():
                     task['delay'] = 5
             temp_playbook.write_text(yaml.safe_dump(plays, sort_keys=False))
             playbook = temp_playbook
-        values = {'kam_confirm_admin': True, 'kam_auth_url': a.auth_url, 'kam_auth_tls_dir': str(Path(a.tls_dir).resolve())}
+        values = {'kam_confirm_admin': True, 'kam_auth_url': a.auth_url,
+                  'kam_auth_tls_dir': str(Path(tls_directory or a.tls_dir).resolve())}
         result = run(['ansible-playbook', playbook, '-i', a.inventory, '-e', json.dumps(values)], required=False, timeout=1200)
-        log = output.parent / ('kam-webhook-fault.log' if fault else 'kam-webhook-apply.log')
+        log = output.parent / ('kam-webhook-rejected-tls.log' if tls_directory else 'kam-webhook-fault.log' if fault else 'kam-webhook-apply.log')
         log.write_text(result.stdout + result.stderr)
         log.chmod(0o600)
         temp_playbook.unlink(missing_ok=True)
@@ -281,6 +282,23 @@ for name,value in data.items():
                    'old_served_leaf_sha256': first_served, 'new_served_leaf_sha256': expected_served})
 
             installed = {host: snapshot(host) for host in hosts}
+            invalid_tls = output.parent/'invalid-key-probe'
+            invalid_tls.mkdir(mode=0o700)
+            try:
+                for name in ['kam-ca.crt', 'kam-server.crt', 'kam-server.key', 'kam-apiserver.crt', 'kam-apiserver.key']:
+                    candidate = invalid_tls/name
+                    candidate.write_bytes((tls/('kam-server.key' if name == 'kam-apiserver.key' else name)).read_bytes())
+                    candidate.chmod(0o600)
+                rejected = operation(tls_directory=invalid_tls)
+                assert rejected.returncode != 0
+                assert all(fingerprints(snapshot(host)) == fingerprints(installed[host]) for host in hosts)
+                assert api_ready() and real_access()
+                passed('mismatched_tls_key_rejected_before_writing_any_control_plane')
+            finally:
+                for candidate in invalid_tls.iterdir():
+                    assert candidate.is_file() and not candidate.is_symlink()
+                    candidate.unlink()
+                invalid_tls.rmdir()
             run([os.sys.executable, source/'deploy/make_tls.py', '--out', tls, '--hostname', a.auth_url.split('://')[1].split(':')[0], '--renew'])
             fault = operation(fault=True)
             assert fault.returncode != 0 and 'captured manifest and dedicated TLS/config files were restored' in fault.stdout
@@ -334,6 +352,7 @@ for name,value in data.items():
                     passed('helm_uninstall_preserves_external_account_state_and_crd', bool(get('crd', 'kamaccessgrants.access.kam.dustbox.kr')))
                 if created_namespace:
                     k('delete', 'namespace', ns, '--wait=true', '--timeout=90s')
+                    k('-n', 'kam-system', 'delete', 'lease', ctrl, '--ignore-not-found')
                 if created_external:
                     k('-n', 'kam-system', 'delete', 'secret', 'kiki-kam-identities', 'kiki-kam-tls', '--ignore-not-found')
                     k('-n', 'kam-system', 'delete', 'configmap', 'kiki-kam-webhook-ca', '--ignore-not-found')
