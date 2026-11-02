@@ -24,6 +24,12 @@ FILES = ['/etc/kubernetes/manifests/kube-apiserver.yaml'] + [
     '/etc/kubernetes/kiki-kam/' + n for n in ['ca.crt', 'client.crt', 'client.key', 'webhook.yaml']]
 
 
+def restored_failure(result):
+    """Ansible can route failed task diagnostics to either output stream."""
+    return result.returncode != 0 and (
+        'captured manifest and dedicated TLS/config files were restored' in result.stdout + result.stderr)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ['kubeconfig', 'kam-source', 'kam-binary', 'helm', 'inventory', 'tls-dir', 'auth-url', 'auth-image', 'output']:
@@ -301,7 +307,8 @@ for name,value in data.items():
                 invalid_tls.rmdir()
             run([os.sys.executable, source/'deploy/make_tls.py', '--out', tls, '--hostname', a.auth_url.split('://')[1].split(':')[0], '--renew'])
             fault = operation(fault=True)
-            assert fault.returncode != 0 and 'captured manifest and dedicated TLS/config files were restored' in fault.stdout
+            assert restored_failure(fault)
+            assert 'was refused' in fault.stdout + fault.stderr
             assert fingerprints(snapshot('cp02')) == fingerprints(installed['cp02'])
             assert fingerprints(snapshot('cp03')) == fingerprints(installed['cp03'])
             assert fingerprints(snapshot('cp01')) != fingerprints(installed['cp01'])
@@ -309,7 +316,7 @@ for name,value in data.items():
             assert real_access()
             passed('real_cp02_startup_failure_restores_manifest_tls_bundle_stops_before_cp03', {
                 'cp02_before_after_sha256': fingerprints(installed['cp02']), 'cp03_untouched': True,
-                'cp01_updated_first': True, 'all_native_apis_ready': True})
+                'cp01_updated_first': True, 'all_native_apis_ready': True, 'native_probe_connection_refused_observed': True})
             assert operation().returncode == 0
             passed('resume_after_rollback_three_native_apis_and_user_access', api_ready() and real_access())
 
