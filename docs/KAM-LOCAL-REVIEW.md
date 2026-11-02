@@ -50,11 +50,11 @@ RUN_CHART_VALIDATION=1 bash scripts/validate.sh
 
 ## 추가 확인이 필요한 운영 항목
 
-- 새 순차 적용·bundle rollback은 **실제 다중 VM에서 아직 미실증**입니다. 현재 전용 랩을 재개하거나 자원을 생성하지 않았습니다.
-- 최초 webhook 활성화, 같은 CA의 leaf 갱신, 두 번째 CP 실패 후 rollback, limit/check 거부를 실제 랩에서 확인해야 합니다.
+- 새 순차 적용·bundle rollback과 실제 Helm Pod 배포는 [터미널랩 실증](KAM-HELM-LIVE.md)에서 확인했습니다. 원문·실제 화면·정리 결과는 해당 문서에 구분했습니다.
+- 최초 webhook 활성화·같은 CA의 leaf 갱신·잘못된 키 사전 거부·CP02 실제 시작 실패 후 rollback·복구 후 재실행을 실제 랩에서 통과했습니다. check/partial-limit 거부는 별도 사전 검사·회귀 범위입니다.
 - 같은 CA의 클라이언트 leaf는 지원하지만 CA 교체·endpoint 이동은 이 playbook이 자동 처리하지 않습니다. 기존·신규 trust 동시 수용과 endpoint 가용성을 갖춘 별도 migration이 필요합니다.
 - Helm CRD upgrade·기존 Ansible 리소스 소유권 이전·controller 대상 namespace 제거 시 잔여 Grant/Binding 처리도 관리 절차가 필요합니다. Helm uninstall은 자동 권한 회수가 아닙니다.
-- 인증 서비스 Pod readiness·image pull·TLS NodePort/private LB 경로·인증서 갱신 알림·etcd Secret 저장 암호화/백업은 실제 환경에서 확인해야 합니다.
+- 인증 서비스 Pod readiness·worker 분산 배치·CRI-O 이미지 공급·private NodePort TLS 갱신은 실증했습니다. 운영 registry pull 인증·private LB의 mTLS 전달·인증서 만료 알림·etcd Secret 저장 암호화/백업은 사이트별 운영 검토가 필요합니다.
 - 기존 CNI/CIDR/API VIP·Rook 디스크 선택·데이터 보존 설정은 변경하지 않았습니다.
 
 ## 검증 기록
@@ -63,9 +63,9 @@ RUN_CHART_VALIDATION=1 bash scripts/validate.sh
 
 ### 완료한 로컬 검증
 
-- 최종 unittest **83개 모두 통과**. 전체 `scripts/validate.sh` 실행은 당시 81개 회귀·실제 controller API·CLI 설치 통합·공식 차트 4개와 새 로컬 차트 검사까지 통과했고, 이후 추가한 캐시·mirror 조건 회귀를 포함한 최종 83개를 별도로 확인했습니다.
+- 최종 `bash scripts/validate.sh`에서 **85개 회귀**, 실제 controller API·CLI 통합·공식 차트 4개·고정 KAM 차트 검사를 모두 통과했습니다. GitHub Ubuntu multi-call 실행 경로와 Ansible stderr 판정 회귀도 포함합니다.
 - Helm 4.3.1의 lint·실제 render와 Python YAML의 **5개 구성 완전 일치**, 잘못된 설정 12가지와 잘못된 release namespace 거부를 확인했습니다.
 - 실제 Kubernetes 1.37.0 API/etcd에서 **Helm install·upgrade·uninstall과 로그인/RBAC 13개 조건 통과**. 계정 Secret 데이터·CRD·namespace 보존을 확인했습니다.
 - 실제 Ansible 실행에서 check mode는 TLS/file/API 변경 단계 전에 거부됐습니다. 새 mirror UID·bundle·Ready 조건은 정상 및 이전 UID·잘못된 checksum·Ready=False·annotation 없음의 조건을 평가했습니다.
 - 실제 실행 중인 캐시 바이너리를 재검증해도 덮어쓰지 않고, 변조된 다른 캐시 파일은 복구되는 회귀를 추가했습니다.
-- [검증 원문·요약](KAM-LOCAL-RESULT.json)을 보관했습니다. 이 결과는 로컬 API 프로세스 환경이며 Pod 배치·image pull·Helm --wait·VM failover를 입증하지 않습니다. 새 TLS/config 복구 task의 실제 원격 쓰기·rollback 실증도 남아 있습니다.
+- [로컬 API 검증 원문·요약](KAM-LOCAL-RESULT.json)과 [실제 Pod·TLS·rollback 실증](KAM-HELM-LIVE.md)을 별도로 보관했습니다. 로컬 API/etcd 결과와 VM의 실제 수행을 구분합니다.

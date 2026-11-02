@@ -18,6 +18,7 @@ APPROVED_SCREENSHOTS = {
         '07-gitea-actions.jpg', '08-ha-vip-failover.jpg', '09-kam-live-cluster.jpg',
         '10-ha-vm-power-loss.jpg', '11-etcd-quorum.jpg', '12-kam-fast-handover.jpg',
         '13-kiki-kam-repository.jpg', '14-kiki-kam-actions.jpg',
+        '15-kam-helm-pods.jpg', '16-kam-tls-renewal.jpg', '17-kam-bundle-rollback.jpg',
     )
 }
 

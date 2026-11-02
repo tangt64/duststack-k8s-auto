@@ -45,9 +45,9 @@ bash setup-k8s.sh kam-auth -i inventory/local-lab/hosts.yaml \
   -e @inventory/local-lab/kam-auth.yaml
 ```
 
-계정 Secret은 최초에만 `create`하고 재설치 시 보존합니다. 첫 control plane에서 CLI를 빌드·설치하고 auth Deployment 두 replica의 rollout을 검사합니다. 기존 API audience를 그대로 사용하며 dedicated mTLS probe가 성공한 다음 control plane을 **serial: 1**로 변경합니다. 원본 manifest는 kubelet 감시 디렉터리 밖에 보관합니다. 새 listener 기동 후 native 인증서의 `/readyz`와 권한을 확인하며 실패하면 해당 노드의 원본 manifest를 복구하고 다음 노드로 진행하지 않습니다. 기존 인증서·ServiceAccount·API 주소·CNI/CIDR는 변경하지 않습니다.
+계정 Secret은 최초에만 `create`하고 재설치 시 보존합니다. 첫 control plane에서 CLI를 빌드·설치하고 auth Deployment 두 replica의 rollout을 검사합니다. 기존 API audience를 그대로 사용하며 dedicated mTLS probe가 성공한 다음 control plane을 **serial: 1**로 변경합니다. 원본 manifest는 kubelet 감시 디렉터리 밖에 보관합니다. bundle SHA-256과 새 mirror Pod UID·Ready, native 인증서의 `/readyz`와 권한을 확인합니다. 실패 시 해당 노드의 원본 manifest·CA·client cert/key·webhook 파일을 함께 복구하고 다음 노드로 진행하지 않습니다. 기존 인증서·ServiceAccount·API 주소·CNI/CIDR는 변경하지 않습니다.
 
-위 playbook은 API 서버를 재시작하므로 관리 시간에 적용하세요. 설치 중 auth URL·DNS·TLS·이미지 pull 경로가 실패하면 해결한 뒤 재실행합니다. auth 인증 장애 시 native 관리자 인증을 비상 경로로 유지합니다. `--check`는 설치·인증 성공을 입증하지 않습니다.
+위 playbook은 API 서버를 재시작하므로 관리 시간에 적용하세요. 설치 중 auth URL·DNS·TLS·이미지 pull 경로가 실패하면 해결한 뒤 재실행합니다. auth 인증 장애 시 native 관리자 인증을 비상 경로로 유지합니다. auth/webhook 경로는 `--check`와 일부 CP만 선택하는 `--limit`을 거부합니다. 정적 검토에는 `--syntax-check`·로컬 render를 사용합니다.
 
 ## 사용자 CLI
 
@@ -70,11 +70,11 @@ kubectl kam logout
 
 CRD에는 비밀번호나 세션을 저장하지 않습니다. 불변 사용자 UID를 사용하므로 같은 ID를 삭제·재생성해도 옛 Binding을 인수하지 않습니다. disable/delete CLI는 먼저 인증을 차단하고 해당 UID의 Grant를 정리하며 정리 실패는 오류로 알립니다. OIDC는 향후 provider와 `(issuer, sub)` 명시적 연결을 추가할 수 있도록 구조만 준비했으며 현재 제공되는 로그인은 ID·비밀번호입니다.
 
-## 검증 범위와 제한
+## 초기 검증 기록과 제한 (2026-11-01)
 
-이번에는 WSL의 실제 Kubernetes 1.37.0 API·etcd와 두 auth 프로세스에서 실제 자격으로 로그인·조회·권한 상승 거부·만료·회수를 검사했습니다. impersonation을 사용하지 않았습니다. 비밀번호 변경·로그아웃·비활성화 후 거부까지 약 10초였으며 API 서버의 성공 인증 캐시가 영향을 줍니다. webhook TTL을 낮춰도 즉시 차단을 보장하지 않고 이미 열린 watch 연결의 강제 종료는 구현하지 않았습니다.
+2026-11-01 초기 검증은 WSL의 실제 Kubernetes 1.37.0 API·etcd와 두 auth 프로세스에서 실제 자격으로 로그인·조회·권한 상승 거부·만료·회수를 검사했습니다. impersonation을 사용하지 않았습니다. 비밀번호 변경·로그아웃·비활성화 후 거부까지 약 10초였으며 API 서버의 성공 인증 캐시가 영향을 줍니다. webhook TTL을 낮춰도 즉시 차단을 보장하지 않고 이미 열린 watch 연결의 강제 종료는 구현하지 않았습니다.
 
-이 검증은 Pod scheduling, image pull, 새 auth playbook의 다중 VM 적용, 인증 서비스 Pod 장애 전환을 입증하지 않습니다. 이전 [HA 실증](HA-POWER-LIVE.md)은 기존 controller/HA 기능의 별도 결과입니다. 중지된 유료 랩은 이번 작업에서 재개하지 않았습니다.
+이 초기 검증은 API/etcd 환경이었습니다. 이후 2026-11-02의 [Helm·TLS 실제 클러스터 실증](KAM-HELM-LIVE.md)에서 실제 Pod 배치·CRI-O 이미지 공급·다중 CP 적용·TLS 갱신·실패 복구를 확인했습니다. 이전 [HA 실증](HA-POWER-LIVE.md)은 기존 controller/HA 기능의 별도 결과입니다.
 
 실제 저장소 생성·이력 보존 화면입니다. 노란 CI 표시는 runner 대기 상태이며 성공 화면이 아닙니다.
 
@@ -90,7 +90,7 @@ rootless Podman의 별도 socket과 `kiki-kam-runner-ci` bridge를 사용합니�
 
 runner는 이 PC·WSL이 실행 중이어야 동작합니다. 재부팅 후 자동 시작 서비스는 등록하지 않았습니다. 재개할 때 공식 runner 바이너리의 SHA-256을 다시 확인한 후, 동일 사용자의 Podman 서비스(`--cgroup-manager=cgroupfs`, 전용 socket)와 `daemon --config ~/.local/share/kiki-kam-gitea-runner/config.yaml`을 사용합니다. 기존 PID와 socket이 살아 있는 경우 중복 실행하지 마세요. `.runner` 내용을 출력·공유하거나 저장소에 넣지 않습니다.
 
-실제 API 11개 조건의 최신 원문은 [KAM 검증 기록](https://github.com/tangt64/KAM/blob/e383003ded4a6a0d914b187d86e5cac62241d384/docs/auth-api-result.json)에 보관했습니다. 비밀번호 초기화 9.243초·로그아웃 10.140초·비활성화 10.349초 후 실제 API가 기존 토큰을 거부했고, 명시적 context 변경 시 다른 current-context를 보존했습니다.
+2026-11-01 실제 API 11개 조건의 원문은 [KAM 검증 기록](https://github.com/tangt64/KAM/blob/e383003ded4a6a0d914b187d86e5cac62241d384/docs/auth-api-result.json)에 보관했습니다. 비밀번호 초기화 9.243초·로그아웃 10.140초·비활성화 10.349초 후 실제 API가 기존 토큰을 거부했고, 명시적 context 변경 시 다른 current-context를 보존했습니다.
 
 [Gitea KAM 최종 커밋 CI](https://git.vlab.dustbox.kr/dustbox/kiki-kam/actions/runs/3)와 [GitHub KAM Actions](https://github.com/tangt64/KAM/actions), [duststack Gitea](https://git.vlab.dustbox.kr/dustbox/duststack-k8s-auto/actions)·[GitHub Actions](https://github.com/tangt64/duststack-k8s-auto/actions)에서 각 커밋의 서버 검증 결과를 확인할 수 있습니다.
 
@@ -109,4 +109,4 @@ runner는 이 PC·WSL이 실행 중이어야 동작합니다. 재부팅 후 자�
 
 ## 2026-11-02 로컬 YAML·Helm 추가
 
-새 로컬 패키지와 webhook 전용 설치, 플레이북 검토 내용은 [로컬 설치·검토 기록](KAM-LOCAL-REVIEW.md)에 정리했습니다. 이번 작업본은 아직 커밋·푸시되지 않았으며 기존 고정 소스는 유지합니다.
+소스 차트·YAML 생성기·webhook 전용 설치를 양쪽 저장소에 게시하고 commit·아카이브·파일 해시 고정값을 갱신했습니다. [설치·플레이북 검토](KAM-LOCAL-REVIEW.md), [실제 Helm Pod·TLS 갱신·rollback 결과와 화면](KAM-HELM-LIVE.md)을 확인하세요. Helm 애플리케이션 설치와 `kam-webhook` API 연결을 분리하며 외부 계정 Secret은 재설치·Helm 제거 시 보존합니다.

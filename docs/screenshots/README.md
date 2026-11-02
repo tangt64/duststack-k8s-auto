@@ -20,6 +20,9 @@
 | 12-kam-fast-handover.jpg | 2026-11-01 | 리더 Pod 삭제 3회 인수 2.60·2.66·2.70초, 두 worker Ready, namespace·상승 거부·삭제/만료 회수 통과, 남은 Grant 없음 |
 | 13-kiki-kam-repository.jpg | 2026-11-01 | 기존 3개 커밋과 새 c2b708e를 유지한 Gitea kiki-kam 저장소. CI 노란 표시는 runner 대기 상태이며 성공 증거가 아님 |
 | 14-kiki-kam-actions.jpg | 2026-11-01 | 최종 기능 커밋 e383003의 Gitea KAM Actions 실행 3 전체 성공. Go race·controller 실제 API·비밀번호 실제 API 11개 검사 통과 |
+| 15-kam-helm-pods.jpg | 2026-11-02 | 최종 실행의 신규 auth 2개·controller 2개가 두 worker에 Ready로 분산 배치. 기존 controller 2개 보존 |
+| 16-kam-tls-renewal.jpg | 2026-11-02 | 동일 CA 유지, 실제 NodePort 서버 leaf 지문 변경과 갱신 완료 시점 API mirror 3개 Ready 기록 |
+| 17-kam-bundle-rollback.jpg | 2026-11-02 | GitHub에 게시한 실제 실증 원문 열람: CP02 bundle 해시 복원, CP03 미변경, 재실행·Helm rollback 결과 |
 
 이전 RBD 실패 화면은 [당시 커밋](https://github.com/tangt64/duststack-k8s-auto/blob/dc49538c95b74142796ed1b4942c2a83cb0ca658/docs/screenshots/06-rook-pvc-io.jpg)에
 남아 있습니다. 현재 06번 사진은 승인한 키 호환 변경 후 실제 통과 화면입니다.
