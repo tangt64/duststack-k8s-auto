@@ -4,6 +4,18 @@ KAM은 기존 Git 이력을 유지한 [GitHub KAM](https://github.com/tangt64/KA
 
 ## 소스 준비
 
+### 로컬 개발 저장소 분리
+
+KAM 개발 checkout은 duststack 작업 트리 밖의 형제 디렉터리에 둡니다. 두 디렉터리는 각자의 `.git`·브랜치·GitHub/Gitea 원격을 갖는 독립 저장소이며, submodule이나 symlink로 연결하지 않습니다.
+
+```text
+dev/
+├── duststack-k8s-auto/
+└── kiki-kam/
+```
+
+KAM 수정·테스트·커밋은 `kiki-kam/`에서 수행합니다. duststack의 기본 설치는 형제 디렉터리에 의존하지 않고 `config/kam-source.json`으로 검증한 `.tools/kam-source/<commit>/` 캐시를 사용합니다. 개발 중 두 작업본을 함께 검증할 때만 duststack 루트에서 `export KAM_SOURCE_DIR="$(cd ../kiki-kam && pwd)"`를 명시하고, 고정 버전 검증으로 돌아갈 때는 `unset KAM_SOURCE_DIR`를 실행합니다.
+
 ```bash
 python scripts/prepare_kam_source.py
 ```

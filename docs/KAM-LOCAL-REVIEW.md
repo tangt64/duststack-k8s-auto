@@ -26,7 +26,7 @@ bash setup-k8s.sh kam-webhook -i inventory/local-lab/hosts.yaml \
 기본 검증은 고정된 KAM 소스의 차트도 검사합니다. 독립 KAM checkout을 수정하는 개발 작업에서만 다음 override를 사용합니다.
 
 ```bash
-export KAM_SOURCE_DIR="$PWD/.tools/kiki-kam"
+export KAM_SOURCE_DIR="$(cd ../kiki-kam && pwd)"
 RUN_CHART_VALIDATION=1 bash scripts/validate.sh
 ```
 
